@@ -23,10 +23,10 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
 
 // ── Public ────────────────────────────────────────────────────────────────────
-Route::get('/', fn () => redirect()->route('admin.dashboard'));
+Route::view('/', 'frontend.home')->name('frontend.home');
 Route::view('/welcome', 'welcome')->name('welcome');
 
-Route::get('/booking-ticket', fn () => 'Halaman booking tiket (customer/guest).')
+Route::view('/booking-ticket', 'frontend.booking')
     ->name('ticket.booking');
 
 // Webhook Midtrans — no auth, no CSRF (server-to-server)
