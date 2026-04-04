@@ -79,4 +79,3 @@
 <script src="{{ asset('backend/dist/js/adminlte.min.js') }}"></script>
 </body>
 </html>
-

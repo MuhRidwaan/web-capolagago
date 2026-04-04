@@ -2,11 +2,15 @@
 
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\MailSettingController;
+use App\Http\Controllers\Admin\MitraController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\PaymentSettingController;
+use App\Http\Controllers\Admin\ProductCategoryController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductSlotController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\ActivityTagController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Payment\MidtransWebhookController;
@@ -68,6 +72,14 @@ Route::prefix('admin')
 
         // Produk & Layanan (manage_products)
         Route::middleware('permission:manage_products')->group(function () {
+            Route::resource('products', ProductController::class)->except(['show']);
+            Route::resource('product-categories', ProductCategoryController::class)
+                ->parameters(['product-categories' => 'productCategory'])
+                ->except(['show']);
+            Route::resource('activity-tags', ActivityTagController::class)
+                ->parameters(['activity-tags' => 'activityTag'])
+                ->except(['show']);
+
             Route::get('/slots', [ProductSlotController::class, 'index'])->name('slots.index');
             Route::get('/slots/create', [ProductSlotController::class, 'create'])->name('slots.create');
             Route::post('/slots', [ProductSlotController::class, 'store'])->name('slots.store');
@@ -77,6 +89,11 @@ Route::prefix('admin')
             Route::delete('/slots/{id}', [ProductSlotController::class, 'destroy'])->name('slots.destroy');
             Route::post('/slots/bulk-update', [ProductSlotController::class, 'bulkUpdate'])->name('slots.bulk-update');
             Route::post('/slots/bulk-destroy', [ProductSlotController::class, 'bulkDestroy'])->name('slots.bulk-destroy');
+        });
+
+        Route::middleware('permission:manage_users|manage_products')->group(function () {
+            Route::resource('mitra', MitraController::class)->parameters(['mitra' => 'mitra'])->except(['show']);
+            Route::patch('/mitra/{mitra}/status', [MitraController::class, 'updateStatus'])->name('mitra.status');
         });
 
         // Laporan (view_reports)

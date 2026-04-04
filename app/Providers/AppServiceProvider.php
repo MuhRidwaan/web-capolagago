@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\MailSetting;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Paginator::useBootstrapFour();
+
         Gate::before(function ($user, string $ability) {
             return method_exists($user, 'hasRole') && $user->hasRole('Super Admin') ? true : null;
         });

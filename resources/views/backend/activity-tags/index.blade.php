@@ -1,18 +1,18 @@
 @extends('backend.main_backend')
 
-@section('title', 'Role Data')
+@section('title', 'Activity Tags')
 
 @section('content')
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Role Data</h1>
+                    <h1 class="m-0">Activity Tags</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item active">Role Data</li>
+                        <li class="breadcrumb-item active">Activity Tags</li>
                     </ol>
                 </div>
             </div>
@@ -26,27 +26,23 @@
             <div class="card capolaga-user-card">
                 <div class="card-header border-0">
                     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center">
-                        <h3 class="card-title font-weight-normal">Role Data</h3>
+                        <h3 class="card-title font-weight-normal">Tag List</h3>
 
                         <div class="capolaga-user-toolbar mt-3 mt-lg-0">
-                            <form method="GET" action="{{ route('admin.roles.index') }}" class="capolaga-user-search">
+                            <form method="GET" action="{{ route('admin.activity-tags.index') }}" class="capolaga-user-search">
                                 <div class="input-group">
-                                    <input type="text" name="q" class="form-control" placeholder="Search role..."
+                                    <input type="text" name="q" class="form-control" placeholder="Search tag..."
                                         value="{{ request('q') }}">
                                     <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="submit" aria-label="Search role">
+                                        <button class="btn btn-outline-secondary" type="submit">
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </div>
                                 </div>
                             </form>
 
-                            <button type="button" class="btn btn-success capolaga-action-btn" disabled>
-                                <i class="far fa-file-excel mr-1"></i> Export
-                            </button>
-
-                            <a href="{{ route('admin.roles.create') }}" class="btn btn-primary capolaga-action-btn">
-                                <i class="fas fa-plus mr-1"></i> Add Role
+                            <a href="{{ route('admin.activity-tags.create') }}" class="btn btn-primary capolaga-action-btn">
+                                <i class="fas fa-plus mr-1"></i> Add Tag
                             </a>
                         </div>
                     </div>
@@ -57,33 +53,32 @@
                         <table class="table table-bordered table-hover capolaga-user-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 72px;">No</th>
-                                    <th>Role Name</th>
-                                    <th>Permissions</th>
-                                    <th style="width: 140px;">Action</th>
+                                    <th>No</th>
+                                    <th>Name</th>
+                                    <th>Group</th>
+                                    <th>Products</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($roles as $role)
+                                @forelse ($tags as $tag)
                                     <tr>
-                                        <td>{{ $roles->firstItem() + $loop->index }}</td>
-                                        <td>{{ $role->name }}</td>
-                                        <td>
-                                            <span class="badge badge-success">{{ $role->permissions_count }} Permissions</span>
-                                        </td>
+                                        <td>{{ $tags->firstItem() + $loop->index }}</td>
+                                        <td>{{ $tag->name }}</td>
+                                        <td>{{ str($tag->group_name)->headline() }}</td>
+                                        <td>{{ $tag->products_count }}</td>
                                         <td>
                                             <div class="capolaga-action-group">
-                                                <a href="{{ route('admin.roles.edit', $role) }}"
-                                                    class="btn btn-warning btn-sm capolaga-icon-btn" title="Edit role">
+                                                <a href="{{ route('admin.activity-tags.edit', $tag) }}"
+                                                    class="btn btn-warning btn-sm capolaga-icon-btn">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <form action="{{ route('admin.roles.destroy', $role) }}" method="POST"
+                                                <form action="{{ route('admin.activity-tags.destroy', $tag) }}" method="POST"
                                                     class="d-inline"
-                                                    onsubmit="return confirm('Yakin ingin menghapus role ini?')">
+                                                    onsubmit="return confirm('Yakin ingin menghapus tag ini?')">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button class="btn btn-danger btn-sm capolaga-icon-btn" type="submit"
-                                                        title="Hapus role">
+                                                    <button class="btn btn-danger btn-sm capolaga-icon-btn" type="submit">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
@@ -92,7 +87,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center text-muted p-4">Belum ada data role.</td>
+                                        <td colspan="5" class="text-center text-muted p-4">Belum ada tag aktivitas.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -101,9 +96,11 @@
                 </div>
 
                 <div class="card-footer clearfix">
-                    {{ $roles->links() }}
+                    {{ $tags->links() }}
                 </div>
             </div>
         </div>
     </section>
 @endsection
+
+

@@ -7,17 +7,25 @@ use App\Http\Requests\Admin\StoreRoleRequest;
 use App\Http\Requests\Admin\UpdateRoleRequest;
 use App\Models\Permission;
 use App\Models\Role;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\PermissionRegistrar;
 
 class RoleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $roles = Role::query()
+        $query = Role::query()
             ->withCount('permissions')
-            ->orderBy('name')
-            ->get();
+            ->orderBy('name');
+
+        if ($request->filled('q')) {
+            $q = trim((string) $request->string('q'));
+
+            $query->where('name', 'like', "%{$q}%");
+        }
+
+        $roles = $query->paginate(15)->withQueryString();
 
         return view('backend.roles.index', [
             'roles' => $roles,

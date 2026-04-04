@@ -23,12 +23,47 @@
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('backend/dist/css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ asset('backend/dist/css/capolaga-theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('backend/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.css') }}">
     <!-- overlayScrollbars -->
     <link rel="stylesheet" href="{{ asset('backend/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
     <!-- Daterange picker -->
     <link rel="stylesheet" href="{{ asset('backend/plugins/daterangepicker/daterangepicker.css') }}">
     <!-- summernote -->
     <link rel="stylesheet" href="{{ asset('backend/plugins/summernote/summernote-bs4.min.css') }}">
+
+    <style>
+        @keyframes capolagaSwalZoomIn {
+            from {
+                opacity: 0;
+                transform: translateY(-14px) scale(0.96);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes capolagaSwalZoomOut {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.98);
+            }
+        }
+
+        .capolaga-swal-show {
+            animation: capolagaSwalZoomIn 0.22s ease-out;
+        }
+
+        .capolaga-swal-hide {
+            animation: capolagaSwalZoomOut 0.18s ease-in forwards;
+        }
+    </style>
 
     @stack('styles')
 </head>

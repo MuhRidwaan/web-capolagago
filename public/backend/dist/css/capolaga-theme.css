@@ -19,10 +19,67 @@
 
 .capolaga-sidebar .nav-sidebar .nav-link {
   color: rgba(255, 255, 255, 0.88);
+  border-radius: 0.5rem;
+  margin-bottom: 0.2rem;
 }
 
 .capolaga-sidebar .nav-sidebar .nav-icon {
   color: rgba(255, 255, 255, 0.88);
+}
+
+.capolaga-sidebar .nav-sidebar > .nav-item > .nav-link {
+  display: flex;
+  align-items: center;
+  min-height: 3rem;
+  padding: 0.75rem 0.9rem;
+}
+
+.capolaga-sidebar .nav-sidebar > .nav-item > .nav-link > p {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.capolaga-sidebar .nav-sidebar .nav-treeview {
+  margin-top: 0.35rem;
+  padding-bottom: 0.25rem;
+}
+
+.capolaga-sidebar .nav-sidebar .nav-treeview > .nav-item > .nav-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.9rem 0.65rem 1rem;
+}
+
+.capolaga-sidebar .nav-sidebar .nav-treeview > .nav-item > .nav-link > .nav-icon {
+  flex: 0 0 1rem;
+  width: 1rem;
+  min-width: 1rem;
+  margin: 0.2rem 0 0;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.capolaga-sidebar .nav-sidebar .nav-treeview > .nav-item > .nav-link > p {
+  flex: 1 1 auto;
+  margin: 0;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.capolaga-sidebar .nav-sidebar .nav-header {
+  padding: 1rem 0.9rem 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .capolaga-sidebar .nav-sidebar .nav-link:hover,
@@ -37,3 +94,218 @@
   color: #ffffff;
 }
 
+.capolaga-sidebar .nav-treeview > .nav-item > .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.capolaga-sidebar .nav-sidebar .nav-link.text-danger,
+.capolaga-sidebar .nav-sidebar .nav-link.text-danger .nav-icon,
+.capolaga-sidebar .nav-sidebar .nav-link.text-danger p {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.capolaga-user-card {
+  border: 0;
+  border-radius: 0.85rem;
+  box-shadow: 0 10px 30px rgba(11, 94, 74, 0.08);
+}
+
+.capolaga-user-card .card-header {
+  padding: 1rem 1.5rem 0.75rem;
+}
+
+.capolaga-user-card .card-title {
+  color: #173b33;
+  font-size: 1.7rem;
+}
+
+.capolaga-user-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.capolaga-user-search {
+  min-width: 320px;
+}
+
+.capolaga-user-search .form-control,
+.capolaga-user-search .btn {
+  height: 2.45rem;
+  border-color: #d7dde4;
+}
+
+.capolaga-user-search .form-control {
+  border-right: 0;
+}
+
+.capolaga-user-search .btn {
+  background-color: #ffffff;
+  color: #4b5c6b;
+}
+
+.capolaga-action-btn {
+  height: 2.45rem;
+  padding: 0.5rem 0.95rem;
+  border-radius: 0.35rem;
+  font-weight: 600;
+}
+
+.capolaga-action-btn.btn-success:disabled {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: #ffffff;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.capolaga-user-table th,
+.capolaga-user-table td {
+  padding: 1rem 0.95rem;
+  vertical-align: middle;
+  border-color: #d9e1e8;
+}
+
+.capolaga-user-table thead th {
+  color: #1d2f3d;
+  font-size: 1rem;
+  font-weight: 700;
+  background-color: #ffffff;
+}
+
+.capolaga-user-table tbody td {
+  color: #233746;
+}
+
+.capolaga-action-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.capolaga-icon-btn {
+  min-width: 2.6rem;
+  border-radius: 0.3rem;
+}
+
+@media (max-width: 767.98px) {
+  .capolaga-user-search {
+    min-width: 100%;
+  }
+
+  .capolaga-user-toolbar {
+    justify-content: stretch;
+  }
+
+  .capolaga-action-btn {
+    flex: 1 1 auto;
+  }
+}
+
+.capolaga-form-card {
+  border: 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.capolaga-form-header {
+  background: #1f8fff;
+  color: #ffffff;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #1f8fff;
+}
+
+.capolaga-form-header .card-title {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.capolaga-form-card .card-body {
+  padding: 1.75rem 1.5rem 0;
+}
+
+.capolaga-form-label {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #14283c;
+}
+
+.capolaga-required {
+  color: #e55353;
+  font-weight: 700;
+}
+
+.capolaga-form-control {
+  height: 2.95rem;
+  border-color: #cfd7df;
+  border-radius: 0.35rem;
+  font-size: 0.95rem;
+}
+
+.capolaga-form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+}
+
+.capolaga-form-control::placeholder {
+  color: #8ea0b2;
+}
+
+.capolaga-form-card .form-group {
+  margin-bottom: 1.45rem;
+}
+
+.capolaga-form-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 2rem -1.5rem 0;
+  padding: 1rem 1.5rem;
+  background-color: #f7f8fa;
+  border-top: 1px solid #edf1f5;
+}
+
+.capolaga-form-card .btn-primary,
+.capolaga-action-btn.btn-primary {
+  background-color: #1f8fff;
+  border-color: #1f8fff;
+}
+
+.capolaga-form-card .btn-primary:hover,
+.capolaga-form-card .btn-primary:focus,
+.capolaga-action-btn.btn-primary:hover,
+.capolaga-action-btn.btn-primary:focus {
+  background-color: #0c82f4;
+  border-color: #0c82f4;
+}
+
+.capolaga-form-card .btn-primary:disabled,
+.capolaga-action-btn.btn-primary:disabled {
+  background-color: #9cc9ff;
+  border-color: #9cc9ff;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.capolaga-form-card .btn-secondary {
+  background-color: #6d7a86;
+  border-color: #6d7a86;
+}
+
+.capolaga-form-card .btn-secondary:hover,
+.capolaga-form-card .btn-secondary:focus {
+  background-color: #5d6974;
+  border-color: #5d6974;
+}
+
+@media (max-width: 767.98px) {
+  .capolaga-form-footer {
+    flex-wrap: wrap;
+  }
+}

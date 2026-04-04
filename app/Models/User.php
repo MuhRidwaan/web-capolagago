@@ -47,4 +47,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function mitraProfile()
+    {
+        return $this->hasOne(MitraProfile::class);
+    }
 }
