@@ -15,9 +15,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role' => RoleMiddleware::class,
-            'permission' => PermissionMiddleware::class,
-            'role_or_permission' => RoleOrPermissionMiddleware::class,
+            'role'                => RoleMiddleware::class,
+            'permission'          => PermissionMiddleware::class,
+            'role_or_permission'  => RoleOrPermissionMiddleware::class,
+        ]);
+
+        // Webhook Midtrans tidak butuh CSRF token (server-to-server)
+        $middleware->validateCsrfTokens(except: [
+            'payment/webhook/midtrans',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

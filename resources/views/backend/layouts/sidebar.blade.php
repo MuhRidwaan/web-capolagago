@@ -37,41 +37,99 @@
                     </a>
                 </li>
 
+                 {{-- ===================== PENGATURAN SISTEM ===================== --}}
+                @can('manage_users')
+                <li class="nav-header">PENGATURAN SISTEM</li>
+
+                <li class="nav-item {{ request()->is('admin/users*') || request()->is('admin/roles*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/users*') || request()->is('admin/roles*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-users-cog"></i>
+                        <p>Pengguna & Akses <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.users.index') }}"
+                                class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manajemen User</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.roles.index') }}"
+                                class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manajemen Role</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('admin.payment-methods.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.payment-methods.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-credit-card"></i>
+                        <p>Metode Pembayaran</p>
+                    </a>
+                </li>
+
+                <li class="nav-item {{ request()->routeIs('admin.settings.*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-cogs"></i>
+                        <p>Pengaturan <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.settings.payment') }}"
+                                class="nav-link {{ request()->routeIs('admin.settings.payment*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Midtrans</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.settings.mail') }}"
+                                class="nav-link {{ request()->routeIs('admin.settings.mail*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Email / SMTP</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>                @endcan
+
                 {{-- ===================== RESERVASI & TRANSAKSI ===================== --}}
                 @canany(['manage_transactions', 'manage_users'])
                 <li class="nav-header">RESERVASI & TRANSAKSI</li>
 
                 @can('manage_transactions')
-                <li class="nav-item {{ request()->is('admin/bookings*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('admin/bookings*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->routeIs('admin.bookings.*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-calendar-check"></i>
                         <p>Pemesanan <i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ url('admin/bookings') }}"
-                                class="nav-link {{ request()->is('admin/bookings') ? 'active' : '' }}">
+                            <a href="{{ route('admin.bookings.index') }}"
+                                class="nav-link {{ request()->routeIs('admin.bookings.index') && ! request('status') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Semua Booking</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/bookings?status=pending') }}"
-                                class="nav-link">
+                            <a href="{{ route('admin.bookings.index', ['status' => 'pending']) }}"
+                                class="nav-link {{ request()->routeIs('admin.bookings.index') && request('status') === 'pending' ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon text-warning"></i>
                                 <p>Menunggu Pembayaran</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/bookings?status=confirmed') }}"
-                                class="nav-link">
+                            <a href="{{ route('admin.bookings.index', ['status' => 'confirmed']) }}"
+                                class="nav-link {{ request()->routeIs('admin.bookings.index') && request('status') === 'confirmed' ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon text-success"></i>
                                 <p>Terkonfirmasi</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/bookings?status=checked_in') }}"
-                                class="nav-link">
+                            <a href="{{ route('admin.bookings.index', ['status' => 'checked_in']) }}"
+                                class="nav-link {{ request()->routeIs('admin.bookings.index') && request('status') === 'checked_in' ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon text-info"></i>
                                 <p>Check-In Hari Ini</p>
                             </a>
@@ -79,29 +137,29 @@
                     </ul>
                 </li>
 
-                <li class="nav-item {{ request()->is('admin/payments*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('admin/payments*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->routeIs('admin.payments.*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-money-bill-wave"></i>
                         <p>Pembayaran <i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ url('admin/payments') }}"
-                                class="nav-link {{ request()->is('admin/payments') ? 'active' : '' }}">
+                            <a href="{{ route('admin.payments.index') }}"
+                                class="nav-link {{ request()->routeIs('admin.payments.index') && ! request('status') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Semua Transaksi</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/payments?status=pending') }}"
-                                class="nav-link">
+                            <a href="{{ route('admin.payments.index', ['status' => 'pending']) }}"
+                                class="nav-link {{ request()->routeIs('admin.payments.index') && request('status') === 'pending' ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon text-warning"></i>
                                 <p>Menunggu Konfirmasi</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/payments?status=refunded') }}"
-                                class="nav-link">
+                            <a href="{{ route('admin.payments.index', ['status' => 'refunded']) }}"
+                                class="nav-link {{ request()->routeIs('admin.payments.index') && request('status') === 'refunded' ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon text-danger"></i>
                                 <p>Refund</p>
                             </a>
@@ -161,8 +219,8 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ url('admin/product-slots') }}"
-                        class="nav-link {{ request()->is('admin/product-slots*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.slots.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.slots.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-calendar-alt"></i>
                         <p>Ketersediaan Slot</p>
                     </a>
@@ -282,41 +340,7 @@
                 </li>
                 @endcan
 
-                {{-- ===================== PENGATURAN SISTEM ===================== --}}
-                @can('manage_users')
-                <li class="nav-header">PENGATURAN SISTEM</li>
-
-                <li class="nav-item {{ request()->is('admin/users*') || request()->is('admin/roles*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('admin/users*') || request()->is('admin/roles*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-users-cog"></i>
-                        <p>Pengguna & Akses <i class="right fas fa-angle-left"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('admin.users.index') }}"
-                                class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Manajemen User</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.roles.index') }}"
-                                class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Manajemen Role</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ url('admin/payment-methods') }}"
-                        class="nav-link {{ request()->is('admin/payment-methods*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-credit-card"></i>
-                        <p>Metode Pembayaran</p>
-                    </a>
-                </li>
-                @endcan
+               
 
                 {{-- ===================== LOGOUT ===================== --}}
                 <li class="nav-item mt-3 mb-5">

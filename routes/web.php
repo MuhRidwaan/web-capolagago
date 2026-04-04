@@ -1,10 +1,18 @@
 <?php
 
+use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\MailSettingController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\PaymentMethodController;
+use App\Http\Controllers\Admin\PaymentSettingController;
+use App\Http\Controllers\Admin\ProductSlotController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Payment\MidtransWebhookController;
 use Illuminate\Support\Facades\Route;
 
+// ── Auth ──────────────────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
@@ -14,31 +22,85 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-Route::get('/', function () {
-    return redirect()->route('admin.dashboard');
-});
-
+// ── Public ────────────────────────────────────────────────────────────────────
+Route::get('/', fn () => redirect()->route('admin.dashboard'));
 Route::view('/welcome', 'welcome')->name('welcome');
 
+Route::get('/booking-ticket', fn () => 'Halaman booking tiket (customer/guest).')
+    ->name('ticket.booking');
+
+// Webhook Midtrans — no auth, no CSRF (server-to-server)
+Route::post('/payment/webhook/midtrans', [MidtransWebhookController::class, 'handle'])
+    ->name('payment.webhook.midtrans');
+
+// ── Admin ─────────────────────────────────────────────────────────────────────
 Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth', 'role:Super Admin|Mitra'])
     ->group(function () {
-        Route::view('/', 'backend.dashboard')->name('dashboard');
 
+        Route::view('/', 'backend.dashboard')->name('dashboard');
         Route::redirect('/dashboard', '/admin');
 
+        // Pengaturan Sistem (manage_users)
         Route::middleware('permission:manage_users')->group(function () {
             Route::resource('users', UserController::class)->except(['show']);
             Route::resource('roles', RoleController::class)->except(['show']);
+
+            Route::get('/settings/payment', [PaymentSettingController::class, 'index'])->name('settings.payment');
+            Route::put('/settings/payment', [PaymentSettingController::class, 'update'])->name('settings.payment.update');
+            Route::post('/settings/payment/test', [PaymentSettingController::class, 'testConnection'])->name('settings.payment.test');
+
+            Route::get('/settings/mail', [MailSettingController::class, 'index'])->name('settings.mail');
+            Route::put('/settings/mail', [MailSettingController::class, 'update'])->name('settings.mail.update');
+            Route::post('/settings/mail/test', [MailSettingController::class, 'sendTest'])->name('settings.mail.test');
+
+            // Metode Pembayaran
+            Route::get('/payment-methods', [PaymentMethodController::class, 'index'])->name('payment-methods.index');
+            Route::get('/payment-methods/create', [PaymentMethodController::class, 'create'])->name('payment-methods.create');
+            Route::post('/payment-methods', [PaymentMethodController::class, 'store'])->name('payment-methods.store');
+            Route::get('/payment-methods/{id}/edit', [PaymentMethodController::class, 'edit'])->name('payment-methods.edit');
+            Route::put('/payment-methods/{id}', [PaymentMethodController::class, 'update'])->name('payment-methods.update');
+            Route::post('/payment-methods/{id}/toggle', [PaymentMethodController::class, 'toggleActive'])->name('payment-methods.toggle');
+            Route::post('/payment-methods/reorder', [PaymentMethodController::class, 'reorder'])->name('payment-methods.reorder');
+            Route::delete('/payment-methods/{id}', [PaymentMethodController::class, 'destroy'])->name('payment-methods.destroy');
         });
 
-        Route::get('/reports', function () {
-            return 'Halaman laporan (butuh permission: view_reports)';
-        })->middleware('permission:view_reports')->name('reports.index');
-    });
+        // Produk & Layanan (manage_products)
+        Route::middleware('permission:manage_products')->group(function () {
+            Route::get('/slots', [ProductSlotController::class, 'index'])->name('slots.index');
+            Route::get('/slots/create', [ProductSlotController::class, 'create'])->name('slots.create');
+            Route::post('/slots', [ProductSlotController::class, 'store'])->name('slots.store');
+            Route::post('/slots/generate', [ProductSlotController::class, 'generate'])->name('slots.generate');
+            Route::get('/slots/{id}/edit', [ProductSlotController::class, 'edit'])->name('slots.edit');
+            Route::put('/slots/{id}', [ProductSlotController::class, 'update'])->name('slots.update');
+            Route::delete('/slots/{id}', [ProductSlotController::class, 'destroy'])->name('slots.destroy');
+            Route::post('/slots/bulk-update', [ProductSlotController::class, 'bulkUpdate'])->name('slots.bulk-update');
+            Route::post('/slots/bulk-destroy', [ProductSlotController::class, 'bulkDestroy'])->name('slots.bulk-destroy');
+        });
 
-// Customer adalah guest (tidak login)
-Route::get('/booking-ticket', function () {
-    return 'Halaman booking tiket (customer/guest).';
-})->name('ticket.booking');
+        // Laporan (view_reports)
+        Route::get('/reports', fn () => 'Halaman laporan.')
+            ->middleware('permission:view_reports')
+            ->name('reports.index');
+
+        // Booking Management (manage_transactions)
+        Route::middleware('permission:manage_transactions')->group(function () {
+            Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+            Route::get('/bookings/create', [BookingController::class, 'create'])->name('bookings.create');
+            Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
+            Route::get('/bookings/{id}', [BookingController::class, 'show'])->name('bookings.show');
+            Route::get('/bookings/{id}/edit', [BookingController::class, 'edit'])->name('bookings.edit');
+            Route::put('/bookings/{id}', [BookingController::class, 'update'])->name('bookings.update');
+            Route::patch('/bookings/{id}/status', [BookingController::class, 'updateStatus'])->name('bookings.update-status');
+        });
+
+        // Payment Management (manage_transactions)
+        Route::middleware('permission:manage_transactions')->group(function () {
+            Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+            Route::get('/payments/{id}', [PaymentController::class, 'show'])->name('payments.show');
+            Route::post('/payments/{id}/confirm', [PaymentController::class, 'confirm'])->name('payments.confirm');
+            Route::post('/payments/{id}/refund', [PaymentController::class, 'refund'])->name('payments.refund');
+            Route::get('/payments/{id}/check-gateway', [PaymentController::class, 'checkGateway'])->name('payments.check-gateway');
+        });
+    });
