@@ -53,8 +53,8 @@
                 </button>
                 <a data-slot="button"
                     class="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-[#1a3a4a] px-3 text-sm font-medium text-white transition-all hover:bg-[#1a3a4a]/90"
-                    href="{{ route('login') }}">
-                    Login
+                    href="{{ route('admin.dashboard') }}">
+                    Login Admin di sini dulu ya
                 </a>
             </div>
 
@@ -124,7 +124,7 @@
 
         const syncActiveMenu = () => {
             setLinkState(resolveActiveTarget());
-        };
+        };  
 
         window.addEventListener('hashchange', syncActiveMenu);
         window.addEventListener('load', syncActiveMenu);
