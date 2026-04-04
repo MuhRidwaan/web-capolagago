@@ -1,0 +1,39 @@
+/* Capolaga AdminLTE theme overrides */
+
+.capolaga-navbar {
+  background-color: #ffffff !important;
+}
+
+.capolaga-sidebar {
+  background-color: #0b5e4a;
+}
+
+.capolaga-sidebar .brand-link {
+  background-color: #0b5e4a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.capolaga-sidebar .user-panel {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.capolaga-sidebar .nav-sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.capolaga-sidebar .nav-sidebar .nav-icon {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.capolaga-sidebar .nav-sidebar .nav-link:hover,
+.capolaga-sidebar .nav-sidebar .nav-link:focus,
+.capolaga-sidebar .nav-sidebar > .nav-item > .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.capolaga-sidebar .nav-sidebar > .nav-item > .nav-link.active .nav-icon,
+.capolaga-sidebar .nav-sidebar .nav-link:hover .nav-icon {
+  color: #ffffff;
+}
+
