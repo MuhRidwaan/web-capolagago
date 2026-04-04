@@ -32,10 +32,8 @@ class RbacSeeder extends Seeder
 
         $roles = [
             'Super Admin',
-            'Admin Operasional',
-            'Admin Marketing',
-            'Mitra Lokal',
-            'Wisatawan',
+            'Mitra',
+            'Customer',
         ];
 
         foreach ($roles as $roleName) {
@@ -46,24 +44,12 @@ class RbacSeeder extends Seeder
 
         Role::findByName('Super Admin', $guard)->syncPermissions($permissions);
 
-        Role::findByName('Admin Operasional', $guard)->syncPermissions([
+        Role::findByName('Mitra', $guard)->syncPermissions([
             'manage_products',
             'manage_transactions',
             'view_reports',
         ]);
 
-        Role::findByName('Admin Marketing', $guard)->syncPermissions([
-            'manage_products',
-            'view_reports',
-        ]);
-
-        Role::findByName('Mitra Lokal', $guard)->syncPermissions([
-            'manage_products',
-            'manage_transactions',
-        ]);
-
-        Role::findByName('Wisatawan', $guard)->syncPermissions([
-            'booking_ticket',
-        ]);
+        // Customer adalah guest (tidak login) untuk saat ini, jadi tidak perlu assign permission ke user.
     }
 }

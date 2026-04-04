@@ -1,4 +1,5 @@
 <aside class="main-sidebar sidebar-dark-success elevation-4 capolaga-sidebar">
+    <!-- Brand Logo -->
     <a href="{{ route('admin.dashboard') }}" class="brand-link">
         <img src="{{ asset('backend/dist/img/AdminLTELogo.png') }}" alt="Capolaga Logo"
             class="brand-image img-circle elevation-3" style="opacity: .8">
@@ -6,6 +7,7 @@
     </a>
 
     <div class="sidebar">
+        <!-- Sidebar user panel -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
                 <img src="{{ asset('backend/dist/img/user2-160x160.jpg') }}" class="img-circle elevation-2"
@@ -13,151 +15,321 @@
             </div>
             <div class="info">
                 <a href="#" class="d-block">{{ Auth::user()->name ?? 'Administrator' }}</a>
+                <small class="text-muted">
+                    @foreach(Auth::user()->getRoleNames() as $role)
+                        <span>{{ $role }}</span>@if(!$loop->last), @endif
+                    @endforeach
+                </small>
             </div>
         </div>
 
+        <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview" role="menu"
                 data-accordion="false">
 
+                {{-- ===================== UTAMA ===================== --}}
                 <li class="nav-item">
                     <a href="{{ route('admin.dashboard') }}"
-                        class="nav-link {{ request()->is('admin/dashboard*') ? 'active' : '' }}">
+                        class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
-                        <p>Dashboard Utama</p>
+                        <p>Dashboard</p>
                     </a>
                 </li>
 
-                <li class="nav-header">DATA MASTER</li>
+                {{-- ===================== RESERVASI & TRANSAKSI ===================== --}}
+                @canany(['manage_transactions', 'manage_users'])
+                <li class="nav-header">RESERVASI & TRANSAKSI</li>
 
-                <li class="nav-item {{ request()->is('admin/master/wilayah*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('admin/master/wilayah*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-map-marker-alt"></i>
-                        <p>
-                            Master Wilayah
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
+                @can('manage_transactions')
+                <li class="nav-item {{ request()->is('admin/bookings*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/bookings*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-calendar-check"></i>
+                        <p>Pemesanan <i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon text-success"></i>
-                                <p>Spot Lokasi (Blok/Area)</p>
+                            <a href="{{ url('admin/bookings') }}"
+                                class="nav-link {{ request()->is('admin/bookings') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Semua Booking</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="{{ url('admin/bookings?status=pending') }}"
+                                class="nav-link">
+                                <i class="far fa-circle nav-icon text-warning"></i>
+                                <p>Menunggu Pembayaran</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('admin/bookings?status=confirmed') }}"
+                                class="nav-link">
                                 <i class="far fa-circle nav-icon text-success"></i>
-                                <p>Master Fasilitas</p>
+                                <p>Terkonfirmasi</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('admin/bookings?status=checked_in') }}"
+                                class="nav-link">
+                                <i class="far fa-circle nav-icon text-info"></i>
+                                <p>Check-In Hari Ini</p>
                             </a>
                         </li>
                     </ul>
                 </li>
 
-                <li class="nav-item {{ request()->is('admin/master/ekosistem*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('admin/master/ekosistem*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-network-wired"></i>
-                        <p>
-                            Master Ekosistem
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
+                <li class="nav-item {{ request()->is('admin/payments*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/payments*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-money-bill-wave"></i>
+                        <p>Pembayaran <i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon text-info"></i>
+                            <a href="{{ url('admin/payments') }}"
+                                class="nav-link {{ request()->is('admin/payments') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Semua Transaksi</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('admin/payments?status=pending') }}"
+                                class="nav-link">
+                                <i class="far fa-circle nav-icon text-warning"></i>
+                                <p>Menunggu Konfirmasi</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('admin/payments?status=refunded') }}"
+                                class="nav-link">
+                                <i class="far fa-circle nav-icon text-danger"></i>
+                                <p>Refund</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ url('admin/commissions') }}"
+                        class="nav-link {{ request()->is('admin/commissions*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-percentage"></i>
+                        <p>Komisi Mitra</p>
+                    </a>
+                </li>
+                @endcan
+                @endcanany
+
+                {{-- ===================== PRODUK & LAYANAN ===================== --}}
+                @can('manage_products')
+                <li class="nav-header">PRODUK & LAYANAN</li>
+
+                <li class="nav-item {{ request()->is('admin/products*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/products*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-box-open"></i>
+                        <p>Katalog Produk <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ url('admin/products') }}"
+                                class="nav-link {{ request()->is('admin/products') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Semua Produk</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('admin/products/create') }}"
+                                class="nav-link {{ request()->is('admin/products/create') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon text-success"></i>
+                                <p>Tambah Produk</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('admin/product-categories') }}"
+                                class="nav-link {{ request()->is('admin/product-categories*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
                                 <p>Kategori Produk</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon text-info"></i>
-                                <p>Data Mitra Lokal</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon text-info"></i>
-                                <p>Daftar Rekening Bank</p>
+                            <a href="{{ url('admin/activity-tags') }}"
+                                class="nav-link {{ request()->is('admin/activity-tags*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Tag Aktivitas</p>
                             </a>
                         </li>
                     </ul>
                 </li>
 
-                <li class="nav-item {{ request()->is('admin/master/inventaris*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('admin/master/inventaris*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-box-open"></i>
-                        <p>
-                            Master Inventaris
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
+                <li class="nav-item">
+                    <a href="{{ url('admin/product-slots') }}"
+                        class="nav-link {{ request()->is('admin/product-slots*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-calendar-alt"></i>
+                        <p>Ketersediaan Slot</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ url('admin/reviews') }}"
+                        class="nav-link {{ request()->is('admin/reviews*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-star"></i>
+                        <p>Ulasan & Rating</p>
+                    </a>
+                </li>
+                @endcan
+
+                {{-- ===================== MITRA ===================== --}}
+                @canany(['manage_users', 'manage_products'])
+                <li class="nav-header">MITRA</li>
+
+                <li class="nav-item {{ request()->is('admin/mitra*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/mitra*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-store"></i>
+                        <p>Manajemen Mitra <i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon text-warning"></i>
-                                <p>Produk Utama</p>
+                            <a href="{{ url('admin/mitra') }}"
+                                class="nav-link {{ request()->is('admin/mitra') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Daftar Mitra</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="{{ url('admin/mitra?status=pending') }}"
+                                class="nav-link">
                                 <i class="far fa-circle nav-icon text-warning"></i>
-                                <p>Aktivitas Add-on</p>
+                                <p>Menunggu Verifikasi</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon text-warning"></i>
-                                <p>Paket Bundling</p>
+                            <a href="{{ url('admin/commission-tiers') }}"
+                                class="nav-link {{ request()->is('admin/commission-tiers*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Tier Komisi</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endcanany
+
+                {{-- ===================== PROMOSI ===================== --}}
+                @can('manage_products')
+                <li class="nav-header">PROMOSI</li>
+
+                <li class="nav-item {{ request()->is('admin/promotions*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/promotions*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-ticket-alt"></i>
+                        <p>Voucher & Promo <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ url('admin/promotions') }}"
+                                class="nav-link {{ request()->is('admin/promotions') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Semua Promo</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="fas fa-calendar-alt nav-icon text-warning"></i>
-                                <p>Manajemen Slot/Kuota</p>
+                            <a href="{{ url('admin/promotions/create') }}"
+                                class="nav-link {{ request()->is('admin/promotions/create') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon text-success"></i>
+                                <p>Buat Promo Baru</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('admin/promo-types') }}"
+                                class="nav-link {{ request()->is('admin/promo-types*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Tipe Promo</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endcan
+
+                {{-- ===================== LAPORAN ===================== --}}
+                @can('view_reports')
+                <li class="nav-header">LAPORAN</li>
+
+                <li class="nav-item {{ request()->is('admin/reports*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/reports*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-chart-bar"></i>
+                        <p>Laporan <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.reports.index') }}"
+                                class="nav-link {{ request()->routeIs('admin.reports.index') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Laporan Penjualan</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('admin/reports/commissions') }}"
+                                class="nav-link {{ request()->is('admin/reports/commissions*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Laporan Komisi</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('admin/reports/products') }}"
+                                class="nav-link {{ request()->is('admin/reports/products*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Performa Produk</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endcan
+
+                {{-- ===================== PENGATURAN SISTEM ===================== --}}
+                @can('manage_users')
+                <li class="nav-header">PENGATURAN SISTEM</li>
+
+                <li class="nav-item {{ request()->is('admin/users*') || request()->is('admin/roles*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/users*') || request()->is('admin/roles*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-users-cog"></i>
+                        <p>Pengguna & Akses <i class="right fas fa-angle-left"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.users.index') }}"
+                                class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manajemen User</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.roles.index') }}"
+                                class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Manajemen Role</p>
                             </a>
                         </li>
                     </ul>
                 </li>
 
-                <li class="nav-header">TRANSAKSI & RESERVASI</li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-shopping-basket"></i>
-                        <p>Semua Reservasi</p>
+                    <a href="{{ url('admin/payment-methods') }}"
+                        class="nav-link {{ request()->is('admin/payment-methods*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-credit-card"></i>
+                        <p>Metode Pembayaran</p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-camera-retro"></i>
-                        <p>
-                            Verifikasi Manual
-                            <span class="right badge badge-danger">New</span>
-                        </p>
+                @endcan
+
+                {{-- ===================== LOGOUT ===================== --}}
+                <li class="nav-item mt-3 mb-5">
+                    <a href="#" class="nav-link text-danger"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                        <p>Logout</p>
                     </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        @csrf
+                    </form>
                 </li>
 
-                <li class="nav-header">LAPORAN & KEUANGAN</li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-wallet"></i>
-                        <p>Bagi Hasil Mitra</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-chart-pie"></i>
-                        <p>Analitik LOS</p>
-                    </a>
-                </li>
-
-                <li class="nav-header">SYSTEM</li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-tools"></i>
-                        <p>Pengaturan Umum</p>
-                    </a>
-                </li>
             </ul>
         </nav>
     </div>

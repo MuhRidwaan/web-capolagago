@@ -8,4 +8,3 @@ class Permission extends SpatiePermission
 {
     //
 }
-

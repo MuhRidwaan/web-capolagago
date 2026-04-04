@@ -8,4 +8,3 @@ class Role extends SpatieRole
 {
     //
 }
-
