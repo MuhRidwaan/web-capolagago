@@ -1,138 +1,173 @@
 @extends('frontend.layouts.main')
 
 @section('content')
-@include('frontend.layouts.header')<section id="home" class="pt-20 md:pt-24"><div class="relative py-14 md:py-16 lg:py-20" style="background:linear-gradient(135deg, #1a3a4a 0%, #2d5a6b 50%, #3d7a8a 100%)"><div class="container mx-auto px-4"><div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8"><div class="max-w-xl"><h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">Experience Nature Adventure<br/>at Capolaga</h1><p class="text-white/80 text-base md:text-lg mb-6">Pesan camping, glamping &amp; aktivitas petualangan dalam satu platform.</p><a data-slot="button" class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive h-10 rounded-md px-6 has-[&gt;svg]:px-4 bg-white text-[#1a3a4a] hover:bg-white/90 font-semibold" href="{{ route('ticket.booking') }}"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap h-4 w-4 mr-2" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path></svg>Book Now</a></div><div class="flex flex-col items-start lg:items-end gap-4"><div class="flex items-center gap-2 text-white"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star h-5 w-5 fill-yellow-400 text-yellow-400" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg><span class="font-semibold">4.9 Rating</span><span class="text-white/70">·</span><span class="text-white/80">500+ Wisatawan</span></div><div class="flex flex-wrap gap-2"><span class="inline-flex items-center gap-1.5 px-4 py-2 bg-white/20 backdrop-blur-sm text-white text-sm font-medium rounded-full border border-white/30"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tent h-4 w-4" aria-hidden="true"><path d="M3.5 21 14 3"></path><path d="M20.5 21 10 3"></path><path d="M15.5 21 12 15l-3.5 6"></path><path d="M2 21h20"></path></svg>Camping</span><span class="inline-flex items-center gap-1.5 px-4 py-2 bg-white/20 backdrop-blur-sm text-white text-sm font-medium rounded-full border border-white/30"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tent h-4 w-4" aria-hidden="true"><path d="M3.5 21 14 3"></path><path d="M20.5 21 10 3"></path><path d="M15.5 21 12 15l-3.5 6"></path><path d="M2 21h20"></path></svg>Glamping</span><span class="inline-flex items-center gap-1.5 px-4 py-2 bg-white/20 backdrop-blur-sm text-white text-sm font-medium rounded-full border border-white/30"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mountain h-4 w-4" aria-hidden="true"><path d="m8 3 4 8 5-5 5 15H2L8 3z"></path></svg>Adventure</span></div></div></div></div></div><div class="bg-white border-b border-border"><div class="container mx-auto px-4 py-4 md:py-5"><div class="flex flex-col md:flex-row md:items-end gap-4"><div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4"><div><label class="block text-xs text-muted-foreground uppercase tracking-wide mb-1.5">Cari Pengalaman</label><div class="relative"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg><input type="text" placeholder="Glamping, Rafting..." class="w-full pl-9 pr-3 py-2.5 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/></div></div><div><label class="block text-xs text-muted-foreground uppercase tracking-wide mb-1.5">Tanggal Kunjungan</label><div class="relative"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg><input type="text" placeholder="21 Juni 2025" class="w-full pl-9 pr-3 py-2.5 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"/></div></div><div><label class="block text-xs text-muted-foreground uppercase tracking-wide mb-1.5">Jumlah Peserta</label><div class="relative"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg><select class="w-full pl-9 pr-3 py-2.5 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary appearance-none"><option value="2">2 Orang</option><option value="1">1 Orang</option><option value="3">3 Orang</option><option value="4">4 Orang</option><option value="5">5+ Orang</option></select></div></div></div><a data-slot="button" class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*=&#x27;size-&#x27;])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive h-10 rounded-md has-[&gt;svg]:px-4 bg-[#2d9da8] hover:bg-[#2d9da8]/90 text-white px-8" href="{{ route('ticket.booking') }}"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search h-4 w-4 mr-2" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>Cari Sekarang</a></div></div></div></section><section id="paket" class="scroll-mt-24 md:scroll-mt-28 py-12 md:py-16 bg-background"><div class="container mx-auto px-4"><div class="flex items-center justify-between mb-6"><div class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles h-5 w-5 text-primary" aria-hidden="true"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"></path><path d="M20 2v4"></path><path d="M22 4h-4"></path><circle cx="4" cy="20" r="2"></circle></svg><h2 class="text-xl md:text-2xl font-bold text-foreground">Featured Experiences</h2></div><a class="flex items-center gap-1 text-sm text-primary hover:text-primary/80 font-medium transition-colors" href="{{ route('ticket.booking') }}">Lihat Semua<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right h-4 w-4" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></a></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5"><a class="group bg-card rounded-xl overflow-hidden shadow-sm border border-border hover:shadow-lg transition-all duration-300" href="{{ route('ticket.booking') }}"><div class="relative aspect-[4/3] overflow-hidden"><img alt="Glamping Riverside Luxury" loading="lazy" decoding="async" data-nimg="fill" class="object-cover group-hover:scale-105 transition-transform duration-500" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent" src="{{ asset('backend/dist/img/photo1.png') }}"/><div class="absolute top-3 left-3"><span class="px-2.5 py-1 bg-[#e85a4f] text-white text-xs font-bold rounded-md">POPULER</span></div></div><div class="p-4"><div class="flex items-start justify-between gap-2 mb-2"><h3 class="font-semibold text-card-foreground text-sm leading-tight line-clamp-2">Glamping Riverside Luxury</h3><div class="flex items-center gap-1 shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star h-3.5 w-3.5 fill-yellow-400 text-yellow-400" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg><span class="text-sm font-medium text-card-foreground">4.9</span></div></div><p class="text-muted-foreground text-xs mb-4 line-clamp-2">Tenda glamping mewah dengan pemandangan langsung ke sungai Capolaga.</p><div class="pt-3 border-t border-border"><span class="text-xs text-muted-foreground uppercase">Mulai dari</span><div class="flex items-baseline gap-1"><span class="text-lg font-bold text-primary">Rp <!-- -->850.000</span><span class="text-muted-foreground text-sm">/malam</span></div></div></div></a><a class="group bg-card rounded-xl overflow-hidden shadow-sm border border-border hover:shadow-lg transition-all duration-300" href="{{ route('ticket.booking') }}"><div class="relative aspect-[4/3] overflow-hidden"><img alt="Standard Camping Ground" loading="lazy" decoding="async" data-nimg="fill" class="object-cover group-hover:scale-105 transition-transform duration-500" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent" src="{{ asset('backend/dist/img/photo2.png') }}"/></div><div class="p-4"><div class="flex items-start justify-between gap-2 mb-2"><h3 class="font-semibold text-card-foreground text-sm leading-tight line-clamp-2">Standard Camping Ground</h3><div class="flex items-center gap-1 shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star h-3.5 w-3.5 fill-yellow-400 text-yellow-400" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg><span class="text-sm font-medium text-card-foreground">4.7</span></div></div><p class="text-muted-foreground text-xs mb-4 line-clamp-2">Area camping luas di bawah hutan pinus dengan fasilitas toilet bersih.</p><div class="pt-3 border-t border-border"><span class="text-xs text-muted-foreground uppercase">Mulai dari</span><div class="flex items-baseline gap-1"><span class="text-lg font-bold text-primary">Rp <!-- -->150.000</span><span class="text-muted-foreground text-sm">/malam</span></div></div></div></a><a class="group bg-card rounded-xl overflow-hidden shadow-sm border border-border hover:shadow-lg transition-all duration-300" href="{{ route('ticket.booking') }}"><div class="relative aspect-[4/3] overflow-hidden"><img alt="Homestay Forest View" loading="lazy" decoding="async" data-nimg="fill" class="object-cover group-hover:scale-105 transition-transform duration-500" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent" src="{{ asset('backend/dist/img/photo3.jpg') }}"/></div><div class="p-4"><div class="flex items-start justify-between gap-2 mb-2"><h3 class="font-semibold text-card-foreground text-sm leading-tight line-clamp-2">Homestay Forest View</h3><div class="flex items-center gap-1 shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star h-3.5 w-3.5 fill-yellow-400 text-yellow-400" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg><span class="text-sm font-medium text-card-foreground">4.8</span></div></div><p class="text-muted-foreground text-xs mb-4 line-clamp-2">Rumah kayu estetik yang nyaman untuk keluarga besar.</p><div class="pt-3 border-t border-border"><span class="text-xs text-muted-foreground uppercase">Mulai dari</span><div class="flex items-baseline gap-1"><span class="text-lg font-bold text-primary">Rp <!-- -->1.300.000</span><span class="text-muted-foreground text-sm">/malam</span></div></div></div></a><a class="group bg-card rounded-xl overflow-hidden shadow-sm border border-border hover:shadow-lg transition-all duration-300" href="{{ route('ticket.booking') }}"><div class="relative aspect-[4/3] overflow-hidden"><img alt="Rafting Ciater Adventure" loading="lazy" decoding="async" data-nimg="fill" class="object-cover group-hover:scale-105 transition-transform duration-500" style="position:absolute;height:100%;width:100%;left:0;top:0;right:0;bottom:0;color:transparent" src="{{ asset('backend/dist/img/photo4.jpg') }}"/></div><div class="p-4"><div class="flex items-start justify-between gap-2 mb-2"><h3 class="font-semibold text-card-foreground text-sm leading-tight line-clamp-2">Rafting Ciater Adventure</h3><div class="flex items-center gap-1 shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star h-3.5 w-3.5 fill-yellow-400 text-yellow-400" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg><span class="text-sm font-medium text-card-foreground">5</span></div></div><p class="text-muted-foreground text-xs mb-4 line-clamp-2">Paket rafting seru di aliran sungai Ciater dekat kawasan Capolaga.</p><div class="pt-3 border-t border-border"><span class="text-xs text-muted-foreground uppercase">Mulai dari</span><div class="flex items-baseline gap-1"><span class="text-lg font-bold text-primary">Rp <!-- -->350.000</span><span class="text-muted-foreground text-sm">/Pax</span></div></div></div></a></div></div></section><section id="addon" class="scroll-mt-24 md:scroll-mt-28 py-12 md:py-20 bg-[#f8fafc] border-t border-[#e2e8f0]">
-  <div class="container mx-auto px-4 lg:px-8 max-w-[1400px]">
-    <div class="mb-10 text-center md:text-left">
-      <div class="inline-flex items-center gap-3 mb-3 px-4 py-2 rounded-full bg-[#e6f4f1] text-[#20A678] border border-teal-200">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
-        <span class="font-semibold text-sm tracking-wide uppercase">Add-On Activity</span>
-      </div>
-      <h2 class="text-3xl md:text-4xl font-bold text-[#0f172a] mb-4 tracking-tight">Explore Around Capolaga</h2>
+@include('frontend.layouts.header')
+
+<section id="home" class="pt-20 md:pt-24">
+    <div class="relative overflow-hidden py-14 md:py-16 lg:py-20" style="background:linear-gradient(135deg, #1a3a4a 0%, #2d5a6b 50%, #3d7a8a 100%)">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col gap-8">
+                <div class="max-w-xl">
+                    <h1 class="mb-4 text-3xl font-bold leading-tight text-white md:text-4xl lg:text-5xl">
+                        Experience Nature Adventure<br />at Capolaga
+                    </h1>
+                    <p class="mb-6 text-base text-white/80 md:text-lg">
+                        Pesan camping, glamping, homestay, dan aktivitas petualangan dari katalog Capolaga yang sekarang langsung terhubung ke data produk.
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <a class="inline-flex items-center justify-center rounded-md bg-white px-6 py-3 text-sm font-semibold text-[#1a3a4a] transition hover:bg-white/90"
+                            href="{{ route('ticket.booking') }}">
+                            Book Now
+                        </a>
+                        @if ($heroProducts->isNotEmpty())
+                            <a class="inline-flex items-center justify-center rounded-md border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                                href="{{ route('ticket.booking', ['product' => $heroProducts->first()->slug]) }}">
+                                Mulai Dari {{ $heroProducts->first()->name }}
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
-      <a class="group flex flex-col p-5 bg-white rounded-2xl border border-[#e2e8f0] hover:border-[#20A678] hover:shadow-lg hover:-translate-y-1 transition-all duration-300" href="{{ route('ticket.booking') }}">
-        <div class="w-12 h-12 flex flex-shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path></svg>
-        </div>
-        <div>
-          <h3 class="font-bold text-[#0f172a] text-base mb-1">Rafting Ciater</h3>
-          <p class="text-[#20A678] text-sm font-semibold">Rp 200rb<span class="text-xs text-[#64748b] font-normal">/orang</span></p>
-        </div>
-      </a>
-      
-      <a class="group flex flex-col p-5 bg-white rounded-2xl border border-[#e2e8f0] hover:border-[#20A678] hover:shadow-lg hover:-translate-y-1 transition-all duration-300" href="{{ route('ticket.booking') }}">
-        <div class="w-12 h-12 flex flex-shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600 mb-4 group-hover:bg-orange-600 group-hover:text-white transition-colors duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="18.5" cy="17.5" r="3.5"></circle><circle cx="5.5" cy="17.5" r="3.5"></circle><circle cx="15" cy="5" r="1"></circle><path d="M12 17.5V14l-3-3 4-3 2 3h2"></path></svg>
-        </div>
-        <div>
-          <h3 class="font-bold text-[#0f172a] text-base mb-1">ATV Adventure</h3>
-          <p class="text-[#20A678] text-sm font-semibold">Rp 150rb<span class="text-xs text-[#64748b] font-normal">/orang</span></p>
-        </div>
-      </a>
-      
-      <a class="group flex flex-col p-5 bg-white rounded-2xl border border-[#e2e8f0] hover:border-[#20A678] hover:shadow-lg hover:-translate-y-1 transition-all duration-300" href="{{ route('ticket.booking') }}">
-        <div class="w-12 h-12 flex flex-shrink-0 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 mb-4 group-hover:bg-cyan-600 group-hover:text-white transition-colors duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M12.8 19.6A2 2 0 1 0 14 16H2"></path><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2"></path><path d="M9.8 4.4A2 2 0 1 1 11 8H2"></path></svg>
-        </div>
-        <div>
-          <h3 class="font-bold text-[#0f172a] text-base mb-1">Paragliding</h3>
-          <p class="text-[#20A678] text-sm font-semibold">Rp 350rb<span class="text-xs text-[#64748b] font-normal">/orang</span></p>
-        </div>
-      </a>
-      
-      <a class="group flex flex-col p-5 bg-white rounded-2xl border border-[#e2e8f0] hover:border-[#20A678] hover:shadow-lg hover:-translate-y-1 transition-all duration-300" href="{{ route('ticket.booking') }}">
-        <div class="w-12 h-12 flex flex-shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 mb-4 group-hover:bg-teal-600 group-hover:text-white transition-colors duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"></path><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"></path></svg>
-        </div>
-        <div>
-          <h3 class="font-bold text-[#0f172a] text-base mb-1">Sari Ater Hotspring</h3>
-          <p class="text-[#20A678] text-sm font-semibold">Rp 100rb<span class="text-xs text-[#64748b] font-normal">/orang</span></p>
-        </div>
-      </a>
-      
-      <a class="group flex flex-col p-5 bg-white rounded-2xl border border-[#e2e8f0] hover:border-[#20A678] hover:shadow-lg hover:-translate-y-1 transition-all duration-300" href="{{ route('ticket.booking') }}">
-        <div class="w-12 h-12 flex flex-shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600 mb-4 group-hover:bg-red-600 group-hover:text-white transition-colors duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
-        </div>
-        <div>
-          <h3 class="font-bold text-[#0f172a] text-base mb-1">Paintball Battle</h3>
-          <p class="text-[#20A678] text-sm font-semibold">Rp 120rb<span class="text-xs text-[#64748b] font-normal">/orang</span></p>
-        </div>
-      </a>
-      
-      <a class="group flex flex-col p-5 bg-white rounded-2xl border border-[#e2e8f0] hover:border-[#20A678] hover:shadow-lg hover:-translate-y-1 transition-all duration-300" href="{{ route('ticket.booking') }}">
-        <div class="w-12 h-12 flex flex-shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>
-        </div>
-        <div>
-          <h3 class="font-bold text-[#0f172a] text-base mb-1">Outbound &amp; Fun Games</h3>
-          <p class="text-[#20A678] text-sm font-semibold">Rp 100rb<span class="text-xs text-[#64748b] font-normal">/orang</span></p>
-        </div>
-      </a>
 
-      <a class="group flex flex-col p-5 bg-white rounded-2xl border border-[#e2e8f0] hover:border-[#20A678] hover:shadow-lg hover:-translate-y-1 transition-all duration-300" href="{{ route('ticket.booking') }}">
-        <div class="w-12 h-12 flex flex-shrink-0 items-center justify-center rounded-xl bg-yellow-50 text-yellow-600 mb-4 group-hover:bg-yellow-500 group-hover:text-white transition-colors duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+    <div class="border-b border-slate-900/15 bg-white">
+        <div class="container mx-auto px-4 py-4 md:py-5">
+            <div class="flex flex-col gap-4 md:flex-row md:items-end">
+                <div class="grid flex-1 grid-cols-1 gap-4 md:grid-cols-3">
+                    <div>
+                        <label class="mb-1.5 block text-xs uppercase tracking-wide text-muted-foreground">Cari Pengalaman</label>
+                        <input type="text" value="{{ $heroProducts->first()?->name ?? '' }}" readonly
+                            class="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm" />
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-xs uppercase tracking-wide text-muted-foreground">Kategori Utama</label>
+                        <input type="text" value="{{ $mainCategories->pluck('label')->take(3)->implode(', ') }}" readonly
+                            class="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm" />
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-xs uppercase tracking-wide text-muted-foreground">Add-On Tersedia</label>
+                        <input type="text" value="{{ $addonProducts->count() }} aktivitas"
+                            readonly class="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm" />
+                    </div>
+                </div>
+                <a class="inline-flex items-center justify-center rounded-md bg-[#2d9da8] px-8 py-2.5 text-sm font-medium text-white transition hover:bg-[#2d9da8]/90"
+                    href="{{ route('ticket.booking') }}">
+                    Cari Sekarang
+                </a>
+            </div>
         </div>
-        <div>
-          <h3 class="font-bold text-[#0f172a] text-base mb-1">Flying Fox</h3>
-          <p class="text-[#20A678] text-sm font-semibold">Rp 50rb<span class="text-xs text-[#64748b] font-normal">/orang</span></p>
-        </div>
-      </a>
-
-      <a class="group flex flex-col p-5 bg-white rounded-2xl border border-[#e2e8f0] hover:border-[#20A678] hover:shadow-lg hover:-translate-y-1 transition-all duration-300" href="{{ route('ticket.booking') }}">
-        <div class="w-12 h-12 flex flex-shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-600 mb-4 group-hover:bg-green-600 group-hover:text-white transition-colors duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="m8 3 4 8 5-5 5 15H2L8 3z"></path></svg>
-        </div>
-        <div>
-          <h3 class="font-bold text-[#0f172a] text-base mb-1">Curug Trekking</h3>
-          <p class="text-[#20A678] text-sm font-semibold">Rp 75rb<span class="text-xs text-[#64748b] font-normal">/orang</span></p>
-        </div>
-      </a>
-
-      <a class="group flex flex-col p-5 bg-white rounded-2xl border border-[#e2e8f0] hover:border-[#20A678] hover:shadow-lg hover:-translate-y-1 transition-all duration-300" href="{{ route('ticket.booking') }}">
-        <div class="w-12 h-12 flex flex-shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 mb-4 group-hover:bg-slate-700 group-hover:text-white transition-colors duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><rect width="16" height="16" x="4" y="4" rx="2"></rect><rect width="6" height="6" x="9" y="9" rx="1"></rect><path d="M15 2v2"></path><path d="M15 20v2"></path><path d="M2 15h2"></path><path d="M2 9h2"></path><path d="M20 15h2"></path><path d="M20 9h2"></path><path d="M9 2v2"></path><path d="M9 20v2"></path></svg>
-        </div>
-        <div>
-          <h3 class="font-bold text-[#0f172a] text-base mb-1">Offroad 4x4</h3>
-          <p class="text-[#20A678] text-sm font-semibold">Rp 250rb<span class="text-xs text-[#64748b] font-normal">/orang</span></p>
-        </div>
-      </a>
-
-      <a class="group flex flex-col p-5 bg-white rounded-2xl border border-[#e2e8f0] hover:border-[#20A678] hover:shadow-lg hover:-translate-y-1 transition-all duration-300" href="{{ route('ticket.booking') }}">
-        <div class="w-12 h-12 flex flex-shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-600 mb-4 group-hover:bg-sky-600 group-hover:text-white transition-colors duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
-        </div>
-        <div>
-          <h3 class="font-bold text-[#0f172a] text-base mb-1">River Tubing</h3>
-          <p class="text-[#20A678] text-sm font-semibold">Rp 120rb<span class="text-xs text-[#64748b] font-normal">/orang</span></p>
-        </div>
-      </a>
-
-      <a class="group flex flex-col p-5 bg-white rounded-2xl border border-[#e2e8f0] hover:border-[#20A678] hover:shadow-lg hover:-translate-y-1 transition-all duration-300" href="{{ route('ticket.booking') }}">
-        <div class="w-12 h-12 flex flex-shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600 mb-4 group-hover:bg-rose-600 group-hover:text-white transition-colors duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><circle cx="12" cy="11" r="3"></circle></svg>
-        </div>
-        <div>
-          <h3 class="font-bold text-[#0f172a] text-base mb-1">Archery</h3>
-          <p class="text-[#20A678] text-sm font-semibold">Rp 80rb<span class="text-xs text-[#64748b] font-normal">/orang</span></p>
-        </div>
-      </a>
-
-      <a class="group flex flex-col p-5 bg-white rounded-2xl border border-[#e2e8f0] hover:border-[#20A678] hover:shadow-lg hover:-translate-y-1 transition-all duration-300" href="{{ route('ticket.booking') }}">
-        <div class="w-12 h-12 flex flex-shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-700 mb-4 group-hover:bg-orange-500 group-hover:text-white transition-colors duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><path d="M5.5 8.5C5.5 8.5 7 7 9 7c2 0 3 1.5 3 1.5s1 1.5 3 1.5c2 0 3.5-1.5 3.5-1.5"></path><path d="M5.5 15.5C5.5 15.5 7 14 9 14c2 0 3 1.5 3 1.5s1 1.5 3 1.5c2 0 3.5-1.5 3.5-1.5"></path><path d="M12 2v20"></path></svg>
-        </div>
-        <div>
-          <h3 class="font-bold text-[#0f172a] text-base mb-1">Agrowisata</h3>
-          <p class="text-[#20A678] text-sm font-semibold">Rp 40rb<span class="text-xs text-[#64748b] font-normal">/orang</span></p>
-        </div>
-      </a>
-      
     </div>
-  </div>
+</section>
+
+<section id="paket" class="scroll-mt-24 border-b border-slate-900/15 bg-background py-12 md:py-16">
+    <div class="container mx-auto px-4">
+        <div class="mb-6 flex items-center justify-between">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-[0.24em] text-primary">Featured Experiences</p>
+                <h2 class="mt-2 text-2xl font-bold text-foreground">Produk unggulan yang aktif di sistem</h2>
+            </div>
+            <a class="text-sm font-medium text-primary transition-colors hover:text-primary/80"
+                href="{{ route('ticket.booking') }}">
+                Lihat Semua
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+            @forelse ($featuredProducts as $product)
+                <a class="group overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-lg"
+                    href="{{ route('ticket.booking', ['product' => $product->slug]) }}">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                        @if ($product->primary_image_url)
+                            <img src="{{ $product->primary_image_url }}" alt="{{ $product->name }}"
+                                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                        @else
+                            <div class="flex h-full items-center justify-center text-sm text-slate-500">Belum ada gambar</div>
+                        @endif
+                        @if ($product->is_featured)
+                            <div class="absolute left-3 top-3">
+                                <span class="rounded-md bg-[#e85a4f] px-2.5 py-1 text-xs font-bold text-white">POPULER</span>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="p-4">
+                        <div class="mb-2 flex items-start justify-between gap-2">
+                            <h3 class="text-sm font-semibold leading-tight text-card-foreground">{{ $product->name }}</h3>
+                            <span class="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-600">
+                                {{ $product->category?->label ?? 'Produk' }}
+                            </span>
+                        </div>
+                        <p class="mb-4 text-xs text-muted-foreground">{{ $product->short_desc }}</p>
+                        <div class="border-t border-border pt-3">
+                            <span class="text-xs uppercase text-muted-foreground">Mulai dari</span>
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-lg font-bold text-primary">Rp {{ number_format((float) $product->price, 0, ',', '.') }}</span>
+                                <span class="text-sm text-muted-foreground">{{ $product->price_label }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            @empty
+                <div class="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
+                    Belum ada produk unggulan aktif.
+                </div>
+            @endforelse
+        </div>
+    </div>
+</section>
+
+<section class="border-t border-b border-slate-900/15 bg-white py-12 md:py-16">
+    <div class="container mx-auto px-4">
+        <div class="mb-8">
+            <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[#20A678]">Kategori Utama</p>
+            <h2 class="mt-2 text-2xl font-bold text-[#0f172a]">Pilih gaya menginap dan aktivitas inti</h2>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            @foreach ($mainCategories as $category)
+                <a href="{{ route('ticket.booking') }}"
+                    class="rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:-translate-y-1 hover:border-[#20A678] hover:bg-white hover:shadow-lg">
+                    <div class="mb-3 h-3 w-16 rounded-full" style="background-color: {{ $category->color_hex }}"></div>
+                    <h3 class="text-lg font-bold text-slate-900">{{ $category->label }}</h3>
+                    <p class="mt-2 text-sm text-slate-600">
+                        {{ ucfirst($category->type) }} experience yang sudah masuk katalog Capolaga.
+                    </p>
+                </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+<section id="addon" class="scroll-mt-24 border-t border-b border-slate-900/15 bg-[#f8fafc] py-12 md:py-20">
+    <div class="container mx-auto px-4">
+        <div class="mb-8">
+            <div class="mb-3 inline-flex items-center gap-3 rounded-full border border-teal-200 bg-[#e6f4f1] px-4 py-2 text-[#20A678]">
+                <span class="text-sm font-semibold uppercase tracking-wide">Add-On Activity</span>
+            </div>
+            <h2 class="text-3xl font-bold tracking-tight text-[#0f172a] md:text-4xl">Explore Around Capolaga</h2>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            @forelse ($addonProducts as $product)
+                <a class="group flex flex-col rounded-2xl border border-[#e2e8f0] bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[#20A678] hover:shadow-lg"
+                    href="{{ route('ticket.booking', ['product' => $product->slug]) }}">
+                    <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+                        <span class="text-xs font-bold uppercase">{{ substr($product->category?->label ?? 'A', 0, 2) }}</span>
+                    </div>
+                    <div>
+                        <h3 class="mb-1 text-base font-bold text-[#0f172a]">{{ $product->name }}</h3>
+                        <p class="text-sm font-semibold text-[#20A678]">
+                            Rp {{ number_format((float) $product->price, 0, ',', '.') }}
+                            <span class="text-xs font-normal text-[#64748b]">{{ $product->price_label }}</span>
+                        </p>
+                    </div>
+                </a>
+            @empty
+                <div class="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
+                    Add-on activity belum tersedia.
+                </div>
+            @endforelse
+        </div>
+    </div>
 </section>
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Services\BookingSlotService;
 use App\Services\MidtransService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -10,7 +11,10 @@ use Illuminate\Support\Facades\Log;
 
 class MidtransWebhookController extends Controller
 {
-    public function __construct(private MidtransService $midtrans) {}
+    public function __construct(
+        private MidtransService $midtrans,
+        private BookingSlotService $bookingSlotService,
+    ) {}
 
     /**
      * Endpoint yang dipanggil Midtrans setelah transaksi berubah status.
@@ -67,6 +71,8 @@ class MidtransWebhookController extends Controller
                         ->whereIn('status', ['pending', 'waiting_payment'])
                         ->update(['status' => 'cancelled', 'updated_at' => now()]);
                 }
+
+                $this->bookingSlotService->syncBookedSlotsForBookingCode($orderId);
             });
 
             return response()->json(['status' => 'ok']);

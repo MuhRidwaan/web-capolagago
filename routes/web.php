@@ -15,6 +15,8 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\ActivityTagController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Frontend\BookingController as FrontendBookingController;
+use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Payment\MidtransWebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,11 +31,23 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
 
 // ── Public ────────────────────────────────────────────────────────────────────
-Route::view('/', 'frontend.home')->name('frontend.home');
+Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::view('/welcome', 'welcome')->name('welcome');
 
-Route::view('/booking-ticket', 'frontend.booking')
+Route::get('/booking-ticket', [FrontendBookingController::class, 'index'])
     ->name('ticket.booking');
+Route::get('/booking-ticket/availability', [FrontendBookingController::class, 'availability'])
+    ->name('ticket.booking.availability');
+Route::get('/booking-ticket/estimate', [FrontendBookingController::class, 'estimate'])
+    ->name('ticket.booking.estimate');
+Route::post('/booking-ticket/checkout', [FrontendBookingController::class, 'checkout'])
+    ->name('ticket.booking.checkout');
+Route::get('/booking-ticket/status/{token}', [FrontendBookingController::class, 'status'])
+    ->name('ticket.booking.status');
+Route::post('/booking-ticket/status/{token}/resume-payment', [FrontendBookingController::class, 'resumePayment'])
+    ->name('ticket.booking.resume-payment');
+Route::get('/booking/finish', [FrontendBookingController::class, 'finish'])
+    ->name('ticket.booking.finish');
 
 // Webhook Midtrans — no auth, no CSRF (server-to-server)
 Route::post('/payment/webhook/midtrans', [MidtransWebhookController::class, 'handle'])

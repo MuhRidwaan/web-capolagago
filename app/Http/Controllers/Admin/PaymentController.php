@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\BookingSlotService;
 use App\Services\MidtransService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
-    public function __construct(private MidtransService $midtrans) {}
+    public function __construct(
+        private MidtransService $midtrans,
+        private BookingSlotService $bookingSlotService,
+    ) {}
 
     public function index(Request $request)
     {
@@ -108,6 +112,8 @@ class PaymentController extends Controller
                 'status'     => 'confirmed',
                 'updated_at' => now(),
             ]);
+
+            $this->bookingSlotService->syncBookedSlotsForBooking((int) $payment->booking_id);
         });
 
         return back()->with('success', 'Pembayaran berhasil dikonfirmasi.');
@@ -137,6 +143,8 @@ class PaymentController extends Controller
                 'status'     => 'refunded',
                 'updated_at' => now(),
             ]);
+
+            $this->bookingSlotService->syncBookedSlotsForBooking((int) $payment->booking_id);
         });
 
         return back()->with('success', 'Refund berhasil diproses.');

@@ -3,12 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\BookingService;
+use App\Services\BookingSlotService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class BookingController extends Controller
 {
+    public function __construct(
+        private BookingSlotService $bookingSlotService,
+        private BookingService $bookingService,
+    ) {}
+
     private array $statusFlow = [
         'pending'         => ['waiting_payment', 'confirmed', 'cancelled'],
         'waiting_payment' => ['confirmed', 'cancelled'],
@@ -111,29 +118,19 @@ class BookingController extends Controller
             $userId = $user->id;
         }
 
-        // Hitung subtotal dari items
-        $subtotal = 0;
-        $itemRows = [];
-        foreach ($data['items'] as $item) {
-            $product = DB::table('products')->find($item['product_id']);
-            $lineTotal = $product->price * $item['quantity'];
-            $subtotal += $lineTotal;
-            $itemRows[] = [
-                'product_id'            => $product->id,
-                'product_name_snapshot' => $product->name,
-                'quantity'              => $item['quantity'],
-                'unit_price'            => $product->price,
-                'subtotal'              => $lineTotal,
-                'is_addon'              => false,
-                'created_at'            => now(),
-                'updated_at'            => now(),
-            ];
-        }
+        $preparedBooking = $this->bookingService->prepareAdminBookingItems(
+            $data['items'],
+            $data['visit_date'],
+            (int) $data['total_guests'],
+        );
+        $subtotal = $preparedBooking['subtotal'];
+        $itemRows = $preparedBooking['items'];
 
         $bookingCode = $this->generateBookingCode();
 
         $bookingId = DB::table('bookings')->insertGetId([
             'booking_code'    => $bookingCode,
+            'public_token'    => $this->bookingService->generatePublicToken(),
             'user_id'         => $userId,
             'visit_date'      => $data['visit_date'],
             'checkout_date'   => $data['checkout_date'] ?? null,
@@ -154,6 +151,7 @@ class BookingController extends Controller
             $row['booking_id'] = $bookingId;
         }
         DB::table('booking_items')->insert($itemRows);
+        $this->bookingSlotService->syncBookedSlotsForBooking($bookingId);
 
         return redirect()->route('admin.bookings.show', $bookingId)
             ->with('success', "Booking {$bookingCode} berhasil dibuat.");
@@ -256,6 +254,8 @@ class BookingController extends Controller
             'status'     => $request->status,
             'updated_at' => now(),
         ]);
+
+        $this->bookingSlotService->syncBookedSlotsForBooking($id);
 
         return back()->with('success', 'Status booking berhasil diubah ke ' . $request->status . '.');
     }
