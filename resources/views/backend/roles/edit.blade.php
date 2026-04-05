@@ -26,7 +26,7 @@
 
             <div class="card capolaga-form-card">
                 <div class="card-header capolaga-form-header">
-                    <h3 class="card-title mb-0">Edit Role Form</h3>
+                    <h3 class="card-title mb-0">Form Edit Role</h3>
                 </div>
 
                 <div class="card-body">
@@ -104,8 +104,8 @@
                         </div>
 
                         <div class="capolaga-form-footer">
-                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="update-role-btn" disabled>Update</button>
-                            <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary capolaga-action-btn">Back</a>
+                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="update-role-btn" disabled>Perbarui</button>
+                            <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary capolaga-action-btn">Kembali</a>
                         </div>
                     </form>
                 </div>
@@ -115,6 +115,7 @@
 @endsection
 
 @push('styles')
+    <link rel="stylesheet" href="{{ asset('backend/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
     <style>
         .capolaga-permission-card {
             border-color: #dbe5ef !important;
@@ -180,6 +181,7 @@
 @endpush
 
 @push('scripts')
+    <script src="{{ asset('backend/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('edit-role-form');
@@ -266,11 +268,11 @@
                 }
 
                 Swal.fire({
-                    title: 'Update role?',
+                    title: 'Perbarui role?',
                     text: 'Perubahan data role akan langsung disimpan.',
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Ya, update',
+                    confirmButtonText: 'Ya, perbarui',
                     cancelButtonText: 'Batal',
                     reverseButtons: true,
                     confirmButtonColor: '#1f8fff',
@@ -290,7 +292,7 @@
                     updateButtonState();
 
                     Swal.fire({
-                        title: 'Updating...',
+                        title: 'Memperbarui...',
                         text: 'Mohon tunggu, data role sedang diproses.',
                         allowOutsideClick: false,
                         allowEscapeKey: false,

@@ -26,5 +26,17 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Tampilkan halaman 403 yang proper saat akses ditolak (permission/role)
+        $exceptions->render(function (
+            \Spatie\Permission\Exceptions\UnauthorizedException $e,
+            \Illuminate\Http\Request $request
+        ) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Akses ditolak.'], 403);
+            }
+
+            return response()->view('errors.403', [
+                'message' => 'Kamu tidak memiliki izin untuk mengakses halaman ini.',
+            ], 403);
+        });
     })->create();

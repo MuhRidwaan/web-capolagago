@@ -46,7 +46,7 @@
                             </button>
 
                             <a href="{{ route('admin.users.create') }}" class="btn btn-primary capolaga-action-btn">
-                                <i class="fas fa-plus mr-1"></i> Add User
+                                <i class="fas fa-plus mr-1"></i> Tambah User
                             </a>
                         </div>
                     </div>
@@ -61,7 +61,7 @@
                                     <th>Nama</th>
                                     <th>Email</th>
                                     <th>Role</th>
-                                    <th style="width: 140px;">Action</th>
+                                    <th style="width: 140px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>

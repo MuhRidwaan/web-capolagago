@@ -9,10 +9,19 @@ use Illuminate\Validation\Rule;
 
 class ProductSlotController extends Controller
 {
+    private function mitraId(): ?int
+    {
+        $user = auth()->user();
+        return $user->hasRole('Super Admin') ? null : $user->mitraProfile?->id;
+    }
+
     public function index(Request $request)
     {
+        $mitraId = $this->mitraId();
+
         $products = DB::table('products')
             ->where('is_active', true)
+            ->when($mitraId, fn($q) => $q->where('mitra_id', $mitraId))
             ->orderBy('name')
             ->get(['id', 'name', 'max_capacity']);
 
@@ -22,7 +31,8 @@ class ProductSlotController extends Controller
                 'ps.id', 'ps.product_id', 'ps.slot_date', 'ps.start_time',
                 'ps.total_slots', 'ps.booked_slots', 'ps.is_blocked',
                 'ps.updated_at', 'p.name as product_name'
-            );
+            )
+            ->when($mitraId, fn($q) => $q->where('p.mitra_id', $mitraId));
 
         if ($request->filled('product_id')) {
             $query->where('ps.product_id', $request->product_id);
@@ -58,8 +68,10 @@ class ProductSlotController extends Controller
      */
     public function create()
     {
+        $mitraId = $this->mitraId();
         $products = DB::table('products')
             ->where('is_active', true)
+            ->when($mitraId, fn($q) => $q->where('mitra_id', $mitraId))
             ->orderBy('name')
             ->get(['id', 'name', 'max_capacity']);
 
@@ -81,6 +93,13 @@ class ProductSlotController extends Controller
             'total_slots' => ['required', 'integer', 'min:1', 'max:9999'],
             'is_blocked'  => ['boolean'],
         ]);
+
+        // Pastikan mitra hanya bisa buat slot untuk produknya sendiri
+        $mitraId = $this->mitraId();
+        if ($mitraId) {
+            $owns = DB::table('products')->where('id', $data['product_id'])->where('mitra_id', $mitraId)->exists();
+            abort_if(! $owns, 403, 'Kamu tidak memiliki akses ke produk ini.');
+        }
 
         $exists = DB::table('product_slots')
             ->where('product_id', $data['product_id'])
@@ -122,6 +141,12 @@ class ProductSlotController extends Controller
             'skip_days'   => ['nullable', 'array'],
             'skip_days.*' => ['integer', 'between:0,6'], // 0=Sun, 6=Sat
         ]);
+
+        $mitraId = $this->mitraId();
+        if ($mitraId) {
+            $owns = DB::table('products')->where('id', $data['product_id'])->where('mitra_id', $mitraId)->exists();
+            abort_if(! $owns, 403, 'Kamu tidak memiliki akses ke produk ini.');
+        }
 
         $skipDays = $data['skip_days'] ?? [];
         $current  = \Carbon\Carbon::parse($data['date_from']);
@@ -168,11 +193,17 @@ class ProductSlotController extends Controller
     public function edit(int $id)
     {
         $slot = DB::table('product_slots')->where('id', $id)->first();
-
         abort_if(! $slot, 404);
+
+        $mitraId = $this->mitraId();
+        if ($mitraId) {
+            $owns = DB::table('products')->where('id', $slot->product_id)->where('mitra_id', $mitraId)->exists();
+            abort_if(! $owns, 403, 'Kamu tidak memiliki akses ke slot ini.');
+        }
 
         $products = DB::table('products')
             ->where('is_active', true)
+            ->when($mitraId, fn($q) => $q->where('mitra_id', $mitraId))
             ->orderBy('name')
             ->get(['id', 'name', 'max_capacity']);
 

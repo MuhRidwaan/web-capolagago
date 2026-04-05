@@ -8,23 +8,41 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
+    private function mitraId(): ?int
+    {
+        $user = auth()->user();
+        return $user->hasRole('Super Admin') ? null : $user->mitraProfile?->id;
+    }
+
     public function sales(Request $request)
     {
         $request->validate([
-            'date_from' => ['nullable', 'date'],
-            'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
-            'status' => ['nullable', 'in:pending,paid,failed,expired,refunded'],
+            'date_from'   => ['nullable', 'date'],
+            'date_to'     => ['nullable', 'date', 'after_or_equal:date_from'],
+            'status'      => ['nullable', 'in:pending,paid,failed,expired,refunded'],
             'method_type' => ['nullable', 'in:manual,va,ewallet,qris,cc,cstore'],
         ]);
 
+        $mitraId  = $this->mitraId();
         $dateFrom = $request->input('date_from', now()->startOfMonth()->toDateString());
-        $dateTo = $request->input('date_to', now()->toDateString());
+        $dateTo   = $request->input('date_to', now()->toDateString());
 
         $baseQuery = DB::table('payments as py')
             ->join('bookings as b', 'b.id', '=', 'py.booking_id')
             ->join('users as u', 'u.id', '=', 'b.user_id')
             ->leftJoin('payment_methods as pm', 'pm.id', '=', 'py.payment_method_id')
             ->whereBetween(DB::raw('DATE(COALESCE(py.paid_at, py.created_at))'), [$dateFrom, $dateTo]);
+
+        // Mitra hanya lihat laporan booking yang mengandung produknya
+        if ($mitraId) {
+            $baseQuery->whereExists(function ($sub) use ($mitraId) {
+                $sub->select(DB::raw(1))
+                    ->from('booking_items as bi')
+                    ->join('products as p', 'p.id', '=', 'bi.product_id')
+                    ->whereColumn('bi.booking_id', 'b.id')
+                    ->where('p.mitra_id', $mitraId);
+            });
+        }
 
         if ($request->filled('status')) {
             $baseQuery->where('py.status', $request->string('status'));
@@ -94,13 +112,14 @@ class ReportController extends Controller
     {
         $request->validate([
             'date_from' => ['nullable', 'date'],
-            'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
-            'status' => ['nullable', 'in:pending,processed,settled,cancelled'],
-            'mitra_id' => ['nullable', 'exists:mitra_profiles,id'],
+            'date_to'   => ['nullable', 'date', 'after_or_equal:date_from'],
+            'status'    => ['nullable', 'in:pending,processed,settled,cancelled'],
+            'mitra_id'  => ['nullable', 'exists:mitra_profiles,id'],
         ]);
 
+        $mitraId  = $this->mitraId();
         $dateFrom = $request->input('date_from', now()->startOfMonth()->toDateString());
-        $dateTo = $request->input('date_to', now()->toDateString());
+        $dateTo   = $request->input('date_to', now()->toDateString());
 
         $baseQuery = DB::table('commissions as c')
             ->join('mitra_profiles as m', 'm.id', '=', 'c.mitra_id')
@@ -108,13 +127,15 @@ class ReportController extends Controller
             ->join('bookings as b', 'b.id', '=', 'py.booking_id')
             ->join('booking_items as bi', 'bi.id', '=', 'c.booking_item_id')
             ->join('products as p', 'p.id', '=', 'bi.product_id')
-            ->whereBetween(DB::raw('DATE(COALESCE(c.settled_at, c.created_at))'), [$dateFrom, $dateTo]);
+            ->whereBetween(DB::raw('DATE(COALESCE(c.settled_at, c.created_at))'), [$dateFrom, $dateTo])
+            ->when($mitraId, fn($q) => $q->where('c.mitra_id', $mitraId));
 
         if ($request->filled('status')) {
             $baseQuery->where('c.status', $request->string('status'));
         }
 
-        if ($request->filled('mitra_id')) {
+        // Filter mitra hanya untuk Super Admin
+        if (! $mitraId && $request->filled('mitra_id')) {
             $baseQuery->where('c.mitra_id', $request->integer('mitra_id'));
         }
 
@@ -173,13 +194,14 @@ class ReportController extends Controller
     public function products(Request $request)
     {
         $request->validate([
-            'date_from' => ['nullable', 'date'],
-            'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
+            'date_from'   => ['nullable', 'date'],
+            'date_to'     => ['nullable', 'date', 'after_or_equal:date_from'],
             'category_id' => ['nullable', 'exists:product_categories,id'],
         ]);
 
+        $mitraId  = $this->mitraId();
         $dateFrom = $request->input('date_from', now()->startOfMonth()->toDateString());
-        $dateTo = $request->input('date_to', now()->toDateString());
+        $dateTo   = $request->input('date_to', now()->toDateString());
 
         $baseQuery = DB::table('booking_items as bi')
             ->join('bookings as b', 'b.id', '=', 'bi.booking_id')
@@ -187,7 +209,8 @@ class ReportController extends Controller
             ->leftJoin('product_categories as pc', 'pc.id', '=', 'p.category_id')
             ->leftJoin('mitra_profiles as m', 'm.id', '=', 'p.mitra_id')
             ->whereIn('b.status', ['confirmed', 'checked_in', 'completed'])
-            ->whereBetween('b.visit_date', [$dateFrom, $dateTo]);
+            ->whereBetween('b.visit_date', [$dateFrom, $dateTo])
+            ->when($mitraId, fn($q) => $q->where('p.mitra_id', $mitraId));
 
         if ($request->filled('category_id')) {
             $baseQuery->where('p.category_id', $request->integer('category_id'));

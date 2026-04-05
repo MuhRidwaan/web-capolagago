@@ -10,8 +10,8 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.mitra.index') }}">Mitra Data</a></li>
-                        <li class="breadcrumb-item active">{{ $mitra->exists ? 'Edit' : 'Create' }}</li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.mitra.index') }}">Data Mitra</a></li>
+                        <li class="breadcrumb-item active">{{ $mitra->exists ? 'Edit' : 'Tambah' }}</li>
                     </ol>
                 </div>
             </div>
@@ -35,7 +35,7 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Account Name <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Nama Akun <span class="capolaga-required">*</span></label>
                                     <input type="text" name="user_name" value="{{ old('user_name', $mitra->user?->name) }}" class="form-control capolaga-form-control" required>
                                     <small class="text-muted">Wajib diisi. Nama akun user yang terhubung dengan mitra ini.</small>
                                 </div>
@@ -52,7 +52,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Business Name <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Nama Bisnis <span class="capolaga-required">*</span></label>
                                     <input type="text" name="business_name" value="{{ old('business_name', $mitra->business_name) }}" class="form-control capolaga-form-control" required>
                                     <small class="text-muted">Wajib diisi. Nama bisnis atau nama vendor yang akan tampil di sistem.</small>
                                 </div>
@@ -60,13 +60,13 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="capolaga-form-label">Description</label>
+                            <label class="capolaga-form-label">Deskripsi</label>
                             <textarea name="description" rows="4" class="form-control">{{ old('description', $mitra->description) }}</textarea>
                             <small class="text-muted">Opsional. Isi deskripsi singkat tentang mitra atau layanan yang ditawarkan.</small>
                         </div>
 
                         <div class="form-group">
-                            <label class="capolaga-form-label">Address</label>
+                            <label class="capolaga-form-label">Alamat</label>
                             <textarea name="address" rows="3" class="form-control">{{ old('address', $mitra->address) }}</textarea>
                             <small class="text-muted">Opsional. Alamat lengkap lokasi mitra.</small>
                         </div>
@@ -74,21 +74,21 @@
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Latitude</label>
+                                    <label class="capolaga-form-label">Lintang</label>
                                     <input type="text" name="latitude" value="{{ old('latitude', $mitra->latitude) }}" class="form-control capolaga-form-control">
                                     <small class="text-muted">Opsional. Isi jika ingin menandai lokasi di peta.</small>
                                 </div>
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Longitude</label>
+                                    <label class="capolaga-form-label">Bujur</label>
                                     <input type="text" name="longitude" value="{{ old('longitude', $mitra->longitude) }}" class="form-control capolaga-form-control">
                                     <small class="text-muted">Opsional. Pasangkan dengan latitude untuk koordinat lokasi.</small>
                                 </div>
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Contact Person</label>
+                                    <label class="capolaga-form-label">Kontak Person</label>
                                     <input type="text" name="contact_person" value="{{ old('contact_person', $mitra->contact_person) }}" class="form-control capolaga-form-control">
                                     <small class="text-muted">Opsional. Nama PIC atau kontak utama dari mitra.</small>
                                 </div>
@@ -112,7 +112,7 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Subscription</label>
+                                    <label class="capolaga-form-label">Langganan</label>
                                     <select name="subscription_type" class="form-control capolaga-form-control">
                                         @foreach ($subscriptionOptions as $option)
                                             <option value="{{ $option }}" @selected(old('subscription_type', $mitra->subscription_type ?: 'free') === $option)>{{ str($option)->headline() }}</option>
@@ -137,14 +137,14 @@
                         <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Commission Rate (%)</label>
+                                    <label class="capolaga-form-label">Rate Komisi (%)</label>
                                     <input type="number" step="0.01" name="commission_rate" value="{{ old('commission_rate', $mitra->commission_rate ?: 10) }}" class="form-control capolaga-form-control">
                                     <small class="text-muted">Opsional. Jika kosong, sistem memakai default 10%.</small>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Joined At</label>
+                                    <label class="capolaga-form-label">Bergabung Sejak</label>
                                     <input type="date" name="joined_at" value="{{ old('joined_at', $mitra->joined_at?->format('Y-m-d')) }}" class="form-control capolaga-form-control">
                                     <small class="text-muted">Opsional. Tanggal mulai kerja sama dengan mitra.</small>
                                 </div>
@@ -159,7 +159,7 @@
                                             <img src="{{ \Illuminate\Support\Facades\Storage::url($mitra->logo_path) }}" alt="Logo" style="max-width:110px;border-radius:.5rem;">
                                             <div class="form-check mt-2">
                                                 <input type="checkbox" class="form-check-input" id="remove_logo" name="remove_logo" value="1">
-                                                <label class="form-check-label" for="remove_logo">Remove current logo</label>
+                                                <label class="form-check-label" for="remove_logo">Hapus logo saat ini</label>
                                             </div>
                                         </div>
                                     @endif
@@ -170,21 +170,21 @@
                         <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Bank Name</label>
+                                    <label class="capolaga-form-label">Nama Bank</label>
                                     <input type="text" name="bank_name" value="{{ old('bank_name', $mitra->bank_name) }}" class="form-control capolaga-form-control">
                                     <small class="text-muted">Opsional. Nama bank rekening pencairan mitra.</small>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Account Number</label>
+                                    <label class="capolaga-form-label">Nomor Rekening</label>
                                     <input type="text" name="bank_account_no" value="{{ old('bank_account_no', $mitra->bank_account_no) }}" class="form-control capolaga-form-control">
                                     <small class="text-muted">Opsional. Nomor rekening bank mitra.</small>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Account Name</label>
+                                    <label class="capolaga-form-label">Nama Akun</label>
                                     <input type="text" name="bank_account_name" value="{{ old('bank_account_name', $mitra->bank_account_name) }}" class="form-control capolaga-form-control">
                                     <small class="text-muted">Opsional. Nama pemilik rekening.</small>
                                 </div>
@@ -192,8 +192,8 @@
                         </div>
 
                         <div class="capolaga-form-footer">
-                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="mitra-submit-btn">{{ $mitra->exists ? 'Update' : 'Save' }}</button>
-                            <a href="{{ route('admin.mitra.index') }}" class="btn btn-secondary capolaga-action-btn">Back</a>
+                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="mitra-submit-btn">{{ $mitra->exists ? 'Perbarui' : 'Simpan' }}</button>
+                            <a href="{{ route('admin.mitra.index') }}" class="btn btn-secondary capolaga-action-btn">Kembali</a>
                         </div>
                     </form>
                 </div>
@@ -273,16 +273,16 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         Swal.fire({
-            title: '{{ $mitra->exists ? 'Update mitra?' : 'Create mitra?' }}',
+            title: '{{ $mitra->exists ? 'Perbarui mitra?' : 'Tambah mitra?' }}',
             text: '{{ $mitra->exists ? 'Perubahan data mitra akan langsung disimpan.' : 'Mitra baru akan langsung disimpan.' }}',
             icon: 'question', showCancelButton: true,
-            confirmButtonText: '{{ $mitra->exists ? 'Ya, update' : 'Ya, simpan' }}', cancelButtonText: 'Batal', reverseButtons: true,
+            confirmButtonText: '{{ $mitra->exists ? 'Ya, perbarui' : 'Ya, simpan' }}', cancelButtonText: 'Batal', reverseButtons: true,
             confirmButtonColor: '#1f8fff', cancelButtonColor: '#6d7a86',
             showClass: { popup: 'capolaga-swal-show' }, hideClass: { popup: 'capolaga-swal-hide' }
         }).then((result) => {
             if (!result.isConfirmed) return;
             isSubmitting = true; updateButtonState();
-            Swal.fire({ title: '{{ $mitra->exists ? 'Updating...' : 'Saving...' }}', text: 'Mohon tunggu, data mitra sedang diproses.', allowOutsideClick: false, allowEscapeKey: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: '{{ $mitra->exists ? 'Memperbarui...' : 'Menyimpan...' }}', text: 'Mohon tunggu, data mitra sedang diproses.', allowOutsideClick: false, allowEscapeKey: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
             form.submit();
         });
     });

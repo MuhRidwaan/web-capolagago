@@ -104,8 +104,8 @@
                         </div>
 
                         <div class="capolaga-form-footer">
-                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="update-user-btn" disabled>Update</button>
-                            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary capolaga-action-btn">Back</a>
+                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="update-user-btn" disabled>Perbarui</button>
+                            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary capolaga-action-btn">Kembali</a>
                         </div>
                     </form>
                 </div>
@@ -214,11 +214,11 @@
                 }
 
                 Swal.fire({
-                    title: 'Update user?',
+                    title: 'Perbarui user?',
                     text: 'Perubahan data user akan langsung disimpan.',
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Ya, update',
+                    confirmButtonText: 'Ya, perbarui',
                     cancelButtonText: 'Batal',
                     reverseButtons: true,
                     confirmButtonColor: '#1f8fff',
@@ -238,7 +238,7 @@
                     updateButtonState();
 
                     Swal.fire({
-                        title: 'Updating...',
+                        title: 'Memperbarui...',
                         text: 'Mohon tunggu, data user sedang diproses.',
                         allowOutsideClick: false,
                         allowEscapeKey: false,

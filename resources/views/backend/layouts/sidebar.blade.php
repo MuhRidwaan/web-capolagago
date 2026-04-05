@@ -14,12 +14,22 @@
                     alt="User Image">
             </div>
             <div class="info">
-                <a href="#" class="d-block">{{ Auth::user()->name ?? 'Administrator' }}</a>
-                <small class="text-muted">
+                <a href="#" class="d-block font-weight-bold">{{ Auth::user()->name ?? 'Administrator' }}</a>
+                <div class="mt-1">
                     @foreach(Auth::user()->getRoleNames() as $role)
-                        <span>{{ $role }}</span>@if(!$loop->last), @endif
+                        @php
+                            $badgeColor = match($role) {
+                                'Super Admin' => 'danger',
+                                'Mitra'       => 'info',
+                                'Customer'    => 'secondary',
+                                default       => 'light',
+                            };
+                        @endphp
+                        <span class="badge badge-{{ $badgeColor }}" style="font-size:0.65rem">
+                            {{ $role }}
+                        </span>
                     @endforeach
-                </small>
+                </div>
             </div>
         </div>
 
@@ -168,8 +178,8 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ url('admin/commissions') }}"
-                        class="nav-link {{ request()->is('admin/commissions*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.commissions.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.commissions.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-percentage"></i>
                         <p>Komisi Mitra</p>
                     </a>
@@ -181,36 +191,36 @@
                 @can('manage_products')
                 <li class="nav-header">PRODUK & LAYANAN</li>
 
-                <li class="nav-item {{ request()->is('admin/products*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('admin/products*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->routeIs('admin.products.*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-box-open"></i>
                         <p>Katalog Produk <i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ url('admin/products') }}"
-                                class="nav-link {{ request()->is('admin/products') ? 'active' : '' }}">
+                            <a href="{{ route('admin.products.index') }}"
+                                class="nav-link {{ request()->routeIs('admin.products.index') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Semua Produk</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/products/create') }}"
-                                class="nav-link {{ request()->is('admin/products/create') ? 'active' : '' }}">
+                            <a href="{{ route('admin.products.create') }}"
+                                class="nav-link {{ request()->routeIs('admin.products.create') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon text-success"></i>
                                 <p>Tambah Produk</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/product-categories') }}"
-                                class="nav-link {{ request()->is('admin/product-categories*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.product-categories.index') }}"
+                                class="nav-link {{ request()->routeIs('admin.product-categories.*') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Kategori Produk</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/activity-tags') }}"
-                                class="nav-link {{ request()->is('admin/activity-tags*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.activity-tags.index') }}"
+                                class="nav-link {{ request()->routeIs('admin.activity-tags.*') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Tag Aktivitas</p>
                             </a>
@@ -227,8 +237,8 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ url('admin/reviews') }}"
-                        class="nav-link {{ request()->is('admin/reviews*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.reviews.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-star"></i>
                         <p>Ulasan & Rating</p>
                     </a>
@@ -239,31 +249,24 @@
                 @canany(['manage_users', 'manage_products'])
                 <li class="nav-header">MITRA</li>
 
-                <li class="nav-item {{ request()->is('admin/mitra*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('admin/mitra*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->routeIs('admin.mitra.*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.mitra.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-store"></i>
                         <p>Manajemen Mitra <i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ url('admin/mitra') }}"
-                                class="nav-link {{ request()->is('admin/mitra') ? 'active' : '' }}">
+                            <a href="{{ route('admin.mitra.index') }}"
+                                class="nav-link {{ request()->routeIs('admin.mitra.index') && ! request('status') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Daftar Mitra</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/mitra?status=pending') }}"
-                                class="nav-link">
+                            <a href="{{ route('admin.mitra.index', ['status' => 'pending']) }}"
+                                class="nav-link {{ request()->routeIs('admin.mitra.index') && request('status') === 'pending' ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon text-warning"></i>
                                 <p>Menunggu Verifikasi</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url('admin/commission-tiers') }}"
-                                class="nav-link {{ request()->is('admin/commission-tiers*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Tier Komisi</p>
                             </a>
                         </li>
                     </ul>
@@ -274,15 +277,15 @@
                 @can('manage_products')
                 <li class="nav-header">PROMOSI</li>
 
-                <li class="nav-item {{ request()->is('admin/promotions*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('admin/promotions*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->routeIs('admin.promotions.*') || request()->routeIs('admin.promo-types.*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.promotions.*') || request()->routeIs('admin.promo-types.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-ticket-alt"></i>
                         <p>Voucher & Promo <i class="right fas fa-angle-left"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{ url('admin/promotions') }}"
-                                class="nav-link {{ request()->is('admin/promotions') ? 'active' : '' }}">
+                                class="nav-link {{ request()->is('admin/promotions') && ! request()->is('admin/promotions/create') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Semua Promo</p>
                             </a>
@@ -309,8 +312,8 @@
                 @can('view_reports')
                 <li class="nav-header">LAPORAN</li>
 
-                <li class="nav-item {{ request()->is('admin/reports*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('admin/reports*') ? 'active' : '' }}">
+                <li class="nav-item {{ request()->routeIs('admin.reports.*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-chart-bar"></i>
                         <p>Laporan <i class="right fas fa-angle-left"></i></p>
                     </a>
@@ -324,14 +327,14 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.reports.commissions') }}"
-                                class="nav-link {{ request()->is('admin/reports/commissions*') ? 'active' : '' }}">
+                                class="nav-link {{ request()->routeIs('admin.reports.commissions') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Laporan Komisi</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.reports.products') }}"
-                                class="nav-link {{ request()->is('admin/reports/products*') ? 'active' : '' }}">
+                                class="nav-link {{ request()->routeIs('admin.reports.products') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Performa Produk</p>
                             </a>

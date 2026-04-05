@@ -160,7 +160,13 @@
                             <span class="font-weight-medium">{{ $slot->product_name }}</span>
                         </td>
                         <td>{{ \Carbon\Carbon::parse($slot->slot_date)->translatedFormat('D, d M Y') }}</td>
-                        <td>{{ $slot->start_time ? \Carbon\Carbon::parse($slot->start_time)->format('H:i') : '<span class="text-muted">—</span>' }}</td>
+                        <td>
+                            @if($slot->start_time)
+                                {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }}
+                            @else
+                                <span class="text-muted">—</span>
+                            @endif
+                        </td>
                         <td class="text-center">{{ $slot->total_slots }}</td>
                         <td class="text-center">{{ $slot->booked_slots }}</td>
                         <td class="text-center">

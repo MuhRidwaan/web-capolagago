@@ -10,8 +10,8 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.products.index') }}">Product Data</a></li>
-                        <li class="breadcrumb-item active">{{ $product->exists ? 'Edit' : 'Create' }}</li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.products.index') }}">Data Produk</a></li>
+                        <li class="breadcrumb-item active">{{ $product->exists ? 'Edit' : 'Tambah' }}</li>
                     </ol>
                 </div>
             </div>
@@ -39,7 +39,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Product Name <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Nama Produk <span class="capolaga-required">*</span></label>
                                     <input type="text" name="name" id="product-name" value="{{ old('name', $product->name) }}" class="form-control capolaga-form-control" required>
                                     <small class="text-muted">Wajib diisi. Nama produk yang akan tampil di admin dan website, misalnya <code>Glamping Riverside Luxury</code>.</small>
                                 </div>
@@ -49,7 +49,7 @@
                         <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Category <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Kategori <span class="capolaga-required">*</span></label>
                                     <select name="category_id" class="form-control capolaga-form-control" required>
                                         <option value="" @selected(! old('category_id', $product->category_id)) disabled>Pilih kategori produk</option>
                                         @foreach ($categories as $category)
@@ -62,19 +62,27 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="capolaga-form-label">Mitra <span class="capolaga-required">*</span></label>
-                                    <select name="mitra_id" class="form-control capolaga-form-control" required>
-                                        <option value="" @selected(old('mitra_id', $product->mitra_id ? (string) $product->mitra_id : 'internal') === '') disabled>Pilih kepemilikan produk</option>
-                                        <option value="internal" @selected(old('mitra_id', $product->mitra_id ? (string) $product->mitra_id : 'internal') === 'internal')>Capolaga Internal</option>
-                                        @foreach ($mitras as $mitra)
-                                            <option value="{{ $mitra->id }}" @selected((string) old('mitra_id', $product->mitra_id) === (string) $mitra->id)>{{ $mitra->business_name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <small class="text-muted">Wajib diisi. Pilih <code>Capolaga Internal</code> jika produk milik Capolaga langsung, atau pilih mitra vendor yang mengelola produk.</small>
+                                    @if($isMitra ?? false)
+                                        {{-- Mitra: field terkunci, value otomatis dari profil --}}
+                                        <input type="hidden" name="mitra_id" value="{{ $mitraProfile->id }}">
+                                        <input type="text" class="form-control capolaga-form-control"
+                                            value="{{ $mitraProfile->business_name }}" readonly disabled>
+                                        <small class="text-muted">Produk akan otomatis terdaftar atas nama mitra kamu.</small>
+                                    @else
+                                        <select name="mitra_id" class="form-control capolaga-form-control" required>
+                                            <option value="" @selected(old('mitra_id', $product->mitra_id ? (string) $product->mitra_id : 'internal') === '') disabled>Pilih kepemilikan produk</option>
+                                            <option value="internal" @selected(old('mitra_id', $product->mitra_id ? (string) $product->mitra_id : 'internal') === 'internal')>Capolaga Internal</option>
+                                            @foreach ($mitras as $mitra)
+                                                <option value="{{ $mitra->id }}" @selected((string) old('mitra_id', $product->mitra_id) === (string) $mitra->id)>{{ $mitra->business_name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <small class="text-muted">Pilih <code>Capolaga Internal</code> jika produk milik Capolaga langsung.</small>
+                                    @endif
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Price Label <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Satuan Harga <span class="capolaga-required">*</span></label>
                                     <select name="price_label" class="form-control capolaga-form-control" required>
                                         @foreach ($priceLabels as $label)
                                             <option value="{{ $label }}" @selected(old('price_label', $product->price_label ?: '/malam') === $label)>{{ $label }}</option>
@@ -88,35 +96,35 @@
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Price <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Harga <span class="capolaga-required">*</span></label>
                                     <input type="number" step="0.01" name="price" value="{{ old('price', $product->price) }}" class="form-control capolaga-form-control" required>
                                     <small class="text-muted">Wajib diisi. Masukkan angka harga tanpa titik atau simbol rupiah.</small>
                                 </div>
                             </div>
                             <div class="col-lg-2">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Min Pax <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Min. Tamu <span class="capolaga-required">*</span></label>
                                     <input type="number" name="min_pax" value="{{ old('min_pax', $product->min_pax ?: 1) }}" class="form-control capolaga-form-control" min="1" required>
                                     <small class="text-muted">Wajib diisi. Tentukan minimal peserta atau tamu untuk produk ini.</small>
                                 </div>
                             </div>
                             <div class="col-lg-2">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Max Pax <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Maks. Tamu <span class="capolaga-required">*</span></label>
                                     <input type="number" name="max_pax" value="{{ old('max_pax', $product->max_pax ?: 10) }}" class="form-control capolaga-form-control" min="1" required>
                                     <small class="text-muted">Wajib diisi. Nilai ini harus sama atau lebih besar dari Min Pax.</small>
                                 </div>
                             </div>
                             <div class="col-lg-2">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Capacity <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Kapasitas <span class="capolaga-required">*</span></label>
                                     <input type="number" name="max_capacity" value="{{ old('max_capacity', $product->max_capacity ?: 1) }}" class="form-control capolaga-form-control" min="1" required>
                                     <small class="text-muted">Wajib diisi. Jumlah unit atau slot yang tersedia per hari.</small>
                                 </div>
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Duration Hours <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Durasi (Jam) <span class="capolaga-required">*</span></label>
                                     <input type="number" step="0.1" min="0" name="duration_hours" value="{{ old('duration_hours', $product->duration_hours) }}" class="form-control capolaga-form-control" required>
                                     <small class="text-muted">Wajib diisi. Isi durasi aktivitas dalam jam, misalnya <code>2.5</code>.</small>
                                 </div>
@@ -126,35 +134,35 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Short Description <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Deskripsi Singkat <span class="capolaga-required">*</span></label>
                                     <input type="text" name="short_desc" value="{{ old('short_desc', $product->short_desc) }}" class="form-control capolaga-form-control" maxlength="300" required>
                                     <small class="text-muted">Wajib diisi. Ringkasan singkat produk untuk preview kartu atau daftar produk.</small>
                                 </div>
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Sort Order <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Urutan Tampil <span class="capolaga-required">*</span></label>
                                     <input type="number" name="sort_order" value="{{ old('sort_order', $product->sort_order ?? 0) }}" class="form-control capolaga-form-control" min="0" required>
                                     <small class="text-muted">Wajib diisi. Angka kecil akan tampil lebih dulu.</small>
                                 </div>
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label d-block">Flags <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label d-block">Status Produk <span class="capolaga-required">*</span></label>
                                     <div class="mb-3">
-                                        <label class="small font-weight-bold d-block">Featured Status</label>
+                                        <label class="small font-weight-bold d-block">Status Unggulan</label>
                                         <select name="is_featured" class="form-control capolaga-form-control" required>
                                             <option value="" @selected(old('is_featured', $product->exists ? (string) (int) $product->is_featured : '') === '') disabled>Pilih status featured</option>
-                                            <option value="1" @selected(old('is_featured', $product->exists ? (string) (int) $product->is_featured : '') === '1')>Featured</option>
-                                            <option value="0" @selected(old('is_featured', $product->exists ? (string) (int) $product->is_featured : '') === '0')>Not Featured</option>
+                                            <option value="1" @selected(old('is_featured', $product->exists ? (string) (int) $product->is_featured : '') === '1')>Unggulan</option>
+                                            <option value="0" @selected(old('is_featured', $product->exists ? (string) (int) $product->is_featured : '') === '0')>Tidak Unggulan</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="small font-weight-bold d-block">Product Status</label>
+                                        <label class="small font-weight-bold d-block">Status Aktif</label>
                                         <select name="is_active" class="form-control capolaga-form-control" required>
                                             <option value="" @selected(old('is_active', $product->exists ? (string) (int) $product->is_active : '') === '') disabled>Pilih status produk</option>
-                                            <option value="1" @selected(old('is_active', $product->exists ? (string) (int) $product->is_active : '') === '1')>Active</option>
-                                            <option value="0" @selected(old('is_active', $product->exists ? (string) (int) $product->is_active : '') === '0')>Inactive</option>
+                                            <option value="1" @selected(old('is_active', $product->exists ? (string) (int) $product->is_active : '') === '1')>Aktif</option>
+                                            <option value="0" @selected(old('is_active', $product->exists ? (string) (int) $product->is_active : '') === '0')>Nonaktif</option>
                                         </select>
                                     </div>
                                     <small class="text-muted d-block mt-2">Wajib diisi. Tentukan apakah produk menjadi unggulan dan apakah produk aktif ditampilkan ke sistem.</small>
@@ -163,7 +171,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="capolaga-form-label">Description <span class="capolaga-required">*</span></label>
+                            <label class="capolaga-form-label">Deskripsi <span class="capolaga-required">*</span></label>
                             <textarea name="description" rows="5" class="form-control" required>{{ old('description', $product->description) }}</textarea>
                             <small class="text-muted">Wajib diisi. Deskripsi lengkap produk, fasilitas, pengalaman, atau informasi penting lain.</small>
                         </div>
@@ -171,14 +179,14 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Meta Title</label>
+                                    <label class="capolaga-form-label">Meta Judul</label>
                                     <input type="text" name="meta_title" value="{{ old('meta_title', $product->meta_title) }}" class="form-control capolaga-form-control">
                                     <small class="text-muted">Opsional. Judul SEO untuk halaman produk di mesin pencari.</small>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Meta Description</label>
+                                    <label class="capolaga-form-label">Meta Deskripsi</label>
                                     <input type="text" name="meta_desc" value="{{ old('meta_desc', $product->meta_desc) }}" class="form-control capolaga-form-control">
                                     <small class="text-muted">Opsional. Ringkasan SEO singkat yang muncul di hasil pencarian.</small>
                                 </div>
@@ -186,7 +194,7 @@
                         </div>
 
                         <div class="form-group" data-required-checkbox-group="activity_tags">
-                            <label class="capolaga-form-label">Activity Tags <span class="capolaga-required">*</span></label>
+                            <label class="capolaga-form-label">Tag Aktivitas <span class="capolaga-required">*</span></label>
                             <div class="row">
                                 @foreach ($tagGroups as $group => $tags)
                                     <div class="col-lg-3 col-md-6 mb-3">
@@ -208,7 +216,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="capolaga-form-label">Existing Images</label>
+                            <label class="capolaga-form-label">Gambar Saat Ini</label>
                             <div class="row">
                                 @forelse ($product->images as $image)
                                     <div class="col-lg-4 mb-4">
@@ -225,11 +233,11 @@
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" id="primary_{{ $image->id }}" name="existing_images[{{ $image->id }}][is_primary]" value="1" @checked(old("existing_images.{$image->id}.is_primary", $image->is_primary))>
-                                                    <label class="form-check-label" for="primary_{{ $image->id }}">Primary image</label>
+                                                    <label class="form-check-label" for="primary_{{ $image->id }}">Gambar utama</label>
                                                 </div>
                                                 <div class="form-check mt-2">
                                                     <input class="form-check-input" type="checkbox" id="delete_{{ $image->id }}" name="delete_images[]" value="{{ $image->id }}">
-                                                    <label class="form-check-label text-danger" for="delete_{{ $image->id }}">Delete this image</label>
+                                                    <label class="form-check-label text-danger" for="delete_{{ $image->id }}">Hapus gambar ini</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -244,7 +252,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="capolaga-form-label">Upload New Images @unless($product->exists)<span class="capolaga-required">*</span>@endunless</label>
+                            <label class="capolaga-form-label">Upload Gambar Baru @unless($product->exists)<span class="capolaga-required">*</span>@endunless</label>
                             <input type="file" name="new_images[]" class="form-control-file" accept="image/*" multiple @required(! $product->exists)>
                             <small class="form-text text-muted">
                                 {{ $product->exists ? 'Opsional. Upload satu atau beberapa gambar baru sekaligus.' : 'Wajib diisi saat create product. Upload minimal satu gambar utama produk.' }}
@@ -252,8 +260,8 @@
                         </div>
 
                         <div class="capolaga-form-footer">
-                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="product-submit-btn">{{ $product->exists ? 'Update' : 'Save' }}</button>
-                            <a href="{{ route('admin.products.index') }}" class="btn btn-secondary capolaga-action-btn">Back</a>
+                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="product-submit-btn">{{ $product->exists ? 'Perbarui' : 'Simpan' }}</button>
+                            <a href="{{ route('admin.products.index') }}" class="btn btn-secondary capolaga-action-btn">Kembali</a>
                         </div>
                     </form>
                 </div>
@@ -390,11 +398,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         Swal.fire({
-            title: '{{ $product->exists ? 'Update product?' : 'Create product?' }}',
+            title: '{{ $product->exists ? 'Perbarui produk?' : 'Tambah produk?' }}',
             text: '{{ $product->exists ? 'Perubahan data produk akan langsung disimpan.' : 'Produk baru akan langsung disimpan.' }}',
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: '{{ $product->exists ? 'Ya, update' : 'Ya, simpan' }}',
+            confirmButtonText: '{{ $product->exists ? 'Ya, perbarui' : 'Ya, simpan' }}',
             cancelButtonText: 'Batal',
             reverseButtons: true,
             confirmButtonColor: '#1f8fff',
@@ -406,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function () {
             isSubmitting = true;
             updateButtonState();
             Swal.fire({
-                title: '{{ $product->exists ? 'Updating...' : 'Saving...' }}',
+                title: '{{ $product->exists ? 'Memperbarui...' : 'Menyimpan...' }}',
                 text: 'Mohon tunggu, data produk sedang diproses.',
                 allowOutsideClick: false,
                 allowEscapeKey: false,

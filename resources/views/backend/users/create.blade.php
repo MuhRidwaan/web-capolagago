@@ -1,19 +1,19 @@
 @extends('backend.main_backend')
 
-@section('title', 'Add User')
+@section('title', 'Tambah User')
 
 @section('content')
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Add User</h1>
+                    <h1 class="m-0">Tambah User</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('admin.users.index') }}">User Data</a></li>
-                        <li class="breadcrumb-item active">Add</li>
+                        <li class="breadcrumb-item active">Tambah</li>
                     </ol>
                 </div>
             </div>
@@ -26,7 +26,7 @@
 
             <div class="card capolaga-form-card">
                 <div class="card-header capolaga-form-header">
-                    <h3 class="card-title mb-0">Add User Form</h3>
+                    <h3 class="card-title mb-0">Form Tambah User</h3>
                 </div>
 
                 <div class="card-body">
@@ -90,8 +90,8 @@
                         </div>
 
                         <div class="capolaga-form-footer">
-                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="save-user-btn" disabled>Save</button>
-                            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary capolaga-action-btn">Back</a>
+                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="save-user-btn" disabled>Simpan</button>
+                            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary capolaga-action-btn">Kembali</a>
                         </div>
                     </form>
                 </div>

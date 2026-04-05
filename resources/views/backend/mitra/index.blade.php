@@ -1,18 +1,18 @@
 @extends('backend.main_backend')
 
-@section('title', 'Mitra Data')
+@section('title', 'Data Mitra')
 
 @section('content')
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Mitra Data</h1>
+                    <h1 class="m-0">Data Mitra</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item active">Mitra Data</li>
+                        <li class="breadcrumb-item active">Data Mitra</li>
                     </ol>
                 </div>
             </div>
@@ -26,12 +26,12 @@
             <div class="card capolaga-user-card">
                 <div class="card-header border-0">
                     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center">
-                        <h3 class="card-title font-weight-normal">Partner Directory</h3>
+                        <h3 class="card-title font-weight-normal">Direktori Mitra</h3>
 
                         <div class="capolaga-user-toolbar mt-3 mt-lg-0">
                             <form method="GET" action="{{ route('admin.mitra.index') }}" class="capolaga-user-search">
                                 <div class="input-group">
-                                    <input type="text" name="q" class="form-control" placeholder="Search mitra..."
+                                    <input type="text" name="q" class="form-control" placeholder="Cari mitra..."
                                         value="{{ request('q') }}">
                                     <div class="input-group-append">
                                         <button class="btn btn-outline-secondary" type="submit" aria-label="Search mitra">
@@ -44,7 +44,7 @@
                             <form method="GET" action="{{ route('admin.mitra.index') }}">
                                 <input type="hidden" name="q" value="{{ request('q') }}">
                                 <select name="status" class="form-control capolaga-action-btn" onchange="this.form.submit()">
-                                    <option value="">All Status</option>
+                                    <option value="">Semua Status</option>
                                     @foreach ($statuses as $status)
                                         <option value="{{ $status }}" @selected(request('status') === $status)>
                                             {{ str($status)->headline() }}
@@ -54,7 +54,7 @@
                             </form>
 
                             <a href="{{ route('admin.mitra.create') }}" class="btn btn-primary capolaga-action-btn">
-                                <i class="fas fa-plus mr-1"></i> Add Mitra
+                                <i class="fas fa-plus mr-1"></i> Tambah Mitra
                             </a>
                         </div>
                     </div>
@@ -66,12 +66,12 @@
                             <thead>
                                 <tr>
                                     <th style="width: 72px;">No</th>
-                                    <th>Business</th>
-                                    <th>Owner Account</th>
+                                    <th>Bisnis</th>
+                                    <th>Akun Pemilik</th>
                                     <th>Status</th>
-                                    <th>Subscription</th>
-                                    <th>Products</th>
-                                    <th style="width: 210px;">Action</th>
+                                    <th>Langganan</th>
+                                    <th>Produk</th>
+                                    <th style="width: 210px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -109,7 +109,7 @@
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="active">
-                                                        <button class="btn btn-success btn-sm capolaga-icon-btn" type="submit" title="Activate">
+                                                        <button class="btn btn-success btn-sm capolaga-icon-btn" type="submit" title="Aktifkan">
                                                             <i class="fas fa-check"></i>
                                                         </button>
                                                     </form>
@@ -120,7 +120,7 @@
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="suspended">
-                                                        <button class="btn btn-secondary btn-sm capolaga-icon-btn" type="submit" title="Suspend">
+                                                        <button class="btn btn-secondary btn-sm capolaga-icon-btn" type="submit" title="Tangguhkan">
                                                             <i class="fas fa-pause"></i>
                                                         </button>
                                                     </form>

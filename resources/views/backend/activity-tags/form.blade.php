@@ -1,19 +1,19 @@
 @extends('backend.main_backend')
 
-@section('title', $tag->exists ? 'Edit Activity Tag' : 'Create Activity Tag')
+@section('title', $tag->exists ? 'Edit Tag Aktivitas' : 'Tambah Tag Aktivitas')
 
 @section('content')
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">{{ $tag->exists ? 'Edit Activity Tag' : 'Create Activity Tag' }}</h1>
+                    <h1 class="m-0">{{ $tag->exists ? 'Edit Tag Aktivitas' : 'Tambah Tag Aktivitas' }}</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.activity-tags.index') }}">Activity Tags</a></li>
-                        <li class="breadcrumb-item active">{{ $tag->exists ? 'Edit' : 'Create' }}</li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.activity-tags.index') }}">Tag Aktivitas</a></li>
+                        <li class="breadcrumb-item active">{{ $tag->exists ? 'Edit' : 'Tambah' }}</li>
                     </ol>
                 </div>
             </div>
@@ -26,7 +26,7 @@
 
             <div class="card capolaga-form-card">
                 <div class="card-header capolaga-form-header">
-                    <h3 class="card-title mb-0">{{ $tag->exists ? 'Edit Activity Tag Form' : 'Create Activity Tag Form' }}</h3>
+                    <h3 class="card-title mb-0">{{ $tag->exists ? 'Form Edit Tag Aktivitas' : 'Form Tambah Tag Aktivitas' }}</h3>
                 </div>
 
                 <div class="card-body">
@@ -41,7 +41,7 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Name <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Nama <span class="capolaga-required">*</span></label>
                                     <input type="text" name="name" id="tag-name" value="{{ old('name', $tag->name) }}" class="form-control capolaga-form-control @error('name') is-invalid @enderror" required>
                                     <small class="text-muted">Wajib diisi. Nama tag aktivitas yang akan dipakai di produk.</small>
                                     @error('name')
@@ -52,12 +52,12 @@
 
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Group <span class="capolaga-required">*</span></label>
+                                    <label class="capolaga-form-label">Grup <span class="capolaga-required">*</span></label>
                                     <select name="group_name" class="form-control capolaga-form-control @error('group_name') is-invalid @enderror" required>
-                                        <option value="audience" @selected(old('group_name', $tag->group_name ?: 'audience') === 'audience')>Audience</option>
-                                        <option value="difficulty" @selected(old('group_name', $tag->group_name) === 'difficulty')>Difficulty</option>
-                                        <option value="facility" @selected(old('group_name', $tag->group_name) === 'facility')>Facility</option>
-                                        <option value="theme" @selected(old('group_name', $tag->group_name) === 'theme')>Theme</option>
+                                        <option value="audience" @selected(old('group_name', $tag->group_name ?: 'audience') === 'audience')>Audiens</option>
+                                        <option value="difficulty" @selected(old('group_name', $tag->group_name) === 'difficulty')>Tingkat Kesulitan</option>
+                                        <option value="facility" @selected(old('group_name', $tag->group_name) === 'facility')>Fasilitas</option>
+                                        <option value="theme" @selected(old('group_name', $tag->group_name) === 'theme')>Tema</option>
                                     </select>
                                     <small class="text-muted">Wajib diisi. Pilih grup untuk mengelompokkan tag aktivitas.</small>
                                     @error('group_name')
@@ -68,8 +68,8 @@
                         </div>
 
                         <div class="capolaga-form-footer">
-                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="activity-tag-submit-btn">{{ $tag->exists ? 'Update' : 'Save' }}</button>
-                            <a href="{{ route('admin.activity-tags.index') }}" class="btn btn-secondary capolaga-action-btn">Back</a>
+                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="activity-tag-submit-btn">{{ $tag->exists ? 'Perbarui' : 'Simpan' }}</button>
+                            <a href="{{ route('admin.activity-tags.index') }}" class="btn btn-secondary capolaga-action-btn">Kembali</a>
                         </div>
                     </form>
                 </div>

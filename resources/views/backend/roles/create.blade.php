@@ -1,19 +1,19 @@
 @extends('backend.main_backend')
 
-@section('title', 'Create Role')
+@section('title', 'Tambah Role')
 
 @section('content')
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Create Role</h1>
+                    <h1 class="m-0">Tambah Role</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('admin.roles.index') }}">Role Data</a></li>
-                        <li class="breadcrumb-item active">Create</li>
+                        <li class="breadcrumb-item active">Tambah</li>
                     </ol>
                 </div>
             </div>
@@ -26,7 +26,7 @@
 
             <div class="card capolaga-form-card">
                 <div class="card-header capolaga-form-header">
-                    <h3 class="card-title mb-0">Create Role Form</h3>
+                    <h3 class="card-title mb-0">Form Tambah Role</h3>
                 </div>
 
                 <div class="card-body">
@@ -95,8 +95,8 @@
                         </div>
 
                         <div class="capolaga-form-footer">
-                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="create-role-btn" disabled>Save</button>
-                            <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary capolaga-action-btn">Back</a>
+                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="create-role-btn" disabled>Simpan</button>
+                            <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary capolaga-action-btn">Kembali</a>
                         </div>
                     </form>
                 </div>
@@ -106,6 +106,7 @@
 @endsection
 
 @push('styles')
+    <link rel="stylesheet" href="{{ asset('backend/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
     <style>
         .capolaga-permission-card {
             border-color: #dbe5ef !important;
@@ -171,6 +172,7 @@
 @endpush
 
 @push('scripts')
+    <script src="{{ asset('backend/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('create-role-form');
@@ -232,7 +234,7 @@
                 }
 
                 Swal.fire({
-                    title: 'Create role?',
+                    title: 'Tambah role?',
                     text: 'Role baru akan langsung disimpan.',
                     icon: 'question',
                     showCancelButton: true,

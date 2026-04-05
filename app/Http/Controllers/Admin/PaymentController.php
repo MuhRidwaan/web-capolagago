@@ -15,8 +15,30 @@ class PaymentController extends Controller
         private BookingSlotService $bookingSlotService,
     ) {}
 
+    private function mitraId(): ?int
+    {
+        $user = auth()->user();
+        return $user->hasRole('Super Admin') ? null : $user->mitraProfile?->id;
+    }
+
+    private function mitraBookingIds(?int $mitraId): ?array
+    {
+        if (! $mitraId) return null;
+
+        return DB::table('booking_items as bi')
+            ->join('products as p', 'p.id', '=', 'bi.product_id')
+            ->where('p.mitra_id', $mitraId)
+            ->pluck('bi.booking_id')
+            ->unique()
+            ->values()
+            ->all();
+    }
+
     public function index(Request $request)
     {
+        $mitraId    = $this->mitraId();
+        $bookingIds = $this->mitraBookingIds($mitraId);
+
         $query = DB::table('payments as py')
             ->join('bookings as b', 'b.id', '=', 'py.booking_id')
             ->join('users as u', 'u.id', '=', 'b.user_id')
@@ -29,6 +51,7 @@ class PaymentController extends Controller
                 'u.name as user_name', 'u.email as user_email',
                 'pm.name as method_name', 'pm.type as method_type'
             )
+            ->when($bookingIds !== null, fn($q) => $q->whereIn('py.booking_id', $bookingIds))
             ->orderByDesc('py.created_at');
 
         if ($request->filled('q')) {
@@ -60,12 +83,14 @@ class PaymentController extends Controller
         $payments = $query->paginate(15)->withQueryString();
 
         $statusCounts = DB::table('payments')
+            ->when($bookingIds !== null, fn($q) => $q->whereIn('booking_id', $bookingIds))
             ->selectRaw('status, count(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status');
 
         $totalPaid = DB::table('payments')
             ->where('status', 'paid')
+            ->when($bookingIds !== null, fn($q) => $q->whereIn('booking_id', $bookingIds))
             ->sum('amount');
 
         return view('backend.payments.index', compact('payments', 'statusCounts', 'totalPaid'));
@@ -73,6 +98,9 @@ class PaymentController extends Controller
 
     public function show(int $id)
     {
+        $mitraId    = $this->mitraId();
+        $bookingIds = $this->mitraBookingIds($mitraId);
+
         $payment = DB::table('payments as py')
             ->join('bookings as b', 'b.id', '=', 'py.booking_id')
             ->join('users as u', 'u.id', '=', 'b.user_id')
@@ -84,6 +112,7 @@ class PaymentController extends Controller
                 'u.name as user_name', 'u.email as user_email',
                 'pm.name as method_name', 'pm.type as method_type', 'pm.provider'
             )
+            ->when($bookingIds !== null, fn($q) => $q->whereIn('py.booking_id', $bookingIds))
             ->where('py.id', $id)
             ->first();
 

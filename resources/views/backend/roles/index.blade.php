@@ -2,6 +2,10 @@
 
 @section('title', 'Role Data')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('backend/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
+@endpush
+
 @section('content')
     <div class="content-header">
         <div class="container-fluid">
@@ -46,7 +50,7 @@
                             </button>
 
                             <a href="{{ route('admin.roles.create') }}" class="btn btn-primary capolaga-action-btn">
-                                <i class="fas fa-plus mr-1"></i> Add Role
+                                <i class="fas fa-plus mr-1"></i> Tambah Role
                             </a>
                         </div>
                     </div>
@@ -60,7 +64,7 @@
                                     <th style="width: 72px;">No</th>
                                     <th>Role Name</th>
                                     <th>Permissions</th>
-                                    <th style="width: 140px;">Action</th>
+                                    <th style="width: 140px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -78,8 +82,7 @@
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <form action="{{ route('admin.roles.destroy', $role) }}" method="POST"
-                                                    class="d-inline"
-                                                    onsubmit="return confirm('Yakin ingin menghapus role ini?')">
+                                                    class="d-inline form-delete-role">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button class="btn btn-danger btn-sm capolaga-icon-btn" type="submit"
@@ -107,3 +110,31 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('backend/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+<script>
+$(function () {
+    $('.form-delete-role').on('submit', function (e) {
+        e.preventDefault();
+        const form = this;
+        Swal.fire({
+            title: 'Hapus role ini?',
+            text: 'Role yang masih dipakai user tidak bisa dihapus.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#dc3545',
+        }).then(r => { if (r.isConfirmed) form.submit(); });
+    });
+
+    @if(session('success'))
+        Swal.fire({ icon: 'success', title: 'Berhasil', text: @json(session('success')), timer: 3000, showConfirmButton: false });
+    @endif
+    @if(session('error'))
+        Swal.fire({ icon: 'error', title: 'Gagal', text: @json(session('error')) });
+    @endif
+});
+</script>
+@endpush

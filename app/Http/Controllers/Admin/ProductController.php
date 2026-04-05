@@ -17,13 +17,33 @@ use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
+    /**
+     * Ambil MitraProfile milik user yang sedang login.
+     * Return null jika user adalah Super Admin (akses penuh).
+     */
+    private function currentMitraProfile(): ?MitraProfile
+    {
+        $user = auth()->user();
+        if ($user->hasRole('Super Admin')) {
+            return null;
+        }
+        return MitraProfile::where('user_id', $user->id)->first();
+    }
+
     public function index(Request $request)
     {
+        $mitraProfile = $this->currentMitraProfile();
+
         $query = Product::query()
             ->with(['category', 'mitra', 'primaryImage', 'images'])
             ->orderByDesc('is_featured')
             ->orderBy('sort_order')
             ->orderBy('name');
+
+        // Mitra hanya lihat produk miliknya sendiri
+        if ($mitraProfile) {
+            $query->where('mitra_id', $mitraProfile->id);
+        }
 
         if ($request->filled('q')) {
             $q = trim((string) $request->string('q'));
@@ -39,7 +59,8 @@ class ProductController extends Controller
             $query->where('category_id', $request->integer('category_id'));
         }
 
-        if ($request->filled('mitra_id')) {
+        // Filter mitra hanya untuk Super Admin
+        if (! $mitraProfile && $request->filled('mitra_id')) {
             $query->where('mitra_id', $request->integer('mitra_id'));
         }
 
@@ -50,19 +71,56 @@ class ProductController extends Controller
         $products = $query->paginate(15)->withQueryString();
 
         return view('backend.products.index', [
-            'products' => $products,
+            'products'   => $products,
             'categories' => ProductCategory::query()->orderBy('name')->get(),
-            'mitras' => MitraProfile::query()->where('status', 'active')->orderBy('business_name')->get(),
+            // Mitra tidak perlu lihat dropdown filter mitra
+            'mitras'     => $mitraProfile ? collect() : MitraProfile::query()->where('status', 'active')->orderBy('business_name')->get(),
+            'isMitra'    => (bool) $mitraProfile,
         ]);
     }
 
     public function create()
     {
-        return view('backend.products.form', $this->formData(new Product(), 'Create Product', 'Create Product Form'));
+        return view('backend.products.form', $this->formData(new Product(), 'Tambah Produk', 'Form Tambah Produk'));
+    }
+
+    public function show(Product $product)
+    {
+        $mitraProfile = $this->currentMitraProfile();
+        if ($mitraProfile && $product->mitra_id !== $mitraProfile->id) {
+            abort(403);
+        }
+
+        $product->load(['images', 'activityTags', 'category', 'mitra']);
+
+        $stats = DB::table('booking_items as bi')
+            ->join('bookings as b', 'b.id', '=', 'bi.booking_id')
+            ->where('bi.product_id', $product->id)
+            ->whereIn('b.status', ['confirmed', 'checked_in', 'completed'])
+            ->selectRaw('COUNT(DISTINCT b.id) as total_bookings, SUM(bi.quantity) as total_qty, SUM(bi.subtotal) as total_revenue')
+            ->first();
+
+        $recentReviews = DB::table('reviews as r')
+            ->join('users as u', 'u.id', '=', 'r.user_id')
+            ->where('r.product_id', $product->id)
+            ->where('r.is_published', true)
+            ->select('r.rating', 'r.comment', 'r.created_at', 'u.name as user_name')
+            ->orderByDesc('r.created_at')
+            ->limit(5)
+            ->get();
+
+        return view('backend.products.detail', compact('product', 'stats', 'recentReviews'));
     }
 
     public function store(Request $request)
     {
+        $mitraProfile = $this->currentMitraProfile();
+
+        // Paksa mitra_id ke profil mitra yang login
+        if ($mitraProfile) {
+            $request->merge(['mitra_id' => $mitraProfile->id]);
+        }
+
         $data = $this->validateProduct($request);
 
         DB::transaction(function () use ($request, $data) {
@@ -77,6 +135,12 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
+        // Mitra tidak boleh edit produk milik mitra lain
+        $mitraProfile = $this->currentMitraProfile();
+        if ($mitraProfile && $product->mitra_id !== $mitraProfile->id) {
+            abort(403, 'Kamu tidak memiliki akses ke produk ini.');
+        }
+
         $product->load(['images', 'activityTags', 'category', 'mitra']);
 
         return view('backend.products.form', $this->formData($product, 'Edit Product', 'Edit Product Form'));
@@ -84,6 +148,16 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        $mitraProfile = $this->currentMitraProfile();
+        if ($mitraProfile && $product->mitra_id !== $mitraProfile->id) {
+            abort(403, 'Kamu tidak memiliki akses ke produk ini.');
+        }
+
+        // Paksa mitra_id agar tidak bisa diubah oleh mitra
+        if ($mitraProfile) {
+            $request->merge(['mitra_id' => $mitraProfile->id]);
+        }
+
         $product->load('images', 'activityTags');
         $data = $this->validateProduct($request, $product);
 
@@ -101,11 +175,14 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        $mitraProfile = $this->currentMitraProfile();
+        if ($mitraProfile && $product->mitra_id !== $mitraProfile->id) {
+            abort(403, 'Kamu tidak memiliki akses ke produk ini.');
+        }
+
         try {
             $imagePaths = $product->images->pluck('image_path')->filter()->all();
-
             $product->delete();
-
             foreach ($imagePaths as $imagePath) {
                 Storage::disk('public')->delete($imagePath);
             }
@@ -118,39 +195,37 @@ class ProductController extends Controller
 
     private function formData(Product $product, string $pageTitle, string $formTitle): array
     {
+        $mitraProfile   = $this->currentMitraProfile();
         $currentCategoryId = $product->category_id;
-        $currentMitraId = $product->mitra_id;
+        $currentMitraId    = $product->mitra_id;
+
+        // Mitra hanya lihat profil miliknya sendiri
+        $mitrasQuery = MitraProfile::query();
+        if ($mitraProfile) {
+            $mitrasQuery->where('id', $mitraProfile->id);
+        } else {
+            $mitrasQuery->when($currentMitraId, function ($q) use ($currentMitraId) {
+                $q->where(function ($inner) use ($currentMitraId) {
+                    $inner->where('status', 'active')->orWhere('id', $currentMitraId);
+                });
+            }, fn($q) => $q->where('status', 'active'));
+        }
 
         return [
-            'product' => $product,
-            'pageTitle' => $pageTitle,
-            'formTitle' => $formTitle,
+            'product'    => $product,
+            'pageTitle'  => $pageTitle,
+            'formTitle'  => $formTitle,
+            'isMitra'    => (bool) $mitraProfile,
+            'mitraProfile' => $mitraProfile,
             'categories' => ProductCategory::query()
-                ->when($currentCategoryId, function ($query) use ($currentCategoryId) {
-                    $query->where(function ($innerQuery) use ($currentCategoryId) {
-                        $innerQuery
-                            ->where('is_active', true)
-                            ->orWhere('id', $currentCategoryId);
-                    });
-                }, function ($query) {
-                    $query->where('is_active', true);
-                })
+                ->when($currentCategoryId, function ($q) use ($currentCategoryId) {
+                    $q->where(fn($i) => $i->where('is_active', true)->orWhere('id', $currentCategoryId));
+                }, fn($q) => $q->where('is_active', true))
                 ->orderBy('name')
                 ->get(),
-            'mitras' => MitraProfile::query()
-                ->when($currentMitraId, function ($query) use ($currentMitraId) {
-                    $query->where(function ($innerQuery) use ($currentMitraId) {
-                        $innerQuery
-                            ->where('status', 'active')
-                            ->orWhere('id', $currentMitraId);
-                    });
-                }, function ($query) {
-                    $query->where('status', 'active');
-                })
-                ->orderBy('business_name')
-                ->get(),
-            'tagGroups' => ActivityTag::query()->orderBy('group_name')->orderBy('name')->get()->groupBy('group_name'),
-            'priceLabels' => ['/malam', '/orang', '/sesi', '/unit'],
+            'mitras'     => $mitrasQuery->orderBy('business_name')->get(),
+            'tagGroups'  => ActivityTag::query()->orderBy('group_name')->orderBy('name')->get()->groupBy('group_name'),
+            'priceLabels'=> ['/malam', '/orang', '/sesi', '/unit'],
         ];
     }
 

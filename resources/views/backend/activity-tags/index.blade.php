@@ -1,18 +1,18 @@
 @extends('backend.main_backend')
 
-@section('title', 'Activity Tags')
+@section('title', 'Tag Aktivitas')
 
 @section('content')
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Activity Tags</h1>
+                    <h1 class="m-0">Tag Aktivitas</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item active">Activity Tags</li>
+                        <li class="breadcrumb-item active">Tag Aktivitas</li>
                     </ol>
                 </div>
             </div>
@@ -26,12 +26,12 @@
             <div class="card capolaga-user-card">
                 <div class="card-header border-0">
                     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center">
-                        <h3 class="card-title font-weight-normal">Tag List</h3>
+                        <h3 class="card-title font-weight-normal">Daftar Tag</h3>
 
                         <div class="capolaga-user-toolbar mt-3 mt-lg-0">
                             <form method="GET" action="{{ route('admin.activity-tags.index') }}" class="capolaga-user-search">
                                 <div class="input-group">
-                                    <input type="text" name="q" class="form-control" placeholder="Search tag..."
+                                    <input type="text" name="q" class="form-control" placeholder="Cari tag..."
                                         value="{{ request('q') }}">
                                     <div class="input-group-append">
                                         <button class="btn btn-outline-secondary" type="submit">
@@ -42,7 +42,7 @@
                             </form>
 
                             <a href="{{ route('admin.activity-tags.create') }}" class="btn btn-primary capolaga-action-btn">
-                                <i class="fas fa-plus mr-1"></i> Add Tag
+                                <i class="fas fa-plus mr-1"></i> Tambah Tag
                             </a>
                         </div>
                     </div>
@@ -54,10 +54,10 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Name</th>
-                                    <th>Group</th>
-                                    <th>Products</th>
-                                    <th>Action</th>
+                                    <th>Nama</th>
+                                    <th>Grup</th>
+                                    <th>Produk</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>

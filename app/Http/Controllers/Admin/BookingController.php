@@ -26,12 +26,31 @@ class BookingController extends Controller
         'refunded'        => [],
     ];
 
+    private function mitraId(): ?int
+    {
+        $user = auth()->user();
+        return $user->hasRole('Super Admin') ? null : $user->mitraProfile?->id;
+    }
+
     public function index(Request $request)
     {
+        $mitraId = $this->mitraId();
+
         $query = DB::table('bookings as b')
             ->join('users as u', 'u.id', '=', 'b.user_id')
             ->select('b.*', 'u.name as user_name', 'u.email as user_email')
             ->orderByDesc('b.created_at');
+
+        // Mitra hanya lihat booking yang mengandung produknya
+        if ($mitraId) {
+            $query->whereExists(function ($sub) use ($mitraId) {
+                $sub->select(DB::raw(1))
+                    ->from('booking_items as bi')
+                    ->join('products as p', 'p.id', '=', 'bi.product_id')
+                    ->whereColumn('bi.booking_id', 'b.id')
+                    ->where('p.mitra_id', $mitraId);
+            });
+        }
 
         if ($request->filled('q')) {
             $q = $request->q;
@@ -60,7 +79,17 @@ class BookingController extends Controller
 
         $bookings = $query->paginate(15)->withQueryString();
 
-        $statusCounts = DB::table('bookings')
+        $statusCountsQuery = DB::table('bookings');
+        if ($mitraId) {
+            $statusCountsQuery->whereExists(function ($sub) use ($mitraId) {
+                $sub->select(DB::raw(1))
+                    ->from('booking_items as bi')
+                    ->join('products as p', 'p.id', '=', 'bi.product_id')
+                    ->whereColumn('bi.booking_id', 'bookings.id')
+                    ->where('p.mitra_id', $mitraId);
+            });
+        }
+        $statusCounts = $statusCountsQuery
             ->selectRaw('status, count(*) as total')
             ->groupBy('status')
             ->pluck('total', 'status');
@@ -70,8 +99,10 @@ class BookingController extends Controller
 
     public function create()
     {
+        $mitraId  = $this->mitraId();
         $products = DB::table('products')
             ->where('is_active', true)
+            ->when($mitraId, fn($q) => $q->where('mitra_id', $mitraId))
             ->orderBy('name')
             ->get(['id', 'name', 'price', 'price_label', 'min_pax', 'max_pax', 'category_id']);
 
@@ -91,20 +122,19 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'customer_name'     => ['required', 'string', 'max:150'],
-            'customer_email'    => ['required', 'email', 'max:150'],
-            'visit_date'        => ['required', 'date', 'after_or_equal:today'],
-            'checkout_date'     => ['nullable', 'date', 'after_or_equal:visit_date'],
-            'total_guests'      => ['required', 'integer', 'min:1'],
-            'source'            => ['required', 'in:web,mobile,whatsapp,walk_in'],
-            'notes'             => ['nullable', 'string', 'max:1000'],
-            'promo_code'        => ['nullable', 'string', 'max:50'],
-            'items'             => ['required', 'array', 'min:1'],
-            'items.*.product_id'=> ['required', 'exists:products,id'],
-            'items.*.quantity'  => ['required', 'integer', 'min:1'],
+            'customer_name'      => ['required', 'string', 'max:150'],
+            'customer_email'     => ['required', 'email', 'max:150'],
+            'visit_date'         => ['required', 'date', 'after_or_equal:today'],
+            'checkout_date'      => ['nullable', 'date', 'after_or_equal:visit_date'],
+            'total_guests'       => ['required', 'integer', 'min:1'],
+            'source'             => ['required', 'in:web,mobile,whatsapp,walk_in'],
+            'notes'              => ['nullable', 'string', 'max:1000'],
+            'promo_code'         => ['nullable', 'string', 'max:50'],
+            'items'              => ['required', 'array', 'min:1'],
+            'items.*.product_id' => ['required', 'exists:products,id'],
+            'items.*.quantity'   => ['required', 'integer', 'min:1'],
         ]);
 
-        // Cari atau buat user berdasarkan email
         $user = DB::table('users')->where('email', $data['customer_email'])->first();
         if (! $user) {
             $userId = DB::table('users')->insertGetId([
@@ -118,6 +148,7 @@ class BookingController extends Controller
             $userId = $user->id;
         }
 
+<<<<<<< HEAD
         $preparedBooking = $this->bookingService->prepareAdminBookingItems(
             $data['items'],
             $data['visit_date'],
@@ -125,10 +156,28 @@ class BookingController extends Controller
         );
         $subtotal = $preparedBooking['subtotal'];
         $itemRows = $preparedBooking['items'];
+=======
+        $subtotal = 0;
+        $itemRows = [];
+        foreach ($data['items'] as $item) {
+            $product   = DB::table('products')->find($item['product_id']);
+            $lineTotal = $product->price * $item['quantity'];
+            $subtotal += $lineTotal;
+            $itemRows[] = [
+                'product_id'            => $product->id,
+                'product_name_snapshot' => $product->name,
+                'quantity'              => $item['quantity'],
+                'unit_price'            => $product->price,
+                'subtotal'              => $lineTotal,
+                'is_addon'              => false,
+                'created_at'            => now(),
+                'updated_at'            => now(),
+            ];
+        }
+>>>>>>> 92fdba5 (perbaikan bahasa , role akses , dan minor)
 
         $bookingCode = $this->generateBookingCode();
-
-        $bookingId = DB::table('bookings')->insertGetId([
+        $bookingId   = DB::table('bookings')->insertGetId([
             'booking_code'    => $bookingCode,
             'public_token'    => $this->bookingService->generatePublicToken(),
             'user_id'         => $userId,
@@ -159,12 +208,24 @@ class BookingController extends Controller
 
     public function show(int $id)
     {
-        $booking = DB::table('bookings as b')
+        $mitraId = $this->mitraId();
+
+        $query = DB::table('bookings as b')
             ->join('users as u', 'u.id', '=', 'b.user_id')
             ->select('b.*', 'u.name as user_name', 'u.email as user_email')
-            ->where('b.id', $id)
-            ->first();
+            ->where('b.id', $id);
 
+        if ($mitraId) {
+            $query->whereExists(function ($sub) use ($mitraId) {
+                $sub->select(DB::raw(1))
+                    ->from('booking_items as bi')
+                    ->join('products as p', 'p.id', '=', 'bi.product_id')
+                    ->whereColumn('bi.booking_id', 'b.id')
+                    ->where('p.mitra_id', $mitraId);
+            });
+        }
+
+        $booking = $query->first();
         abort_if(! $booking, 404);
 
         $items = DB::table('booking_items as bi')
@@ -187,6 +248,7 @@ class BookingController extends Controller
 
     public function edit(int $id)
     {
+        $mitraId = $this->mitraId();
         $booking = DB::table('bookings as b')
             ->join('users as u', 'u.id', '=', 'b.user_id')
             ->select('b.*', 'u.name as user_name', 'u.email as user_email')
@@ -196,10 +258,10 @@ class BookingController extends Controller
         abort_if(! $booking, 404);
         abort_if(in_array($booking->status, ['completed', 'refunded']), 403, 'Booking ini tidak bisa diedit.');
 
-        $items = DB::table('booking_items')->where('booking_id', $id)->get();
-
+        $items    = DB::table('booking_items')->where('booking_id', $id)->get();
         $products = DB::table('products')
             ->where('is_active', true)
+            ->when($mitraId, fn($q) => $q->where('mitra_id', $mitraId))
             ->orderBy('name')
             ->get(['id', 'name', 'price', 'price_label', 'min_pax', 'max_pax', 'category_id']);
 
@@ -235,16 +297,12 @@ class BookingController extends Controller
             ->with('success', 'Booking berhasil diperbarui.');
     }
 
-    /**
-     * Update status booking (inline dari index atau dari detail).
-     */
     public function updateStatus(Request $request, int $id)
     {
         $booking = DB::table('bookings')->where('id', $id)->first();
         abort_if(! $booking, 404);
 
         $allowed = $this->statusFlow[$booking->status] ?? [];
-
         $request->validate([
             'status' => ['required', 'in:' . implode(',', $allowed)],
             'notes'  => ['nullable', 'string', 'max:500'],
@@ -264,12 +322,10 @@ class BookingController extends Controller
     {
         $date   = now()->format('Ymd');
         $prefix = "CAP-{$date}-";
-
-        $last = DB::table('bookings')
+        $last   = DB::table('bookings')
             ->where('booking_code', 'like', "{$prefix}%")
             ->orderByDesc('booking_code')
             ->value('booking_code');
-
         $seq = $last ? ((int) substr($last, -4)) + 1 : 1;
 
         return $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);
