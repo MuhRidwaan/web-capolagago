@@ -30,7 +30,7 @@
     @include('backend.layouts.flash')
 
     <form action="{{ $method ? route('admin.payment-methods.update', $method->id) : route('admin.payment-methods.store') }}"
-        method="POST" enctype="multipart/form-data">
+        method="POST" enctype="multipart/form-data" id="payment-method-form" data-swal-managed="custom">
         @csrf
         @if($method) @method('PUT') @endif
 
@@ -246,7 +246,7 @@
                         <a href="{{ route('admin.payment-methods.index') }}" class="btn btn-secondary btn-block mb-2">
                             <i class="fas fa-arrow-left mr-1"></i>Kembali
                         </a>
-                        <button type="submit" class="btn btn-primary btn-block">
+                        <button type="submit" class="btn btn-primary btn-block" id="payment-method-submit-btn">
                             <i class="fas fa-save mr-1"></i>
                             {{ $method ? 'Simpan Perubahan' : 'Tambah Metode' }}
                         </button>
@@ -265,6 +265,10 @@
 <script src="{{ asset('backend/plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
 <script>
 $(function () {
+    const form = document.getElementById('payment-method-form');
+    const submitButton = document.getElementById('payment-method-submit-btn');
+    let isSubmitting = false;
+
     bsCustomFileInput.init();
 
     $('.select2-basic').select2({ theme: 'bootstrap4', width: '100%' });
@@ -290,6 +294,61 @@ $(function () {
 
     $('input[name=fee_flat], input[name=fee_percent]').on('input', updatePreview);
     updatePreview();
+
+    if (form && submitButton) {
+        window.addEventListener('pageshow', function () {
+            isSubmitting = false;
+            if (typeof Swal !== 'undefined') Swal.close();
+        });
+
+        form.addEventListener('submit', function (event) {
+            if (isSubmitting) {
+                event.preventDefault();
+                return;
+            }
+
+            if (!form.reportValidity()) {
+                event.preventDefault();
+                return;
+            }
+
+            event.preventDefault();
+
+            if (typeof Swal === 'undefined') {
+                isSubmitting = true;
+                form.submit();
+                return;
+            }
+
+            Swal.fire({
+                title: '{{ $method ? 'Update metode pembayaran?' : 'Tambah metode pembayaran?' }}',
+                text: '{{ $method ? 'Perubahan metode pembayaran akan langsung disimpan.' : 'Metode pembayaran baru akan langsung ditambahkan.' }}',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '{{ $method ? 'Ya, update' : 'Ya, simpan' }}',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                confirmButtonColor: '#1f8fff',
+                cancelButtonColor: '#6d7a86',
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+
+                isSubmitting = true;
+                submitButton.disabled = true;
+
+                Swal.fire({
+                    title: '{{ $method ? 'Updating...' : 'Saving...' }}',
+                    text: 'Mohon tunggu, data metode pembayaran sedang diproses.',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+
+                form.submit();
+            });
+        });
+    }
 
     @if(session('success'))
         Swal.fire({ icon: 'success', title: 'Berhasil', text: @json(session('success')), timer: 3000, showConfirmButton: false });

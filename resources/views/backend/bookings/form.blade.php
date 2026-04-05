@@ -135,9 +135,9 @@
                 {{-- Item Produk (hanya saat create) --}}
                 @if(! $booking)
                 <div class="card card-outline card-success">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h3 class="card-title"><i class="fas fa-box mr-2"></i>Produk / Layanan</h3>
-                        <button type="button" class="btn btn-sm btn-success" id="btn-add-item">
+                    <div class="card-header d-flex align-items-center">
+                        <h3 class="card-title mb-0 float-none"><i class="fas fa-box mr-2"></i>Produk / Layanan</h3>
+                        <button type="button" class="btn btn-sm btn-success ml-auto" id="btn-add-item">
                             <i class="fas fa-plus mr-1"></i>Tambah Item
                         </button>
                     </div>
