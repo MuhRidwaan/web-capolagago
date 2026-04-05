@@ -51,6 +51,7 @@
                                 <div class="form-group">
                                     <label class="capolaga-form-label">Category <span class="capolaga-required">*</span></label>
                                     <select name="category_id" class="form-control capolaga-form-control" required>
+                                        <option value="" @selected(! old('category_id', $product->category_id)) disabled>Pilih kategori produk</option>
                                         @foreach ($categories as $category)
                                             <option value="{{ $category->id }}" @selected((string) old('category_id', $product->category_id) === (string) $category->id)>{{ $category->label }}</option>
                                         @endforeach
@@ -60,25 +61,26 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Mitra</label>
-                                    <select name="mitra_id" class="form-control capolaga-form-control">
-                                        <option value="">Capolaga Internal</option>
+                                    <label class="capolaga-form-label">Mitra <span class="capolaga-required">*</span></label>
+                                    <select name="mitra_id" class="form-control capolaga-form-control" required>
+                                        <option value="" @selected(old('mitra_id', $product->mitra_id ? (string) $product->mitra_id : 'internal') === '') disabled>Pilih kepemilikan produk</option>
+                                        <option value="internal" @selected(old('mitra_id', $product->mitra_id ? (string) $product->mitra_id : 'internal') === 'internal')>Capolaga Internal</option>
                                         @foreach ($mitras as $mitra)
                                             <option value="{{ $mitra->id }}" @selected((string) old('mitra_id', $product->mitra_id) === (string) $mitra->id)>{{ $mitra->business_name }}</option>
                                         @endforeach
                                     </select>
-                                    <small class="text-muted">Opsional. Kosongkan jika produk milik Capolaga langsung, pilih mitra jika produk dikelola vendor.</small>
+                                    <small class="text-muted">Wajib diisi. Pilih <code>Capolaga Internal</code> jika produk milik Capolaga langsung, atau pilih mitra vendor yang mengelola produk.</small>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Price Label</label>
-                                    <select name="price_label" class="form-control capolaga-form-control">
+                                    <label class="capolaga-form-label">Price Label <span class="capolaga-required">*</span></label>
+                                    <select name="price_label" class="form-control capolaga-form-control" required>
                                         @foreach ($priceLabels as $label)
                                             <option value="{{ $label }}" @selected(old('price_label', $product->price_label ?: '/malam') === $label)>{{ $label }}</option>
                                         @endforeach
                                     </select>
-                                    <small class="text-muted">Opsional. Jika tidak diubah, sistem akan memakai nilai default yang sudah dipilih.</small>
+                                    <small class="text-muted">Wajib diisi. Pilih satuan harga yang sesuai, misalnya per malam, per orang, per sesi, atau per unit.</small>
                                 </div>
                             </div>
                         </div>
@@ -93,30 +95,30 @@
                             </div>
                             <div class="col-lg-2">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Min Pax</label>
-                                    <input type="number" name="min_pax" value="{{ old('min_pax', $product->min_pax ?: 1) }}" class="form-control capolaga-form-control">
-                                    <small class="text-muted">Opsional. Default sistem: 1.</small>
+                                    <label class="capolaga-form-label">Min Pax <span class="capolaga-required">*</span></label>
+                                    <input type="number" name="min_pax" value="{{ old('min_pax', $product->min_pax ?: 1) }}" class="form-control capolaga-form-control" min="1" required>
+                                    <small class="text-muted">Wajib diisi. Tentukan minimal peserta atau tamu untuk produk ini.</small>
                                 </div>
                             </div>
                             <div class="col-lg-2">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Max Pax</label>
-                                    <input type="number" name="max_pax" value="{{ old('max_pax', $product->max_pax ?: 10) }}" class="form-control capolaga-form-control">
-                                    <small class="text-muted">Opsional. Default sistem: 10.</small>
+                                    <label class="capolaga-form-label">Max Pax <span class="capolaga-required">*</span></label>
+                                    <input type="number" name="max_pax" value="{{ old('max_pax', $product->max_pax ?: 10) }}" class="form-control capolaga-form-control" min="1" required>
+                                    <small class="text-muted">Wajib diisi. Nilai ini harus sama atau lebih besar dari Min Pax.</small>
                                 </div>
                             </div>
                             <div class="col-lg-2">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Capacity</label>
-                                    <input type="number" name="max_capacity" value="{{ old('max_capacity', $product->max_capacity ?: 1) }}" class="form-control capolaga-form-control">
-                                    <small class="text-muted">Opsional. Default sistem: 1.</small>
+                                    <label class="capolaga-form-label">Capacity <span class="capolaga-required">*</span></label>
+                                    <input type="number" name="max_capacity" value="{{ old('max_capacity', $product->max_capacity ?: 1) }}" class="form-control capolaga-form-control" min="1" required>
+                                    <small class="text-muted">Wajib diisi. Jumlah unit atau slot yang tersedia per hari.</small>
                                 </div>
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Duration Hours</label>
-                                    <input type="number" step="0.1" name="duration_hours" value="{{ old('duration_hours', $product->duration_hours) }}" class="form-control capolaga-form-control">
-                                    <small class="text-muted">Opsional. Isi durasi aktivitas dalam jam, misalnya <code>2.5</code>.</small>
+                                    <label class="capolaga-form-label">Duration Hours <span class="capolaga-required">*</span></label>
+                                    <input type="number" step="0.1" min="0" name="duration_hours" value="{{ old('duration_hours', $product->duration_hours) }}" class="form-control capolaga-form-control" required>
+                                    <small class="text-muted">Wajib diisi. Isi durasi aktivitas dalam jam, misalnya <code>2.5</code>.</small>
                                 </div>
                             </div>
                         </div>
@@ -124,38 +126,46 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Short Description</label>
-                                    <input type="text" name="short_desc" value="{{ old('short_desc', $product->short_desc) }}" class="form-control capolaga-form-control" maxlength="300">
-                                    <small class="text-muted">Opsional. Ringkasan singkat produk untuk preview kartu atau daftar produk.</small>
+                                    <label class="capolaga-form-label">Short Description <span class="capolaga-required">*</span></label>
+                                    <input type="text" name="short_desc" value="{{ old('short_desc', $product->short_desc) }}" class="form-control capolaga-form-control" maxlength="300" required>
+                                    <small class="text-muted">Wajib diisi. Ringkasan singkat produk untuk preview kartu atau daftar produk.</small>
                                 </div>
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Sort Order</label>
-                                    <input type="number" name="sort_order" value="{{ old('sort_order', $product->sort_order ?? 0) }}" class="form-control capolaga-form-control">
-                                    <small class="text-muted">Opsional. Default sistem: 0. Angka kecil akan tampil lebih dulu.</small>
+                                    <label class="capolaga-form-label">Sort Order <span class="capolaga-required">*</span></label>
+                                    <input type="number" name="sort_order" value="{{ old('sort_order', $product->sort_order ?? 0) }}" class="form-control capolaga-form-control" min="0" required>
+                                    <small class="text-muted">Wajib diisi. Angka kecil akan tampil lebih dulu.</small>
                                 </div>
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label d-block">Flags</label>
-                                    <div class="form-check mt-2">
-                                        <input type="checkbox" class="form-check-input" id="is_featured" name="is_featured" value="1" @checked(old('is_featured', $product->is_featured))>
-                                        <label class="form-check-label" for="is_featured">Featured</label>
+                                    <label class="capolaga-form-label d-block">Flags <span class="capolaga-required">*</span></label>
+                                    <div class="mb-3">
+                                        <label class="small font-weight-bold d-block">Featured Status</label>
+                                        <select name="is_featured" class="form-control capolaga-form-control" required>
+                                            <option value="" @selected(old('is_featured', $product->exists ? (string) (int) $product->is_featured : '') === '') disabled>Pilih status featured</option>
+                                            <option value="1" @selected(old('is_featured', $product->exists ? (string) (int) $product->is_featured : '') === '1')>Featured</option>
+                                            <option value="0" @selected(old('is_featured', $product->exists ? (string) (int) $product->is_featured : '') === '0')>Not Featured</option>
+                                        </select>
                                     </div>
-                                    <div class="form-check mt-2">
-                                        <input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="1" @checked(old('is_active', $product->exists ? $product->is_active : true))>
-                                        <label class="form-check-label" for="is_active">Active</label>
+                                    <div>
+                                        <label class="small font-weight-bold d-block">Product Status</label>
+                                        <select name="is_active" class="form-control capolaga-form-control" required>
+                                            <option value="" @selected(old('is_active', $product->exists ? (string) (int) $product->is_active : '') === '') disabled>Pilih status produk</option>
+                                            <option value="1" @selected(old('is_active', $product->exists ? (string) (int) $product->is_active : '') === '1')>Active</option>
+                                            <option value="0" @selected(old('is_active', $product->exists ? (string) (int) $product->is_active : '') === '0')>Inactive</option>
+                                        </select>
                                     </div>
-                                    <small class="text-muted d-block mt-2">Opsional. Featured untuk produk unggulan, Active untuk menampilkan produk ke sistem.</small>
+                                    <small class="text-muted d-block mt-2">Wajib diisi. Tentukan apakah produk menjadi unggulan dan apakah produk aktif ditampilkan ke sistem.</small>
                                 </div>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="capolaga-form-label">Description</label>
-                            <textarea name="description" rows="5" class="form-control">{{ old('description', $product->description) }}</textarea>
-                            <small class="text-muted">Opsional. Deskripsi lengkap produk, fasilitas, pengalaman, atau informasi penting lain.</small>
+                            <label class="capolaga-form-label">Description <span class="capolaga-required">*</span></label>
+                            <textarea name="description" rows="5" class="form-control" required>{{ old('description', $product->description) }}</textarea>
+                            <small class="text-muted">Wajib diisi. Deskripsi lengkap produk, fasilitas, pengalaman, atau informasi penting lain.</small>
                         </div>
 
                         <div class="row">
@@ -175,8 +185,8 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="capolaga-form-label">Activity Tags</label>
+                        <div class="form-group" data-required-checkbox-group="activity_tags">
+                            <label class="capolaga-form-label">Activity Tags <span class="capolaga-required">*</span></label>
                             <div class="row">
                                 @foreach ($tagGroups as $group => $tags)
                                     <div class="col-lg-3 col-md-6 mb-3">
@@ -185,7 +195,7 @@
                                                 <h4 class="h6 font-weight-bold mb-3">{{ str($group)->headline() }}</h4>
                                                 @foreach ($tags as $tag)
                                                     <div class="form-check mb-2">
-                                                        <input class="form-check-input" type="checkbox" id="tag_{{ $tag->id }}" name="activity_tags[]" value="{{ $tag->id }}" @checked(in_array($tag->id, old('activity_tags', $product->activityTags->pluck('id')->all()), true))>
+                                                        <input class="form-check-input" type="checkbox" id="tag_{{ $tag->id }}" name="activity_tags[]" value="{{ $tag->id }}" data-checkbox-group="activity_tags" @checked(in_array($tag->id, old('activity_tags', $product->activityTags->pluck('id')->all()), true))>
                                                         <label class="form-check-label" for="tag_{{ $tag->id }}">{{ $tag->name }}</label>
                                                     </div>
                                                 @endforeach
@@ -194,7 +204,7 @@
                                     </div>
                                 @endforeach
                             </div>
-                            <small class="text-muted">Opsional. Pilih tag untuk membantu pengelompokan produk berdasarkan tema, tingkat kesulitan, atau target pengunjung.</small>
+                            <small class="text-muted">Wajib diisi. Pilih minimal satu tag untuk membantu pengelompokan produk berdasarkan tema, tingkat kesulitan, atau target pengunjung.</small>
                         </div>
 
                         <div class="form-group">
@@ -234,13 +244,15 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="capolaga-form-label">Upload New Images</label>
-                            <input type="file" name="new_images[]" class="form-control-file" accept="image/*" multiple>
-                            <small class="form-text text-muted">Opsional. Upload satu atau beberapa gambar baru sekaligus.</small>
+                            <label class="capolaga-form-label">Upload New Images @unless($product->exists)<span class="capolaga-required">*</span>@endunless</label>
+                            <input type="file" name="new_images[]" class="form-control-file" accept="image/*" multiple @required(! $product->exists)>
+                            <small class="form-text text-muted">
+                                {{ $product->exists ? 'Opsional. Upload satu atau beberapa gambar baru sekaligus.' : 'Wajib diisi saat create product. Upload minimal satu gambar utama produk.' }}
+                            </small>
                         </div>
 
                         <div class="capolaga-form-footer">
-                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="product-submit-btn" disabled>{{ $product->exists ? 'Update' : 'Save' }}</button>
+                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="product-submit-btn">{{ $product->exists ? 'Update' : 'Save' }}</button>
                             <a href="{{ route('admin.products.index') }}" class="btn btn-secondary capolaga-action-btn">Back</a>
                         </div>
                     </form>
@@ -262,12 +274,26 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!form || !submitButton) return;
 
     const requiredFields = Array.from(form.querySelectorAll('[required]'));
+    const requiredCheckboxGroups = Array.from(form.querySelectorAll('[data-required-checkbox-group]'))
+        .map((group) => ({
+            fields: Array.from(group.querySelectorAll('input[type="checkbox"]')),
+        }))
+        .filter((group) => group.fields.length > 0);
+
     const isFieldFilled = (field) => {
         if (field.type === 'checkbox' || field.type === 'radio') {
             return field.checked;
         }
 
+        if (field.type === 'file') {
+            return field.files.length > 0;
+        }
+
         return field.value.trim() !== '';
+    };
+
+    const syncFieldValidity = (field) => {
+        field.setCustomValidity(isFieldFilled(field) ? '' : 'Wajib diisi.');
     };
 
     const slugify = (value) => value
@@ -279,9 +305,27 @@ document.addEventListener('DOMContentLoaded', function () {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
 
+    const isCheckboxGroupFilled = (group) => group.fields.some((field) => field.checked);
+
+    const syncCheckboxGroupValidity = (group) => {
+        const firstField = group.fields[0];
+        if (!firstField) return true;
+
+        const isValid = isCheckboxGroupFilled(group);
+        firstField.setCustomValidity(isValid ? '' : 'Wajib diisi.');
+
+        return isValid;
+    };
+
+    const isFormComplete = () => {
+        const allFieldsFilled = requiredFields.every(isFieldFilled);
+        const allCheckboxGroupsFilled = requiredCheckboxGroups.every(syncCheckboxGroupValidity);
+
+        return allFieldsFilled && allCheckboxGroupsFilled;
+    };
+
     const updateButtonState = () => {
-        const allFilled = requiredFields.every(isFieldFilled);
-        submitButton.disabled = isSubmitting || !allFilled;
+        requiredCheckboxGroups.forEach(syncCheckboxGroupValidity);
     };
 
     if (nameInput && slugInput) {
@@ -295,8 +339,28 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     requiredFields.forEach((field) => {
-        field.addEventListener('input', updateButtonState);
-        field.addEventListener('change', updateButtonState);
+        field.addEventListener('input', function () {
+            syncFieldValidity(field);
+            updateButtonState();
+        });
+        field.addEventListener('change', function () {
+            syncFieldValidity(field);
+            updateButtonState();
+        });
+        field.addEventListener('invalid', function () {
+            syncFieldValidity(field);
+        });
+
+        syncFieldValidity(field);
+    });
+
+    requiredCheckboxGroups.forEach((group) => {
+        group.fields.forEach((field) => {
+            field.addEventListener('input', updateButtonState);
+            field.addEventListener('change', updateButtonState);
+        });
+
+        syncCheckboxGroupValidity(group);
     });
 
     window.addEventListener('pageshow', function () {
@@ -306,7 +370,17 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     form.addEventListener('submit', function (event) {
-        if (isSubmitting || !requiredFields.every(isFieldFilled)) return;
+        if (isSubmitting) {
+            event.preventDefault();
+            return;
+        }
+
+        if (!isFormComplete() || !form.reportValidity()) {
+            event.preventDefault();
+            updateButtonState();
+            return;
+        }
+
         event.preventDefault();
         if (typeof Swal === 'undefined') {
             isSubmitting = true;

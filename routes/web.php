@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MailSettingController;
 use App\Http\Controllers\Admin\MitraController;
 use App\Http\Controllers\Admin\PaymentController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\Admin\PaymentSettingController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductSlotController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\ActivityTagController;
 use App\Http\Controllers\Admin\UserController;
@@ -43,7 +45,7 @@ Route::prefix('admin')
     ->middleware(['auth', 'role:Super Admin|Mitra'])
     ->group(function () {
 
-        Route::view('/', 'backend.dashboard')->name('dashboard');
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::redirect('/dashboard', '/admin');
 
         // Pengaturan Sistem (manage_users)
@@ -97,9 +99,11 @@ Route::prefix('admin')
         });
 
         // Laporan (view_reports)
-        Route::get('/reports', fn () => 'Halaman laporan.')
-            ->middleware('permission:view_reports')
-            ->name('reports.index');
+        Route::middleware('permission:view_reports')->group(function () {
+            Route::get('/reports', [ReportController::class, 'sales'])->name('reports.index');
+            Route::get('/reports/commissions', [ReportController::class, 'commissions'])->name('reports.commissions');
+            Route::get('/reports/products', [ReportController::class, 'products'])->name('reports.products');
+        });
 
         // Booking Management (manage_transactions)
         Route::middleware('permission:manage_transactions')->group(function () {

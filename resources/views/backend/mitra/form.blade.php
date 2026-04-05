@@ -192,7 +192,7 @@
                         </div>
 
                         <div class="capolaga-form-footer">
-                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="mitra-submit-btn" disabled>{{ $mitra->exists ? 'Update' : 'Save' }}</button>
+                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="mitra-submit-btn">{{ $mitra->exists ? 'Update' : 'Save' }}</button>
                             <a href="{{ route('admin.mitra.index') }}" class="btn btn-secondary capolaga-action-btn">Back</a>
                         </div>
                     </form>
@@ -217,17 +217,35 @@ document.addEventListener('DOMContentLoaded', function () {
             return field.checked;
         }
 
+        if (field.type === 'file') {
+            return field.files.length > 0;
+        }
+
         return field.value.trim() !== '';
     };
 
+    const syncFieldValidity = (field) => {
+        field.setCustomValidity(isFieldFilled(field) ? '' : 'Wajib diisi.');
+    };
+
     const updateButtonState = () => {
-        const allFilled = requiredFields.every(isFieldFilled);
-        submitButton.disabled = isSubmitting || !allFilled;
+        return;
     };
 
     requiredFields.forEach((field) => {
-        field.addEventListener('input', updateButtonState);
-        field.addEventListener('change', updateButtonState);
+        field.addEventListener('input', function () {
+            syncFieldValidity(field);
+            updateButtonState();
+        });
+        field.addEventListener('change', function () {
+            syncFieldValidity(field);
+            updateButtonState();
+        });
+        field.addEventListener('invalid', function () {
+            syncFieldValidity(field);
+        });
+
+        syncFieldValidity(field);
     });
 
     window.addEventListener('pageshow', function () {
@@ -237,7 +255,16 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     form.addEventListener('submit', function (event) {
-        if (isSubmitting || !requiredFields.every(isFieldFilled)) return;
+        if (isSubmitting) {
+            event.preventDefault();
+            return;
+        }
+
+        if (!form.reportValidity()) {
+            event.preventDefault();
+            return;
+        }
+
         event.preventDefault();
         if (typeof Swal === 'undefined') {
             isSubmitting = true;

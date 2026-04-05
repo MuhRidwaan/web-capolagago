@@ -41,8 +41,9 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Name</label>
+                                    <label class="capolaga-form-label">Name <span class="capolaga-required">*</span></label>
                                     <input type="text" name="name" id="tag-name" value="{{ old('name', $tag->name) }}" class="form-control capolaga-form-control @error('name') is-invalid @enderror" required>
+                                    <small class="text-muted">Wajib diisi. Nama tag aktivitas yang akan dipakai di produk.</small>
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -51,13 +52,14 @@
 
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Group</label>
-                                    <select name="group_name" class="form-control capolaga-form-control @error('group_name') is-invalid @enderror">
+                                    <label class="capolaga-form-label">Group <span class="capolaga-required">*</span></label>
+                                    <select name="group_name" class="form-control capolaga-form-control @error('group_name') is-invalid @enderror" required>
                                         <option value="audience" @selected(old('group_name', $tag->group_name ?: 'audience') === 'audience')>Audience</option>
                                         <option value="difficulty" @selected(old('group_name', $tag->group_name) === 'difficulty')>Difficulty</option>
                                         <option value="facility" @selected(old('group_name', $tag->group_name) === 'facility')>Facility</option>
                                         <option value="theme" @selected(old('group_name', $tag->group_name) === 'theme')>Theme</option>
                                     </select>
+                                    <small class="text-muted">Wajib diisi. Pilih grup untuk mengelompokkan tag aktivitas.</small>
                                     @error('group_name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -66,7 +68,7 @@
                         </div>
 
                         <div class="capolaga-form-footer">
-                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="activity-tag-submit-btn" disabled>{{ $tag->exists ? 'Update' : 'Save' }}</button>
+                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="activity-tag-submit-btn">{{ $tag->exists ? 'Update' : 'Save' }}</button>
                             <a href="{{ route('admin.activity-tags.index') }}" class="btn btn-secondary capolaga-action-btn">Back</a>
                         </div>
                     </form>
@@ -90,6 +92,9 @@
 
             const requiredFields = Array.from(form.querySelectorAll('[required]'));
             const isFieldFilled = (field) => field.value.trim() !== '';
+            const syncFieldValidity = (field) => {
+                field.setCustomValidity(isFieldFilled(field) ? '' : 'Wajib diisi.');
+            };
 
             const slugify = (value) => value
                 .toString()
@@ -109,16 +114,26 @@
             };
 
             const updateButtonState = () => {
-                const allFilled = requiredFields.every(isFieldFilled);
-                submitButton.disabled = !allFilled;
+                return;
             };
 
             nameInput.addEventListener('input', syncSlug);
             nameInput.addEventListener('change', syncSlug);
 
             requiredFields.forEach((field) => {
-                field.addEventListener('input', updateButtonState);
-                field.addEventListener('change', updateButtonState);
+                field.addEventListener('input', function () {
+                    syncFieldValidity(field);
+                    updateButtonState();
+                });
+                field.addEventListener('change', function () {
+                    syncFieldValidity(field);
+                    updateButtonState();
+                });
+                field.addEventListener('invalid', function () {
+                    syncFieldValidity(field);
+                });
+
+                syncFieldValidity(field);
             });
 
             syncSlug();

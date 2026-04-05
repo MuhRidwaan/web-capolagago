@@ -323,14 +323,14 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/reports/commissions') }}"
+                            <a href="{{ route('admin.reports.commissions') }}"
                                 class="nav-link {{ request()->is('admin/reports/commissions*') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Laporan Komisi</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ url('admin/reports/products') }}"
+                            <a href="{{ route('admin.reports.products') }}"
                                 class="nav-link {{ request()->is('admin/reports/products*') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Performa Produk</p>

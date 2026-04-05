@@ -168,26 +168,37 @@ class ProductController extends Controller
         ]);
 
         return $request->validate([
-            'mitra_id' => ['nullable', 'exists:mitra_profiles,id'],
+            'mitra_id' => [
+                'required',
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    if ($value === 'internal') {
+                        return;
+                    }
+
+                    if (! MitraProfile::query()->whereKey($value)->exists()) {
+                        $fail('Pilihan mitra tidak valid.');
+                    }
+                },
+            ],
             'category_id' => ['required', 'exists:product_categories,id'],
             'name' => ['required', 'string', 'max:200'],
             'slug' => ['required', 'string', 'max:200', Rule::unique('products', 'slug')->ignore($product?->id)],
-            'short_desc' => ['nullable', 'string', 'max:300'],
-            'description' => ['nullable', 'string'],
+            'short_desc' => ['required', 'string', 'max:300'],
+            'description' => ['required', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
-            'price_label' => ['nullable', Rule::in(['/malam', '/orang', '/sesi', '/unit'])],
-            'min_pax' => ['nullable', 'integer', 'min:1', 'max:255'],
-            'max_pax' => ['nullable', 'integer', 'min:1', 'max:1000'],
-            'max_capacity' => ['nullable', 'integer', 'min:1', 'max:1000'],
-            'duration_hours' => ['nullable', 'numeric', 'min:0', 'max:99.9'],
-            'sort_order' => ['nullable', 'integer', 'min:0', 'max:65535'],
+            'price_label' => ['required', Rule::in(['/malam', '/orang', '/sesi', '/unit'])],
+            'min_pax' => ['required', 'integer', 'min:1', 'max:255'],
+            'max_pax' => ['required', 'integer', 'min:1', 'max:1000', 'gte:min_pax'],
+            'max_capacity' => ['required', 'integer', 'min:1', 'max:1000'],
+            'duration_hours' => ['required', 'numeric', 'min:0', 'max:99.9'],
+            'sort_order' => ['required', 'integer', 'min:0', 'max:65535'],
             'meta_title' => ['nullable', 'string', 'max:200'],
             'meta_desc' => ['nullable', 'string', 'max:300'],
-            'is_featured' => ['nullable', 'boolean'],
-            'is_active' => ['nullable', 'boolean'],
-            'activity_tags' => ['nullable', 'array'],
+            'is_featured' => ['required', 'boolean'],
+            'is_active' => ['required', 'boolean'],
+            'activity_tags' => ['required', 'array', 'min:1'],
             'activity_tags.*' => ['integer', 'exists:activity_tags,id'],
-            'new_images' => ['nullable', 'array'],
+            'new_images' => [$product ? 'nullable' : 'required', 'array'],
             'new_images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
             'existing_images' => ['nullable', 'array'],
             'existing_images.*.alt_text' => ['nullable', 'string', 'max:200'],
@@ -201,7 +212,7 @@ class ProductController extends Controller
     private function extractProductPayload(Request $request, array $data): array
     {
         return [
-            'mitra_id' => $data['mitra_id'] ?? null,
+            'mitra_id' => ($data['mitra_id'] ?? null) === 'internal' ? null : $data['mitra_id'],
             'category_id' => $data['category_id'],
             'name' => $data['name'],
             'slug' => $data['slug'],

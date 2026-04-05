@@ -74,6 +74,9 @@ class ProductCategoryController extends Controller
             'slug' => $request->filled('slug')
                 ? Str::slug((string) $request->input('slug'))
                 : Str::slug((string) $request->input('name')),
+            'sort_order' => $request->filled('sort_order')
+                ? $request->input('sort_order')
+                : 0,
         ]);
 
         return $request->validate([
@@ -83,7 +86,7 @@ class ProductCategoryController extends Controller
             'icon' => ['nullable', 'string', 'max:50'],
             'color_hex' => ['nullable', 'regex:/^#([A-Fa-f0-9]{6})$/'],
             'type' => ['required', Rule::in(['internal', 'addon'])],
-            'sort_order' => ['required', 'integer', 'min:0', 'max:255'],
+            'sort_order' => ['nullable', 'integer', 'min:0', 'max:255'],
             'is_active' => ['nullable', 'boolean'],
         ]);
     }

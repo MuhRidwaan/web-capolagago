@@ -43,9 +43,9 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Category Name</label>
+                                    <label class="capolaga-form-label">Category Name <span class="capolaga-required">*</span></label>
                                     <input type="text" name="name" id="category-name" value="{{ old('name', $category->name) }}" class="form-control capolaga-form-control @error('name') is-invalid @enderror" required>
-                                    <small class="text-muted">Nama kategori utama di sistem, misalnya <code>glamping</code> atau <code>rafting</code>.</small>
+                                    <small class="text-muted">Wajib diisi. Nama kategori utama di sistem, misalnya <code>glamping</code> atau <code>rafting</code>.</small>
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -54,9 +54,9 @@
 
                             <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Display Name</label>
+                                    <label class="capolaga-form-label">Display Name <span class="capolaga-required">*</span></label>
                                     <input type="text" name="label" id="category-label" value="{{ old('label', $category->label) }}" class="form-control capolaga-form-control @error('label') is-invalid @enderror" required>
-                                    <small class="text-muted">Nama yang akan ditampilkan ke admin atau pengguna di website/app.</small>
+                                    <small class="text-muted">Wajib diisi. Nama yang akan ditampilkan ke admin atau pengguna di website/app.</small>
                                     @error('label')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -67,12 +67,12 @@
                         <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="capolaga-form-label">Category Type</label>
-                                    <select name="type" class="form-control capolaga-form-control @error('type') is-invalid @enderror">
+                                    <label class="capolaga-form-label">Category Type <span class="capolaga-required">*</span></label>
+                                    <select name="type" class="form-control capolaga-form-control @error('type') is-invalid @enderror" required>
                                         <option value="internal" @selected(old('type', $category->type ?: 'internal') === 'internal')>Internal</option>
                                         <option value="addon" @selected(old('type', $category->type) === 'addon')>Addon</option>
                                     </select>
-                                    <small class="text-muted">`Internal` untuk produk utama, `Addon` untuk tambahan.</small>
+                                    <small class="text-muted">Wajib diisi. <code>Internal</code> untuk produk utama, <code>Addon</code> untuk tambahan.</small>
                                     @error('type')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -82,8 +82,8 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label class="capolaga-form-label">Display Order</label>
-                                    <input type="number" name="sort_order" value="{{ old('sort_order', $category->sort_order ?? 0) }}" class="form-control capolaga-form-control @error('sort_order') is-invalid @enderror" min="0" required>
-                                    <small class="text-muted">Angka kecil akan tampil lebih dulu.</small>
+                                    <input type="number" name="sort_order" value="{{ old('sort_order', $category->sort_order ?? 0) }}" class="form-control capolaga-form-control @error('sort_order') is-invalid @enderror" min="0">
+                                    <small class="text-muted">Opsional. Angka kecil akan tampil lebih dulu.</small>
                                     @error('sort_order')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -97,13 +97,13 @@
                                         <input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="1" @checked(old('is_active', $category->is_active ?? true))>
                                         <label class="form-check-label" for="is_active">Active category</label>
                                     </div>
-                                    <small class="text-muted d-block mt-2">Nonaktifkan jika kategori belum ingin ditampilkan.</small>
+                                    <small class="text-muted d-block mt-2">Opsional. Nonaktifkan jika kategori belum ingin ditampilkan.</small>
                                 </div>
                             </div>
                         </div>
 
                         <div class="capolaga-form-footer mt-4">
-                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="product-category-submit-btn" disabled>{{ $category->exists ? 'Update' : 'Save' }}</button>
+                            <button type="submit" class="btn btn-primary capolaga-action-btn" id="product-category-submit-btn">{{ $category->exists ? 'Update' : 'Save' }}</button>
                             <a href="{{ route('admin.product-categories.index') }}" class="btn btn-secondary capolaga-action-btn">Back</a>
                         </div>
                     </form>
@@ -128,6 +128,9 @@
 
             const requiredFields = Array.from(form.querySelectorAll('[required]'));
             const isFieldFilled = (field) => field.value.trim() !== '';
+            const syncFieldValidity = (field) => {
+                field.setCustomValidity(isFieldFilled(field) ? '' : 'Wajib diisi.');
+            };
             let labelTouched = labelInput ? labelInput.value.trim() !== '' : true;
 
             const slugify = (value) => value
@@ -149,8 +152,7 @@
             };
 
             const updateButtonState = () => {
-                const allFilled = requiredFields.every(isFieldFilled);
-                submitButton.disabled = !allFilled;
+                return;
             };
 
             if (labelInput) {
@@ -163,8 +165,19 @@
             nameInput.addEventListener('change', syncGeneratedFields);
 
             requiredFields.forEach((field) => {
-                field.addEventListener('input', updateButtonState);
-                field.addEventListener('change', updateButtonState);
+                field.addEventListener('input', function () {
+                    syncFieldValidity(field);
+                    updateButtonState();
+                });
+                field.addEventListener('change', function () {
+                    syncFieldValidity(field);
+                    updateButtonState();
+                });
+                field.addEventListener('invalid', function () {
+                    syncFieldValidity(field);
+                });
+
+                syncFieldValidity(field);
             });
 
             syncGeneratedFields();
