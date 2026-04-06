@@ -19,6 +19,9 @@ class BookingController extends Controller
 
     public function index(Request $request)
     {
+        $searchQuery = trim((string) $request->query('q', ''));
+        $categoryQuery = trim((string) $request->query('category', ''));
+
         $mainCategories = ProductCategory::query()
             ->where('is_active', true)
             ->where('type', 'internal')
@@ -29,6 +32,22 @@ class BookingController extends Controller
             ->with(['category', 'primaryImage'])
             ->where('is_active', true)
             ->whereHas('category', fn ($query) => $query->where('type', 'internal'))
+            ->when($categoryQuery !== '' && $categoryQuery !== 'all', function ($query) use ($categoryQuery) {
+                $query->whereHas('category', fn ($category) => $category->where('slug', $categoryQuery));
+            })
+            ->when($searchQuery !== '', function ($query) use ($searchQuery) {
+                $query->where(function ($search) use ($searchQuery) {
+                    $search
+                        ->where('name', 'like', "%{$searchQuery}%")
+                        ->orWhere('slug', 'like', "%{$searchQuery}%")
+                        ->orWhere('short_desc', 'like', "%{$searchQuery}%")
+                        ->orWhereHas('category', function ($categoryQuery) use ($searchQuery) {
+                            $categoryQuery
+                                ->where('name', 'like', "%{$searchQuery}%")
+                                ->orWhere('label', 'like', "%{$searchQuery}%");
+                        });
+                });
+            })
             ->orderByDesc('is_featured')
             ->orderBy('sort_order')
             ->orderBy('name')
@@ -38,6 +57,19 @@ class BookingController extends Controller
             ->with(['category', 'primaryImage'])
             ->where('is_active', true)
             ->whereHas('category', fn ($query) => $query->where('type', 'addon'))
+            ->when($searchQuery !== '', function ($query) use ($searchQuery) {
+                $query->where(function ($search) use ($searchQuery) {
+                    $search
+                        ->where('name', 'like', "%{$searchQuery}%")
+                        ->orWhere('slug', 'like', "%{$searchQuery}%")
+                        ->orWhere('short_desc', 'like', "%{$searchQuery}%")
+                        ->orWhereHas('category', function ($categoryQuery) use ($searchQuery) {
+                            $categoryQuery
+                                ->where('name', 'like', "%{$searchQuery}%")
+                                ->orWhere('label', 'like', "%{$searchQuery}%");
+                        });
+                });
+            })
             ->orderByDesc('is_featured')
             ->orderBy('sort_order')
             ->orderBy('name')
@@ -62,6 +94,10 @@ class BookingController extends Controller
             'addonProducts' => $addonProducts,
             'paymentMethods' => $paymentMethods,
             'preselectedProductSlug' => (string) $request->query('product', ''),
+            'preselectedCategorySlug' => $categoryQuery,
+            'prefilledVisitDate' => (string) $request->query('date', ''),
+            'prefilledGuests' => max(1, (int) $request->query('guests', 2)),
+            'searchQuery' => $searchQuery,
             'midtransClientKey' => (string) config('midtrans.client_key', ''),
         ]);
     }
