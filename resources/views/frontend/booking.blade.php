@@ -1,8 +1,9 @@
 @extends('frontend.layouts.main')
 
-@section('content')
-@include('frontend.layouts.header')
+@section('title', 'CapolagaGo - Booking Flow')
+@section('meta_description', 'Halaman booking CapolagaGo untuk memilih produk, add-on, checkout, dan konfirmasi pembayaran.')
 
+@section('content')
 @if ($midtransClientKey !== '')
     <script type="text/javascript"
         src="{{ config('midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
@@ -36,6 +37,7 @@
             'description' => $product->short_desc,
             'price' => (float) $product->price,
             'price_label' => $product->price_label,
+            'image' => $product->primary_image_url,
             'min_pax' => (int) $product->min_pax,
             'max_pax' => (int) $product->max_pax,
         ];
@@ -49,25 +51,39 @@
             'type' => $method->type,
         ];
     })->values();
+
+    $searchResultCount = $mainProducts->count() + $addonProducts->count();
 @endphp
 
-<section class="border-b border-slate-200 bg-white pt-20 md:pt-24">
-    <div class="mx-auto max-w-[1720px] px-4 py-5 sm:px-6 lg:px-8">
+@include('frontend.layouts.header')
+
+<section class="border-b border-slate-200 bg-white pt-24">
+    <div class="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
         <div class="max-w-3xl">
             <a href="{{ route('frontend.home') }}" class="inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-slate-900">
-                <span aria-hidden="true">←</span>
+                <span aria-hidden="true">&larr;</span>
                 <span>Kembali ke beranda</span>
             </a>
-            <h1 class="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Booking Paket Wisata</h1>
-            <p class="mt-2 text-sm leading-6 text-slate-600 sm:text-base">
-                Pilih produk utama, tambahkan add-on jika perlu, lalu lanjutkan ke checkout.
+            <h1 class="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Booking yang sederhana dan jelas</h1>
+            <p class="mt-3 max-w-xl text-sm leading-6 text-slate-600 sm:text-base">
+                Pilih akomodasi, tambahkan activity pelengkap, lalu selesaikan checkout dengan flow yang langsung tersambung ke backend.
             </p>
+            @if ($searchQuery !== '')
+                <p class="mt-4 inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-800">
+                    Hasil pencarian untuk "{{ $searchQuery }}": {{ $searchResultCount }} item
+                </p>
+            @endif
+            @if (!empty($preselectedCategorySlug) && $preselectedCategorySlug !== 'all')
+                <p class="mt-4 inline-flex rounded-full border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+                    Filter kategori aktif: {{ $mainCategories->firstWhere('slug', $preselectedCategorySlug)?->label ?? $preselectedCategorySlug }}
+                </p>
+            @endif
         </div>
     </div>
 </section>
 
-<section class="pb-12 pt-6 md:pt-8">
-    <div class="mx-auto grid max-w-[1720px] gap-6 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:px-8">
+<section class="bg-[#f8fafc] pb-12 pt-6 md:pt-8">
+    <div class="mx-auto grid max-w-[1440px] gap-6 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:px-8">
         <div class="space-y-6">
             <section class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                 <div class="flex flex-wrap gap-2">
@@ -75,7 +91,7 @@
                     <button type="button" data-step-indicator="2" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">2. Add-on</button>
                     <button type="button" data-step-indicator="3" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">3. Keranjang</button>
                     <button type="button" data-step-indicator="4" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">4. Checkout</button>
-                    <span class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">5. Konfirmasi</span>
+                    <button type="button" data-step-indicator="5" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">5. Konfirmasi</button>
                 </div>
                 <div id="flow-feedback" class="hidden"></div>
             </section>
@@ -278,6 +294,61 @@
                     </aside>
                 </form>
             </section>
+
+            <section data-booking-step="5" class="hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div class="mx-auto max-w-2xl text-center">
+                    <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-700">OK</div>
+                    <p class="mt-4 text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Step 5</p>
+                    <h2 class="mt-2 text-3xl font-bold text-slate-900">Booking berhasil dibuat</h2>
+                    <p id="confirmation-message" class="mt-3 text-sm leading-6 text-slate-600">
+                        Booking sudah tersimpan. Kamu bisa lanjut ke halaman status booking untuk memantau pembayaran.
+                    </p>
+
+                    <div class="mt-6 grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-left sm:grid-cols-2">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Kode booking</p>
+                            <p id="confirmation-booking-code" class="mt-2 text-sm font-semibold text-slate-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Total</p>
+                            <p id="confirmation-total" class="mt-2 text-sm font-semibold text-slate-900">Rp 0</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Produk</p>
+                            <p id="confirmation-product" class="mt-2 text-sm font-semibold text-slate-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Atas nama</p>
+                            <p id="confirmation-name" class="mt-2 text-sm font-semibold text-slate-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Kontak</p>
+                            <p id="confirmation-contact" class="mt-2 text-sm font-semibold text-slate-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Tanggal kunjungan</p>
+                            <p id="confirmation-date" class="mt-2 text-sm font-semibold text-slate-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Jumlah peserta</p>
+                            <p id="confirmation-guests" class="mt-2 text-sm font-semibold text-slate-900">-</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Metode pembayaran</p>
+                            <p id="confirmation-payment" class="mt-2 text-sm font-semibold text-slate-900">-</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                        <a id="confirmation-status-link" href="{{ route('ticket.booking') }}" class="rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800">
+                            Lihat Status Booking
+                        </a>
+                        <button id="restart-booking" type="button" class="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                            Buat Booking Baru
+                        </button>
+                    </div>
+                </div>
+            </section>
         </div>
 
         <aside class="h-fit rounded-3xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-24">
@@ -337,6 +408,9 @@
         const addonProducts = @json($addonProductPayload);
         const paymentMethods = @json($paymentMethodPayload);
         const preselectedSlug = @json($preselectedProductSlug);
+        const preselectedCategorySlug = @json($preselectedCategorySlug);
+        const prefilledVisitDate = @json($prefilledVisitDate);
+        const prefilledGuests = @json($prefilledGuests);
 
         const currency = (value) => new Intl.NumberFormat('id-ID').format(value || 0);
         const productGrid = document.getElementById('product-grid');
@@ -355,6 +429,8 @@
         const tripGuestsInput = document.getElementById('trip-guests-input');
         const checkoutDateInput = document.getElementById('checkout-date-input');
         const tripDateInput = document.getElementById('trip-date-input');
+        const confirmationMessage = document.getElementById('confirmation-message');
+        const confirmationStatusLink = document.getElementById('confirmation-status-link');
         const csrfToken = checkoutForm.querySelector('input[name="_token"]').value;
         const availabilityUrl = @json(route('ticket.booking.availability'));
         const estimateUrl = @json(route('ticket.booking.estimate'));
@@ -364,6 +440,8 @@
             currentStep: mainProducts.some((product) => product.slug === preselectedSlug) ? 2 : 1,
             selectedProduct: mainProducts.find((product) => product.slug === preselectedSlug) || null,
             selectedAddons: [],
+            customer: null,
+            lastBooking: null,
             pricing: {
                 subtotal: 0,
                 addon_total: 0,
@@ -372,6 +450,12 @@
                 total_quantity: 0,
                 loading: false,
             },
+        };
+
+        const getToday = () => {
+            const now = new Date();
+            const offset = now.getTimezoneOffset() * 60000;
+            return new Date(now.getTime() - offset).toISOString().slice(0, 10);
         };
 
         const setFeedback = (message, tone = 'info') => {
@@ -396,6 +480,11 @@
             paymentGatewayResult.className = `rounded-xl px-3 py-3 text-xs ${tones[tone] || tones.info}`;
             paymentGatewayResult.classList.remove('hidden');
             paymentGatewayResult.innerHTML = html;
+        };
+
+        const clearGatewayResult = () => {
+            paymentGatewayResult.classList.add('hidden');
+            paymentGatewayResult.innerHTML = '';
         };
 
         const updateStepIndicator = () => {
@@ -510,6 +599,30 @@
             document.getElementById('sidebar-visit-date').textContent = date || 'Belum dipilih';
             tripDateInput.value = date;
             updateStepButtons();
+        };
+
+        const renderConfirmation = () => {
+            const booking = state.lastBooking;
+            const paymentName = booking?.booking?.payment_method
+                || paymentMethods.find((method) => String(method.id) === paymentMethodSelect.value)?.name
+                || '-';
+
+            document.getElementById('confirmation-booking-code').textContent = booking?.booking?.booking_code || '-';
+            document.getElementById('confirmation-total').textContent = `Rp ${currency(booking?.booking?.total_amount || state.pricing.total_amount || 0)}`;
+            document.getElementById('confirmation-product').textContent = state.selectedProduct?.name || '-';
+            document.getElementById('confirmation-name').textContent = state.customer?.name || '-';
+            document.getElementById('confirmation-contact').textContent = state.customer
+                ? `${state.customer.phone || '-'} • ${state.customer.email || '-'}`
+                : '-';
+            document.getElementById('confirmation-date').textContent = state.customer?.date || checkoutDateInput.value || '-';
+            document.getElementById('confirmation-guests').textContent = `${state.customer?.guests || guestInput.value || 0} orang`;
+            document.getElementById('confirmation-payment').textContent = paymentName;
+
+            if (booking?.redirect_url) {
+                confirmationStatusLink.href = booking.redirect_url;
+            } else {
+                confirmationStatusLink.href = @json(route('ticket.booking'));
+            }
         };
 
         const syncEstimate = async () => {
@@ -639,8 +752,11 @@
             productGrid.querySelectorAll('[data-product-slug]').forEach((button) => {
                 button.addEventListener('click', () => {
                     state.selectedProduct = mainProducts.find((product) => product.slug === button.dataset.productSlug) || null;
+                    state.customer = null;
+                    state.lastBooking = null;
                     renderMainProducts();
                     renderSummary();
+                    renderConfirmation();
                     syncEstimate();
                     checkAvailability();
                     setFeedback('Produk utama sudah dipilih. Kamu bisa lanjut ke tahap add-on.', 'info');
@@ -664,6 +780,9 @@
 
                 return `
                     <button type="button" data-addon-id="${product.id}" ${eligible ? '' : 'disabled'} class="text-left rounded-3xl border p-4 shadow-sm transition ${eligible ? '' : 'cursor-not-allowed opacity-60'} ${selected ? 'border-emerald-400 bg-emerald-50 ring-2 ring-emerald-100' : 'border-slate-200 bg-white'} ${eligible && !selected ? 'hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md' : ''}">
+                        <div class="mb-4 aspect-[4/3] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+                            ${product.image ? `<img src="${product.image}" alt="${product.name}" class="h-full w-full object-cover" />` : getProductFallback(product.name)}
+                        </div>
                         <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">${product.category_label}</p>
                         <h3 class="mt-2 text-lg font-bold text-slate-900">${product.name}</h3>
                         <p class="mt-2 min-h-[44px] text-sm leading-6 text-slate-600">${product.description || 'Deskripsi add-on belum tersedia.'}</p>
@@ -700,9 +819,12 @@
                     state.selectedAddons = exists
                         ? state.selectedAddons.filter((item) => item.id !== addonId)
                         : [...state.selectedAddons, addon];
+                    state.customer = null;
+                    state.lastBooking = null;
 
                     renderAddons();
                     renderSummary();
+                    renderConfirmation();
                     syncEstimate();
                 });
             });
@@ -737,7 +859,7 @@
         const syncPaymentHelper = () => {
             const selectedMethod = paymentMethods.find((method) => String(method.id) === paymentMethodSelect.value);
             paymentMethodHelper.textContent = selectedMethod
-                ? `${selectedMethod.name} terdeteksi sebagai metode ${selectedMethod.provider.toUpperCase()} / ${selectedMethod.type.toUpperCase()}.`
+                ? `${selectedMethod.name} terdeteksi sebagai metode ${String(selectedMethod.provider || '-').toUpperCase()} / ${String(selectedMethod.type || '-').toUpperCase()}.`
                 : 'Pilih metode pembayaran.';
         };
 
@@ -786,29 +908,44 @@
                     throw new Error(validationMessage);
                 }
 
+                state.customer = {
+                    name: formData.get('name'),
+                    phone: formData.get('phone'),
+                    email: formData.get('email'),
+                    date: formData.get('date'),
+                    guests: formData.get('guests'),
+                };
+                state.lastBooking = result;
+                renderConfirmation();
+                showStep(5);
                 setFeedback(`${result.message} Kode booking: ${result.booking.booking_code}. Total bayar: Rp ${currency(result.booking.total_amount)}.`, 'info');
 
                 if (result.payment_gateway?.provider === 'midtrans') {
                     if (result.payment_gateway.snap_token && window.snap) {
+                        confirmationMessage.textContent = 'Booking sudah dibuat. Popup pembayaran Midtrans akan dibuka, lalu kamu akan diarahkan ke halaman status booking.';
                         renderGatewayResult(`Snap token Midtrans berhasil dibuat. Popup pembayaran akan dibuka untuk booking <strong>${result.booking.booking_code}</strong>.`);
 
                         window.snap.pay(result.payment_gateway.snap_token, {
                             onSuccess: () => {
+                                confirmationMessage.textContent = 'Pembayaran Midtrans berhasil. Kamu akan diarahkan ke halaman status booking.';
                                 setFeedback(`Pembayaran Midtrans berhasil untuk booking ${result.booking.booking_code}.`, 'info');
                                 if (result.redirect_url) {
                                     window.location.href = result.redirect_url;
                                 }
                             },
                             onPending: () => {
+                                confirmationMessage.textContent = 'Pembayaran Midtrans masih menunggu penyelesaian. Kamu akan diarahkan ke halaman status booking.';
                                 setFeedback(`Pembayaran Midtrans sedang menunggu penyelesaian untuk booking ${result.booking.booking_code}.`, 'warning');
                                 if (result.redirect_url) {
                                     window.location.href = result.redirect_url;
                                 }
                             },
                             onError: () => {
+                                confirmationMessage.textContent = 'Terjadi kendala saat membuka pembayaran Midtrans. Kamu bisa lanjut dari halaman status booking.';
                                 setFeedback(`Terjadi kendala saat membuka pembayaran Midtrans untuk booking ${result.booking.booking_code}.`, 'danger');
                             },
                             onClose: () => {
+                                confirmationMessage.textContent = 'Popup pembayaran Midtrans ditutup. Booking tetap tersimpan dan bisa dilanjutkan dari halaman status booking.';
                                 setFeedback(`Popup pembayaran Midtrans ditutup. Booking ${result.booking.booking_code} masih menunggu pembayaran.`, 'warning');
                                 if (result.redirect_url) {
                                     window.location.href = result.redirect_url;
@@ -822,6 +959,7 @@
                                 : `Booking berhasil dibuat. Snap Midtrans belum dapat dibuka untuk booking <strong>${result.booking.booking_code}</strong>.`,
                             result.payment_gateway.error ? 'warning' : 'info'
                         );
+                        confirmationMessage.textContent = 'Booking sudah dibuat, tetapi pembayaran Midtrans belum siap dibuka. Silakan cek halaman status booking.';
                         if (result.redirect_url) {
                             window.setTimeout(() => {
                                 window.location.href = result.redirect_url;
@@ -829,6 +967,7 @@
                         }
                     }
                 } else {
+                    confirmationMessage.textContent = 'Booking sudah tersimpan ke database dan kamu bisa lanjut memantau pembayarannya di halaman status booking.';
                     renderGatewayResult(`Booking <strong>${result.booking.booking_code}</strong> berhasil dibuat dengan metode <strong>${result.booking.payment_method}</strong>. Status saat ini: menunggu pembayaran.`, 'info');
                     if (result.redirect_url) {
                         window.setTimeout(() => {
@@ -877,6 +1016,11 @@
             button.addEventListener('click', () => {
                 const targetStep = Number(button.dataset.stepIndicator);
 
+                if (targetStep === 5 && !state.lastBooking) {
+                    setFeedback('Step konfirmasi akan aktif setelah booking berhasil dibuat.', 'warning');
+                    return;
+                }
+
                 if (targetStep > 1 && !state.selectedProduct) {
                     showStep(1);
                     setFeedback('Mulai dari Step 1 dulu dengan memilih produk utama.', 'warning');
@@ -890,20 +1034,67 @@
             syncAddonEligibility();
             renderAddons();
             renderSummary();
+            renderConfirmation();
             syncEstimate();
             checkAvailability();
         });
         checkoutDateInput.addEventListener('input', () => {
             renderSummary();
+            renderConfirmation();
             syncEstimate();
             checkAvailability();
         });
         checkoutForm.addEventListener('submit', submitCheckout);
+        document.getElementById('restart-booking').addEventListener('click', () => {
+            state.currentStep = 1;
+            state.selectedProduct = null;
+            state.selectedAddons = [];
+            state.customer = null;
+            state.lastBooking = null;
+            state.pricing = {
+                subtotal: 0,
+                addon_total: 0,
+                fee_amount: 0,
+                total_amount: 0,
+                total_quantity: 0,
+                loading: false,
+            };
+            checkoutForm.reset();
+            checkoutDateInput.min = getToday();
+            checkoutDateInput.value = prefilledVisitDate || getToday();
+            guestInput.value = prefilledGuests || 2;
+            tripDateInput.value = checkoutDateInput.value;
+            tripGuestsInput.value = guestInput.value || prefilledGuests || 2;
+            clearGatewayResult();
+            renderMainProducts();
+            syncAddonEligibility();
+            renderAddons();
+            renderSummary();
+            renderConfirmation();
+            syncPaymentHelper();
+            updateStepIndicator();
+            updateStepButtons();
+            showStep(1);
+        });
+
+        checkoutDateInput.min = getToday();
+        if (!checkoutDateInput.value) {
+            checkoutDateInput.value = prefilledVisitDate || getToday();
+        }
+        if (!guestInput.value) {
+            guestInput.value = prefilledGuests || 2;
+        }
+        tripDateInput.value = checkoutDateInput.value;
+        tripGuestsInput.value = guestInput.value || prefilledGuests || 2;
+        if (preselectedCategorySlug && preselectedCategorySlug !== 'all') {
+            categoryFilter.value = preselectedCategorySlug;
+        }
 
         renderMainProducts();
         syncAddonEligibility();
         renderAddons();
         renderSummary();
+        renderConfirmation();
         syncPaymentHelper();
         updateStepIndicator();
         updateStepButtons();
