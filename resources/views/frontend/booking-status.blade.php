@@ -146,6 +146,12 @@
                                     class="mt-3 inline-flex w-full items-center justify-center rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800">
                                     Lanjutkan Pembayaran
                                 </button>
+                                <button type="button"
+                                    id="sync-payment-button"
+                                    data-sync-url="{{ route('ticket.booking.sync-payment', ['token' => $booking->public_token]) }}"
+                                    class="mt-2 inline-flex w-full items-center justify-center rounded-2xl border border-emerald-300 bg-white px-4 py-2.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50">
+                                    Cek Status Pembayaran
+                                </button>
                                 <p id="resume-payment-feedback" class="mt-3 hidden rounded-xl bg-white px-3 py-2 text-xs text-slate-600"></p>
                             </div>
                         @endif
@@ -182,6 +188,7 @@
 <script>
     (() => {
         const resumeButton = document.getElementById('resume-payment-button');
+        const syncButton = document.getElementById('sync-payment-button');
         const feedbackBox = document.getElementById('resume-payment-feedback');
 
         if (!resumeButton) {
@@ -193,12 +200,48 @@
                 info: 'bg-white text-slate-600',
                 warning: 'border border-amber-200 bg-amber-50 text-amber-900',
                 danger: 'border border-rose-200 bg-rose-50 text-rose-900',
+                success: 'border border-emerald-200 bg-emerald-50 text-emerald-900',
             };
 
             feedbackBox.className = `mt-3 rounded-xl px-3 py-2 text-xs ${tones[tone] || tones.info}`;
             feedbackBox.textContent = message;
             feedbackBox.classList.remove('hidden');
         };
+
+        // Tombol cek status
+        if (syncButton) {
+            syncButton.addEventListener('click', async () => {
+                syncButton.disabled = true;
+                syncButton.textContent = 'Mengecek...';
+
+                try {
+                    const response = await fetch(syncButton.dataset.syncUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': @json(csrf_token()),
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === 'paid') {
+                        setFeedback('Pembayaran terkonfirmasi! Halaman akan direfresh...', 'success');
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else if (result.status === 'pending') {
+                        setFeedback('Pembayaran masih pending di Midtrans.', 'warning');
+                    } else {
+                        setFeedback(result.message || 'Status: ' + result.status, 'warning');
+                    }
+                } catch (error) {
+                    setFeedback('Gagal mengecek status: ' + error.message, 'danger');
+                } finally {
+                    syncButton.disabled = false;
+                    syncButton.textContent = 'Cek Status Pembayaran';
+                }
+            });
+        }
 
         resumeButton.addEventListener('click', async () => {
             resumeButton.disabled = true;

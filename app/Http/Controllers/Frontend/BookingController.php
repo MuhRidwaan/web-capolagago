@@ -270,31 +270,45 @@ class BookingController extends Controller
             ], 422);
         }
 
-        try {
-            $snapToken = $this->midtransService->createTokenFromBooking(
-                $payment['payment_code'],
-                (int) round((float) $payment['total_amount']),
-                [
-                    'first_name' => $payment['customer_name'],
-                    'email' => $payment['customer_email'],
-                ],
-                $payment['items'],
-            );
-        } catch (\Throwable $exception) {
-            return response()->json([
-                'message' => 'Snap token Midtrans belum bisa disiapkan. ' . $exception->getMessage(),
-            ], 422);
+        // Cek apakah snap token lama masih tersimpan di gateway_response
+        $existingResponse = DB::table('payments')
+            ->where('payment_code', $payment['payment_code'])
+            ->value('gateway_response');
+
+        $snapToken = null;
+        if ($existingResponse) {
+            $decoded = json_decode($existingResponse, true);
+            $snapToken = $decoded['snap_token'] ?? null;
         }
 
-        DB::table('payments')
-            ->where('payment_code', $payment['payment_code'])
-            ->update([
-                'gateway_response' => json_encode([
-                    'provider' => 'midtrans',
-                    'snap_token' => $snapToken,
-                ]),
-                'updated_at' => now(),
-            ]);
+        // Kalau tidak ada token lama, buat baru
+        if (! $snapToken) {
+            try {
+                $snapToken = $this->midtransService->createTokenFromBooking(
+                    $payment['payment_code'],
+                    (int) round((float) $payment['total_amount']),
+                    [
+                        'first_name' => $payment['customer_name'],
+                        'email' => $payment['customer_email'],
+                    ],
+                    $payment['items'],
+                );
+
+                DB::table('payments')
+                    ->where('payment_code', $payment['payment_code'])
+                    ->update([
+                        'gateway_response' => json_encode([
+                            'provider' => 'midtrans',
+                            'snap_token' => $snapToken,
+                        ]),
+                        'updated_at' => now(),
+                    ]);
+            } catch (\Throwable $exception) {
+                return response()->json([
+                    'message' => 'Snap token Midtrans belum bisa disiapkan. ' . $exception->getMessage(),
+                ], 422);
+            }
+        }
 
         return response()->json([
             'message' => 'Snap token Midtrans berhasil disiapkan.',
@@ -306,6 +320,57 @@ class BookingController extends Controller
             ],
             'redirect_url' => route('ticket.booking.status', ['token' => $payment['public_token']]),
         ]);
+    }
+
+    public function syncPaymentStatus(string $token)
+    {
+        $payment = DB::table('payments as py')
+            ->join('bookings as b', 'b.id', '=', 'py.booking_id')
+            ->select('py.payment_code', 'py.status as payment_status', 'b.status as booking_status')
+            ->where('b.public_token', $token)
+            ->latest('py.created_at')
+            ->first();
+
+        abort_if(! $payment, 404);
+
+        if ($payment->payment_status === 'paid') {
+            return response()->json(['status' => 'paid', 'message' => 'Pembayaran sudah terkonfirmasi.']);
+        }
+
+        try {
+            $result = $this->midtransService->checkStatus($payment->payment_code);
+            $transactionStatus = $result->transaction_status ?? null;
+            $fraudStatus = $result->fraud_status ?? null;
+
+            $paymentStatus = match (true) {
+                $transactionStatus === 'capture' && $fraudStatus === 'accept' => 'paid',
+                $transactionStatus === 'settlement' => 'paid',
+                $transactionStatus === 'pending' => 'pending',
+                $transactionStatus === 'deny' => 'failed',
+                $transactionStatus === 'expire' => 'expired',
+                $transactionStatus === 'cancel' => 'failed',
+                default => 'pending',
+            };
+
+            DB::table('payments')
+                ->where('payment_code', $payment->payment_code)
+                ->update([
+                    'status' => $paymentStatus,
+                    'gateway_transaction_id' => $result->transaction_id ?? null,
+                    'paid_at' => $paymentStatus === 'paid' ? now() : null,
+                    'updated_at' => now(),
+                ]);
+
+            if ($paymentStatus === 'paid') {
+                DB::table('bookings')
+                    ->where('booking_code', $payment->payment_code)
+                    ->update(['status' => 'confirmed', 'updated_at' => now()]);
+            }
+
+            return response()->json(['status' => $paymentStatus]);
+        } catch (\Throwable $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 422);
+        }
     }
 
     public function finish(Request $request)

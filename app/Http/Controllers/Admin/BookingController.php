@@ -148,7 +148,6 @@ class BookingController extends Controller
             $userId = $user->id;
         }
 
-<<<<<<< HEAD
         $preparedBooking = $this->bookingService->prepareAdminBookingItems(
             $data['items'],
             $data['visit_date'],
@@ -156,25 +155,6 @@ class BookingController extends Controller
         );
         $subtotal = $preparedBooking['subtotal'];
         $itemRows = $preparedBooking['items'];
-=======
-        $subtotal = 0;
-        $itemRows = [];
-        foreach ($data['items'] as $item) {
-            $product   = DB::table('products')->find($item['product_id']);
-            $lineTotal = $product->price * $item['quantity'];
-            $subtotal += $lineTotal;
-            $itemRows[] = [
-                'product_id'            => $product->id,
-                'product_name_snapshot' => $product->name,
-                'quantity'              => $item['quantity'],
-                'unit_price'            => $product->price,
-                'subtotal'              => $lineTotal,
-                'is_addon'              => false,
-                'created_at'            => now(),
-                'updated_at'            => now(),
-            ];
-        }
->>>>>>> 92fdba5 (perbaikan bahasa , role akses , dan minor)
 
         $bookingCode = $this->generateBookingCode();
         $bookingId   = DB::table('bookings')->insertGetId([

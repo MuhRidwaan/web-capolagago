@@ -37,7 +37,6 @@ Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 Route::view('/welcome', 'welcome')->name('welcome');
 Route::view('/booking-ticket', 'frontend.booking')->name('ticket.booking');
 
-<<<<<<< HEAD
 Route::get('/booking-ticket', [FrontendBookingController::class, 'index'])
     ->name('ticket.booking');
 Route::get('/booking-ticket/availability', [FrontendBookingController::class, 'availability'])
@@ -50,13 +49,12 @@ Route::get('/booking-ticket/status/{token}', [FrontendBookingController::class, 
     ->name('ticket.booking.status');
 Route::post('/booking-ticket/status/{token}/resume-payment', [FrontendBookingController::class, 'resumePayment'])
     ->name('ticket.booking.resume-payment');
+Route::post('/booking-ticket/status/{token}/sync-payment', [FrontendBookingController::class, 'syncPaymentStatus'])
+    ->name('ticket.booking.sync-payment');
 Route::get('/booking/finish', [FrontendBookingController::class, 'finish'])
     ->name('ticket.booking.finish');
 
 // Webhook Midtrans — no auth, no CSRF (server-to-server)
-=======
-// Webhook Midtrans — no auth, no CSRF
->>>>>>> 92fdba5 (perbaikan bahasa , role akses , dan minor)
 Route::post('/payment/webhook/midtrans', [MidtransWebhookController::class, 'handle'])
     ->name('payment.webhook.midtrans');
 
