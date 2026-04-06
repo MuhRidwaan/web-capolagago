@@ -1,3 +1,8 @@
+@php
+    $currentUser = Auth::user();
+    $currentUserRoles = $currentUser?->getRoleNames() ?? collect();
+@endphp
+
 <aside class="main-sidebar sidebar-dark-success elevation-4 capolaga-sidebar">
     <!-- Brand Logo -->
     <a href="{{ route('admin.dashboard') }}" class="brand-link">
@@ -14,9 +19,9 @@
                     alt="User Image">
             </div>
             <div class="info">
-                <a href="#" class="d-block font-weight-bold">{{ Auth::user()->name ?? 'Administrator' }}</a>
+                <a href="#" class="d-block font-weight-bold">{{ $currentUser?->name ?? 'Administrator' }}</a>
                 <div class="mt-1">
-                    @foreach(Auth::user()->getRoleNames() as $role)
+                    @foreach($currentUserRoles as $role)
                         @php
                             $badgeColor = match($role) {
                                 'Super Admin' => 'danger',
@@ -29,6 +34,11 @@
                             {{ $role }}
                         </span>
                     @endforeach
+                    @if($currentUserRoles->isEmpty())
+                        <span class="badge badge-light" style="font-size:0.65rem">
+                            Guest
+                        </span>
+                    @endif
                 </div>
             </div>
         </div>

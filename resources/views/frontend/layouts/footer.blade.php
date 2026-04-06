@@ -126,9 +126,9 @@
                         <li><a href="{{ $wisataUrl }}?category=glamping" class="transition hover:text-white">Glamping</a></li>
                         <li><a href="{{ $wisataUrl }}?category=camping" class="transition hover:text-white">Camping</a></li>
                         <li><a href="{{ $wisataUrl }}?category=homestay" class="transition hover:text-white">Homestay</a></li>
-                        <li><a href="{{ $bookingUrl }}?q=rafting" class="transition hover:text-white">Rafting</a></li>
-                        <li><a href="{{ $bookingUrl }}?q=ATV" class="transition hover:text-white">ATV Adventure</a></li>
-                        <li><a href="{{ $bookingUrl }}?q=paragliding" class="transition hover:text-white">Paragliding</a></li>
+                        <li><span class="cursor-not-allowed text-white/40" title="Add-on dipilih setelah produk utama">Rafting</span></li>
+                        <li><span class="cursor-not-allowed text-white/40" title="Add-on dipilih setelah produk utama">ATV Adventure</span></li>
+                        <li><span class="cursor-not-allowed text-white/40" title="Add-on dipilih setelah produk utama">Paragliding</span></li>
                     </ul>
                 </div>
 

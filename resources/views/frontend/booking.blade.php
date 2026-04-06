@@ -52,25 +52,27 @@
         ];
     })->values();
 
-    $searchResultCount = $mainProducts->count() + $addonProducts->count();
+    $mainProductCount = $mainProducts->count();
+    $addonProductCount = $addonProducts->count();
+    $searchResultCount = $mainProductCount + $addonProductCount;
 @endphp
 
-@include('frontend.layouts.header')
-
-<section class="border-b border-slate-200 bg-white pt-24">
-    <div class="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
+<section class="border-b border-slate-200 bg-white pt-8">
+    <div class="mx-auto max-w-[1680px] px-4 py-6 sm:px-6 lg:px-8">
         <div class="max-w-3xl">
             <a href="{{ route('frontend.home') }}" class="inline-flex items-center gap-2 text-sm text-slate-500 transition hover:text-slate-900">
                 <span aria-hidden="true">&larr;</span>
                 <span>Kembali ke beranda</span>
             </a>
-            <h1 class="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Booking yang sederhana dan jelas</h1>
-            <p class="mt-3 max-w-xl text-sm leading-6 text-slate-600 sm:text-base">
-                Pilih akomodasi, tambahkan activity pelengkap, lalu selesaikan checkout dengan flow yang langsung tersambung ke backend.
-            </p>
             @if ($searchQuery !== '')
                 <p class="mt-4 inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-800">
                     Hasil pencarian untuk "{{ $searchQuery }}": {{ $searchResultCount }} item
+                </p>
+                <p class="mt-3 text-sm text-slate-600">
+                    Ditemukan {{ $mainProductCount }} produk utama dan {{ $addonProductCount }} add-on.
+                    @if ($mainProductCount === 0 && $addonProductCount > 0)
+                        Add-on bisa dipilih di Step 3, tetapi kamu tetap perlu memilih produk utama terlebih dahulu.
+                    @endif
                 </p>
             @endif
             @if (!empty($preselectedCategorySlug) && $preselectedCategorySlug !== 'all')
@@ -83,15 +85,16 @@
 </section>
 
 <section class="bg-[#f8fafc] pb-12 pt-6 md:pt-8">
-    <div class="mx-auto grid max-w-[1440px] gap-6 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:px-8">
+    <div class="mx-auto grid max-w-[1680px] gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8">
         <div class="space-y-6">
             <section class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                 <div class="flex flex-wrap gap-2">
                     <button type="button" data-step-indicator="1" class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-900">1. Pilih Produk</button>
-                    <button type="button" data-step-indicator="2" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">2. Add-on</button>
-                    <button type="button" data-step-indicator="3" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">3. Keranjang</button>
-                    <button type="button" data-step-indicator="4" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">4. Checkout</button>
-                    <button type="button" data-step-indicator="5" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">5. Konfirmasi</button>
+                    <span class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">2. Tanggal &amp; Slot</span>
+                    <button type="button" data-step-indicator="2" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">3. Add-on</button>
+                    <button type="button" data-step-indicator="3" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">4. Keranjang</button>
+                    <button type="button" data-step-indicator="4" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">5. Checkout</button>
+                    <button type="button" data-step-indicator="5" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">6. Konfirmasi</button>
                 </div>
                 <div id="flow-feedback" class="hidden"></div>
             </section>
@@ -100,8 +103,8 @@
                 <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Step 1</p>
-                        <h2 class="mt-2 text-2xl font-bold text-slate-900">Pilih produk utama</h2>
-                        <p class="mt-1 text-sm text-slate-600">Daftar produk utama di-render dari kategori internal yang aktif.</p>
+                        <h2 class="mt-2 text-2xl font-bold text-slate-900">Pilih Produk</h2>
+                        <p class="mt-1 text-sm text-slate-600">Pilih produk utama lalu buka detailnya untuk menentukan tanggal kunjungan dan cek kuota.</p>
                     </div>
                     <label class="block">
                         <span class="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Filter</span>
@@ -116,7 +119,7 @@
 
                 <div id="product-grid" class="grid gap-4 xl:grid-cols-2"></div>
 
-                <div class="mt-6 flex items-center justify-end">
+                <div class="mt-6 hidden items-center justify-end">
                     <button type="button" id="step-1-next" class="rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:bg-slate-300">
                         Lanjut ke Add-on
                     </button>
@@ -125,7 +128,7 @@
 
             <section data-booking-step="2" class="hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <div class="mb-5">
-                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Step 2</p>
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Step 3</p>
                     <h2 class="mt-2 text-2xl font-bold text-slate-900">Tambahkan pengalaman pelengkap</h2>
                     <p class="mt-1 text-sm text-slate-600">Daftar add-on berikut berasal dari kategori `addon` yang aktif di backend.</p>
                 </div>
@@ -144,7 +147,7 @@
 
             <section data-booking-step="3" class="hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <div class="mb-5">
-                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Step 3</p>
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Step 4</p>
                     <h2 class="mt-2 text-2xl font-bold text-slate-900">Periksa keranjang</h2>
                     <p class="mt-1 text-sm text-slate-600">Ringkasan ini sudah mengikuti pilihan produk yang dipilih di browser.</p>
                 </div>
@@ -206,7 +209,7 @@
 
             <section data-booking-step="4" class="hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <div class="mb-5">
-                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Step 4</p>
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Step 5</p>
                     <h2 class="mt-2 text-2xl font-bold text-slate-900">Checkout customer</h2>
                     <p class="mt-1 text-sm text-slate-600">Dropdown metode pembayaran sekarang ditarik langsung dari tabel payment method aktif.</p>
                 </div>
@@ -217,33 +220,29 @@
                         <div class="grid gap-4 sm:grid-cols-2">
                             <label class="block">
                                 <span class="mb-2 block text-sm font-semibold text-slate-700">Nama lengkap</span>
-                                <input name="name" type="text" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" placeholder="Nama customer" />
+                                <input name="name" type="text" required minlength="3" maxlength="150" autocomplete="name" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" placeholder="Nama customer" />
                             </label>
                             <label class="block">
                                 <span class="mb-2 block text-sm font-semibold text-slate-700">No. WhatsApp</span>
-                                <input name="phone" type="tel" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" placeholder="08xxxxxxxxxx" />
+                                <input name="phone" type="tel" required inputmode="tel" maxlength="16" autocomplete="tel" pattern="^(?:\\+62|62|0)8[0-9]{7,13}$" title="Gunakan format nomor Indonesia, misalnya 081234567890 atau 6281234567890." class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" placeholder="08xxxxxxxxxx" />
                             </label>
                         </div>
 
                         <div class="grid gap-4 sm:grid-cols-2">
                             <label class="block">
                                 <span class="mb-2 block text-sm font-semibold text-slate-700">Email</span>
-                                <input name="email" type="email" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" placeholder="email@contoh.com" />
+                                <input name="email" type="email" required maxlength="150" autocomplete="email" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" placeholder="email@contoh.com" />
                             </label>
                             <label class="block">
-                                <span class="mb-2 block text-sm font-semibold text-slate-700">Tanggal kunjungan</span>
-                                <input id="checkout-date-input" name="date" type="date" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" />
+                                <span class="mb-2 block text-sm font-semibold text-slate-700">Jumlah peserta</span>
+                                <input id="guest-input" name="guests" type="number" required min="1" step="1" value="2" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" />
                             </label>
                         </div>
 
                         <div class="grid gap-4 sm:grid-cols-2">
                             <label class="block">
-                                <span class="mb-2 block text-sm font-semibold text-slate-700">Jumlah peserta</span>
-                                <input id="guest-input" name="guests" type="number" min="1" value="2" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" />
-                            </label>
-                            <label class="block">
                                 <span class="mb-2 block text-sm font-semibold text-slate-700">Metode pembayaran</span>
-                                <select id="payment-method-select" name="payment_method_id" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400">
+                                <select id="payment-method-select" name="payment_method_id" required class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400">
                                     @foreach ($paymentMethods as $method)
                                         <option value="{{ $method->id }}">{{ $method->name }} ({{ strtoupper($method->type) }})</option>
                                     @endforeach
@@ -251,9 +250,11 @@
                             </label>
                         </div>
 
+                        <input id="checkout-date-input" name="date" type="hidden" />
+
                         <label class="block">
                             <span class="mb-2 block text-sm font-semibold text-slate-700">Catatan tambahan</span>
-                            <textarea name="notes" rows="4" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" placeholder="Contoh: late check-in, butuh area dekat sungai, dsb."></textarea>
+                            <textarea name="notes" rows="4" maxlength="1000" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" placeholder="Contoh: late check-in, butuh area dekat sungai, dsb."></textarea>
                         </label>
                     </div>
 
@@ -298,7 +299,7 @@
             <section data-booking-step="5" class="hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <div class="mx-auto max-w-2xl text-center">
                     <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-700">OK</div>
-                    <p class="mt-4 text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Step 5</p>
+                    <p class="mt-4 text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Step 6</p>
                     <h2 class="mt-2 text-3xl font-bold text-slate-900">Booking berhasil dibuat</h2>
                     <p id="confirmation-message" class="mt-3 text-sm leading-6 text-slate-600">
                         Booking sudah tersimpan. Kamu bisa lanjut ke halaman status booking untuk memantau pembayaran.
@@ -407,6 +408,7 @@
         const mainProducts = @json($mainProductPayload);
         const addonProducts = @json($addonProductPayload);
         const paymentMethods = @json($paymentMethodPayload);
+        const searchQuery = @json($searchQuery);
         const preselectedSlug = @json($preselectedProductSlug);
         const preselectedCategorySlug = @json($preselectedCategorySlug);
         const prefilledVisitDate = @json($prefilledVisitDate);
@@ -435,6 +437,7 @@
         const availabilityUrl = @json(route('ticket.booking.availability'));
         const estimateUrl = @json(route('ticket.booking.estimate'));
         const checkoutUrl = @json(route('ticket.booking.checkout'));
+        const productDetailBaseUrl = @json(rtrim(route('ticket.booking.product', ['slug' => '__slug__']), '/__slug__'));
 
         const state = {
             currentStep: mainProducts.some((product) => product.slug === preselectedSlug) ? 2 : 1,
@@ -450,6 +453,7 @@
                 total_quantity: 0,
                 loading: false,
             },
+            availability: null,
         };
 
         const getToday = () => {
@@ -714,14 +718,16 @@
             if (!filtered.length) {
                 productGrid.innerHTML = `
                     <div class="xl:col-span-2 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-500">
-                        Belum ada produk aktif di kategori ini.
+                        ${searchQuery && addonProducts.length
+                            ? 'Pencarian ini hanya menemukan add-on. Pilih produk utama lain terlebih dahulu, lalu lanjut ke Step 3 untuk menambahkan add-on yang cocok.'
+                            : 'Belum ada produk aktif di kategori ini.'}
                     </div>
                 `;
                 return;
             }
 
             productGrid.innerHTML = filtered.map((product) => `
-                <button type="button" data-product-slug="${product.slug}" class="text-left rounded-3xl border p-4 shadow-sm transition ${state.selectedProduct?.slug === product.slug ? 'border-emerald-400 bg-emerald-50/70 ring-2 ring-emerald-100' : 'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md'}">
+                <a href="${productDetailBaseUrl}/${product.slug}?date=${encodeURIComponent(checkoutDateInput.value || getToday())}&guests=${encodeURIComponent(guestInput.value || 2)}" class="block text-left rounded-3xl border p-4 shadow-sm transition ${state.selectedProduct?.slug === product.slug ? 'border-emerald-400 bg-emerald-50/70 ring-2 ring-emerald-100' : 'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md'}">
                     <div class="grid gap-4 sm:grid-cols-[180px_minmax(0,1fr)] sm:items-start">
                         <div class="aspect-[4/3] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
                             ${product.image ? `<img src="${product.image}" alt="${product.name}" class="h-full w-full object-cover" />` : getProductFallback(product.name)}
@@ -741,27 +747,13 @@
                                     <p class="mt-1 text-lg font-bold text-slate-900">Rp ${currency(product.price)}<span class="text-sm font-medium text-slate-500"> ${product.price_label}</span></p>
                                 </div>
                                 <span class="rounded-2xl px-4 py-2.5 text-sm font-semibold ${state.selectedProduct?.slug === product.slug ? 'bg-emerald-700 text-white shadow-sm' : 'bg-slate-100 text-slate-700'}">
-                                    ${state.selectedProduct?.slug === product.slug ? 'Dipilih' : 'Pilih produk'}
+                                    ${state.selectedProduct?.slug === product.slug ? 'Dipilih' : 'Lihat detail'}
                                 </span>
                             </div>
                         </div>
                     </div>
-                </button>
+                </a>
             `).join('');
-
-            productGrid.querySelectorAll('[data-product-slug]').forEach((button) => {
-                button.addEventListener('click', () => {
-                    state.selectedProduct = mainProducts.find((product) => product.slug === button.dataset.productSlug) || null;
-                    state.customer = null;
-                    state.lastBooking = null;
-                    renderMainProducts();
-                    renderSummary();
-                    renderConfirmation();
-                    syncEstimate();
-                    checkAvailability();
-                    setFeedback('Produk utama sudah dipilih. Kamu bisa lanjut ke tahap add-on.', 'info');
-                });
-            });
         };
 
         const renderAddons = () => {
@@ -828,32 +820,6 @@
                     syncEstimate();
                 });
             });
-        };
-
-        const checkAvailability = async () => {
-            if (!state.selectedProduct || !checkoutDateInput.value || !guestInput.value) {
-                return;
-            }
-
-            const params = new URLSearchParams({
-                product_id: state.selectedProduct.id,
-                visit_date: checkoutDateInput.value,
-                total_guests: guestInput.value,
-            });
-
-            try {
-                const response = await fetch(`${availabilityUrl}?${params.toString()}`, {
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                });
-
-                const result = await response.json();
-                setFeedback(result.message, result.available ? 'info' : 'warning');
-            } catch (error) {
-                setFeedback('Gagal mengecek ketersediaan produk saat ini.', 'warning');
-            }
         };
 
         const syncPaymentHelper = () => {
@@ -994,7 +960,7 @@
             }
 
             showStep(2);
-            setFeedback('Step 2 aktif. Tambahkan add-on jika diperlukan, atau lanjut tanpa add-on.', 'info');
+            setFeedback('Step 3 aktif. Tambahkan add-on jika diperlukan, atau lanjut tanpa add-on.', 'info');
         });
         document.querySelectorAll('[data-step-prev]').forEach((button) => {
             button.addEventListener('click', () => {
@@ -1036,13 +1002,11 @@
             renderSummary();
             renderConfirmation();
             syncEstimate();
-            checkAvailability();
         });
         checkoutDateInput.addEventListener('input', () => {
             renderSummary();
             renderConfirmation();
             syncEstimate();
-            checkAvailability();
         });
         checkoutForm.addEventListener('submit', submitCheckout);
         document.getElementById('restart-booking').addEventListener('click', () => {
@@ -1100,10 +1064,11 @@
         updateStepButtons();
         showStep(state.currentStep);
         if (state.selectedProduct) {
-            setFeedback(`Produk ${state.selectedProduct.name} sudah dipilih dari halaman sebelumnya. Kamu bisa langsung lanjut atur add-on, atau kembali ke Step 1 untuk mengganti produk.`, 'info');
+            setFeedback(`Produk ${state.selectedProduct.name} sudah dipilih. Lanjutkan ke Step 3 untuk memilih add-on atau teruskan ke checkout.`, 'info');
+        } else if (searchQuery && !mainProducts.length && addonProducts.length) {
+            setFeedback(`Pencarian "${searchQuery}" hanya menemukan add-on. Pilih produk utama dulu di Step 1, lalu lanjut ke Step 3 untuk menambahkan add-on yang tersedia.`, 'warning');
         }
         syncEstimate();
-        checkAvailability();
     })();
 </script>
 @endsection

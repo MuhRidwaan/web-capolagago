@@ -93,7 +93,7 @@
                         </div>
                         <div class="mt-4 flex items-center justify-between border-t border-slate-200 pt-4">
                             <span class="text-sm text-slate-500">{{ $product->category?->label ?? 'Produk' }}</span>
-                            <a href="{{ route('ticket.booking', ['product' => $product->slug, 'date' => request('date', $today), 'guests' => request('guests', 2)]) }}" class="inline-flex items-center rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">
+                            <a href="{{ route('ticket.booking.product', ['slug' => $product->slug, 'date' => request('date', $today), 'guests' => request('guests', 2)]) }}" class="inline-flex items-center rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">
                                 Pesan Sekarang
                             </a>
                         </div>

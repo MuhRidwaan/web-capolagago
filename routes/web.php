@@ -38,6 +38,10 @@ Route::get('/wisata', [HomeController::class, 'wisata'])->name('frontend.wisata'
 Route::view('/welcome', 'welcome')->name('welcome');
 Route::get('/booking-ticket', [FrontendBookingController::class, 'index'])
     ->name('ticket.booking');
+Route::get('/booking-ticket/product/{slug}', [FrontendBookingController::class, 'product'])
+    ->name('ticket.booking.product');
+Route::get('/booking-ticket/product/{slug}/calendar', [FrontendBookingController::class, 'productCalendar'])
+    ->name('ticket.booking.product.calendar');
 Route::get('/booking-ticket/availability', [FrontendBookingController::class, 'availability'])
     ->name('ticket.booking.availability');
 Route::get('/booking-ticket/estimate', [FrontendBookingController::class, 'estimate'])

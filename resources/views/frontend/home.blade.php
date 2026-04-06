@@ -61,7 +61,7 @@
                     <p class="mb-6 max-w-lg text-sm leading-7 text-white/80 sm:text-base md:text-lg">
                         Pesan camping, glamping &amp; aktivitas petualangan dalam satu platform.
                     </p>
-                    <a href="{{ route('ticket.booking', ['product' => $startingProduct?->slug]) }}"
+                    <a href="{{ $startingProduct ? route('ticket.booking.product', ['slug' => $startingProduct->slug]) : route('ticket.booking') }}"
                         class="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-semibold text-[#1a3a4a] transition hover:bg-white/90 sm:px-6">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -122,8 +122,8 @@
 
     <div class="border-b border-border bg-white">
         <div class="mx-auto max-w-[1920px] px-4 py-4 md:px-8 md:py-5">
-            <form action="{{ route('frontend.wisata') }}" method="GET" class="grid grid-cols-1 gap-4 2xl:grid-cols-[minmax(0,1fr)_260px] 2xl:items-end">
-                <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <form action="{{ route('ticket.booking') }}" method="GET" class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(220px,0.9fr)_minmax(220px,0.9fr)_260px] xl:items-end">
+                <div class="grid grid-cols-1 gap-4">
                     <label class="block">
                         <span class="mb-1.5 block text-xs uppercase tracking-wide text-muted-foreground">Cari Pengalaman</span>
                         <div class="relative">
@@ -133,11 +133,13 @@
                                 <path d="m21 21-4.34-4.34"></path>
                                 <circle cx="11" cy="11" r="8"></circle>
                             </svg>
-                            <input type="search" name="q" value="{{ request('q', '') }}" placeholder="Glamping, Rafting..."
+                            <input type="search" name="q" value="{{ request('q', '') }}" placeholder="Glamping, camping, homestay..."
                                 class="h-12 w-full rounded-lg border border-border bg-background py-0 pl-9 pr-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30" />
                         </div>
                     </label>
+                </div>
 
+                <div class="grid grid-cols-1 gap-4">
                     <label class="block">
                         <span class="mb-1.5 block text-xs uppercase tracking-wide text-muted-foreground">Tanggal Kunjungan</span>
                         <div class="relative">
@@ -149,11 +151,13 @@
                                 <rect width="18" height="18" x="3" y="4" rx="2"></rect>
                                 <path d="M3 10h18"></path>
                             </svg>
-                            <input type="date" name="date" value="{{ request('date', $today) }}" min="{{ $today }}"
-                                class="h-12 w-full rounded-lg border border-border bg-background py-0 pl-9 pr-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30" />
+                            <input type="date" name="date" min="{{ $today }}" value="{{ request('date', $today) }}"
+                                class="h-12 w-full rounded-lg border border-border bg-background py-0 pl-10 pr-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30" />
                         </div>
                     </label>
+                </div>
 
+                <div class="grid grid-cols-1 gap-4">
                     <label class="block">
                         <span class="mb-1.5 block text-xs uppercase tracking-wide text-muted-foreground">Jumlah Peserta</span>
                         <div class="relative">
@@ -161,23 +165,17 @@
                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                 class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true">
                                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
-                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
                                 <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                             </svg>
-                            <select name="guests"
-                                class="h-12 w-full appearance-none rounded-lg border border-border bg-background py-0 pl-9 pr-10 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30">
-                                @foreach ([2, 1, 3, 4, 5] as $guestCount)
-                                    <option value="{{ $guestCount }}" @selected((int) request('guests', 2) === $guestCount)>
-                                        {{ $guestCount === 5 ? '5+ Orang' : $guestCount . ' Orang' }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <input type="number" name="guests" min="1" step="1" value="{{ max(1, (int) request('guests', 2)) }}"
+                                class="h-12 w-full rounded-lg border border-border bg-background py-0 pl-10 pr-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30" />
                         </div>
                     </label>
                 </div>
 
-                <div class="w-full self-end 2xl:w-[260px]">
+                <div class="w-full self-end xl:w-[260px]">
                     <button type="submit"
                         class="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#2d9da8] px-8 text-sm font-semibold text-white transition hover:bg-[#2d9da8]/90">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -220,7 +218,7 @@
         <div class="grid grid-cols-1 gap-4 overflow-x-hidden xl:grid-cols-4 2xl:gap-5">
             @forelse ($featuredProducts as $product)
                 <article class="min-w-0 w-full overflow-hidden rounded-[24px] bg-white ring-1 ring-slate-200/70">
-                    <a href="{{ route('ticket.booking', ['product' => $product->slug, 'date' => request('date', $today), 'guests' => request('guests', 2)]) }}" class="block">
+                    <a href="{{ route('ticket.booking.product', ['slug' => $product->slug, 'date' => request('date', $today), 'guests' => request('guests', 2)]) }}" class="block">
                         <div class="group/image relative h-[215px] overflow-hidden bg-slate-100 sm:h-[230px] md:h-[260px] xl:h-[305px]">
                             <img src="{{ $featuredImageFor($product) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition duration-500 ease-out group-hover/image:scale-105" />
                             @if ($loop->first)
@@ -280,8 +278,9 @@
                     $style = $iconStyles[$index] ?? $iconStyles[0];
                 @endphp
 
-                <a href="{{ route('ticket.booking', ['q' => $product->name]) }}"
-                    class="flex items-center gap-3 rounded-[18px] border border-slate-200 bg-white px-4 py-4 transition hover:border-sky-200 sm:gap-4 sm:px-5">
+                <div
+                    class="flex items-center gap-3 rounded-[18px] border border-slate-200 bg-white px-4 py-4 opacity-80 sm:gap-4 sm:px-5"
+                    aria-disabled="true">
                     <div class="flex h-10 w-10 items-center justify-center rounded-xl {{ $style['bg'] }} {{ $style['text'] }}">
                         @if ($style['icon'] === 'waves')
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
@@ -315,8 +314,11 @@
                         <p class="mt-0.5 text-[13px] font-medium text-sky-500">
                             Rp {{ number_format((float) $product->price, 0, ',', '.') }}{{ $product->price_label }}
                         </p>
+                        <p class="mt-1 text-[12px] text-slate-500">
+                            <!-- Pilih produk utama dulu untuk menambahkan add-on ini saat booking. -->
+                        </p>
                     </div>
-                </a>
+                </div>
             @empty
                 <div class="col-span-full rounded-2xl border border-dashed border-slate-300 bg-[#f8fafc] p-10 text-center text-sm text-slate-500">
                     Add-on activity belum tersedia.

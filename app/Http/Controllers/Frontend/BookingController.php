@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Services\BookingService;
 use App\Services\MidtransService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -102,6 +103,111 @@ class BookingController extends Controller
         ]);
     }
 
+    public function product(Request $request, string $slug)
+    {
+        $product = Product::query()
+            ->with(['category', 'primaryImage'])
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->whereHas('category', fn ($query) => $query->where('type', 'internal'))
+            ->firstOrFail();
+
+        return view('frontend.booking-product', [
+            'product' => $product,
+            'prefilledVisitDate' => (string) $request->query('date', now()->toDateString()),
+            'prefilledGuests' => max(1, (int) $request->query('guests', 2)),
+        ]);
+    }
+
+    public function productCalendar(Request $request, string $slug)
+    {
+        $product = Product::query()
+            ->select(['id', 'max_capacity'])
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->whereHas('category', fn ($query) => $query->where('type', 'internal'))
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'month' => ['nullable', 'date_format:Y-m'],
+        ]);
+
+        $month = $validated['month'] ?? now()->format('Y-m');
+        $monthStart = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $monthEnd = $monthStart->copy()->endOfMonth();
+        $today = now()->startOfDay();
+
+        $slotRows = DB::table('product_slots')
+            ->selectRaw('
+                slot_date,
+                COUNT(*) as slot_count,
+                SUM(total_slots) as total_slots,
+                SUM(booked_slots) as booked_slots,
+                SUM(CASE WHEN is_blocked = 1 THEN 1 ELSE 0 END) as blocked_count
+            ')
+            ->where('product_id', $product->id)
+            ->whereBetween('slot_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
+            ->groupBy('slot_date')
+            ->orderBy('slot_date')
+            ->get()
+            ->keyBy('slot_date');
+
+        $days = [];
+        $cursor = $monthStart->copy();
+
+        while ($cursor->lte($monthEnd)) {
+            $date = $cursor->toDateString();
+            $slot = $slotRows->get($date);
+
+            if ($slot) {
+                $remaining = max(0, (int) $slot->total_slots - (int) $slot->booked_slots);
+                $allBlocked = (int) $slot->blocked_count >= (int) $slot->slot_count;
+
+                $status = $allBlocked
+                    ? 'blocked'
+                    : ($remaining > 0 ? 'available' : 'full');
+
+                $days[] = [
+                    'date' => $date,
+                    'day' => (int) $cursor->day,
+                    'remaining_capacity' => $remaining,
+                    'total_slots' => (int) $slot->total_slots,
+                    'booked_slots' => (int) $slot->booked_slots,
+                    'slot_count' => (int) $slot->slot_count,
+                    'status' => $cursor->lt($today) ? 'past' : $status,
+                    'is_past' => $cursor->lt($today),
+                    'is_fallback' => false,
+                ];
+
+                $cursor->addDay();
+
+                continue;
+            }
+
+            $days[] = [
+                'date' => $date,
+                'day' => (int) $cursor->day,
+                'remaining_capacity' => (int) $product->max_capacity,
+                'total_slots' => (int) $product->max_capacity,
+                'booked_slots' => 0,
+                'slot_count' => 0,
+                'status' => $cursor->lt($today) ? 'past' : 'default',
+                'is_past' => $cursor->lt($today),
+                'is_fallback' => true,
+            ];
+
+            $cursor->addDay();
+        }
+
+        return response()->json([
+            'month' => $monthStart->format('Y-m'),
+            'label' => $monthStart->translatedFormat('F Y'),
+            'starts_on' => $monthStart->toDateString(),
+            'ends_on' => $monthEnd->toDateString(),
+            'days' => $days,
+        ]);
+    }
+
     public function availability(Request $request)
     {
         $data = $request->validate([
@@ -138,10 +244,17 @@ class BookingController extends Controller
 
     public function checkout(Request $request)
     {
+        $request->merge([
+            'customer_name' => trim((string) $request->input('customer_name', '')),
+            'customer_email' => strtolower(trim((string) $request->input('customer_email', ''))),
+            'customer_phone' => preg_replace('/\s+/', '', (string) $request->input('customer_phone', '')),
+            'notes' => trim((string) $request->input('notes', '')),
+        ]);
+
         $data = $request->validate([
-            'customer_name' => ['required', 'string', 'max:150'],
-            'customer_email' => ['required', 'email', 'max:150'],
-            'customer_phone' => ['required', 'string', 'max:30'],
+            'customer_name' => ['required', 'string', 'min:3', 'max:150'],
+            'customer_email' => ['required', 'email:rfc', 'max:150'],
+            'customer_phone' => ['required', 'string', 'regex:/^(?:\+62|62|0)8[0-9]{7,13}$/'],
             'visit_date' => ['required', 'date', 'after_or_equal:today'],
             'total_guests' => ['required', 'integer', 'min:1'],
             'payment_method_id' => ['required', 'integer', 'exists:payment_methods,id'],
@@ -271,6 +384,18 @@ class BookingController extends Controller
             ->latest('py.created_at')
             ->first();
 
+        if ($payment) {
+            $gatewayResponse = json_decode((string) ($payment->gateway_response ?? ''), true);
+
+            if (! $payment->va_number) {
+                $payment->va_number = $this->extractMidtransVaNumber($gatewayResponse);
+            }
+
+            if (! $payment->qr_url) {
+                $payment->qr_url = $this->extractMidtransQrUrl($gatewayResponse);
+            }
+        }
+
         return view('frontend.booking-status', [
             'booking' => $booking,
             'items' => $items,
@@ -393,6 +518,9 @@ class BookingController extends Controller
                 ->update([
                     'status' => $paymentStatus,
                     'gateway_transaction_id' => $result->transaction_id ?? null,
+                    'va_number' => $this->extractMidtransVaNumber($result),
+                    'qr_url' => $this->extractMidtransQrUrl($result),
+                    'gateway_response' => json_encode($result),
                     'paid_at' => $paymentStatus === 'paid' ? now() : null,
                     'updated_at' => now(),
                 ]);
@@ -428,5 +556,47 @@ class BookingController extends Controller
         }
 
         return redirect()->route('ticket.booking.status', ['token' => $publicToken]);
+    }
+
+    private function extractMidtransVaNumber(object|array|null $payload): ?string
+    {
+        if (! $payload) {
+            return null;
+        }
+
+        $data = is_array($payload) ? $payload : (array) $payload;
+
+        if (! empty($data['va_number'])) {
+            return (string) $data['va_number'];
+        }
+
+        if (! empty($data['permata_va_number'])) {
+            return (string) $data['permata_va_number'];
+        }
+
+        if (! empty($data['bill_key'])) {
+            return (string) $data['bill_key'];
+        }
+
+        $vaNumbers = $data['va_numbers'] ?? null;
+
+        if (is_array($vaNumbers) && ! empty($vaNumbers[0])) {
+            $first = is_array($vaNumbers[0]) ? $vaNumbers[0] : (array) $vaNumbers[0];
+
+            return isset($first['va_number']) ? (string) $first['va_number'] : null;
+        }
+
+        return null;
+    }
+
+    private function extractMidtransQrUrl(object|array|null $payload): ?string
+    {
+        if (! $payload) {
+            return null;
+        }
+
+        $data = is_array($payload) ? $payload : (array) $payload;
+
+        return isset($data['qr_url']) ? (string) $data['qr_url'] : null;
     }
 }
