@@ -50,7 +50,7 @@ class PaymentMethodController extends Controller
 
         $logoPath = null;
         if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')->store('payment-methods', 'public');
+            $logoPath = upload_store($request->file('logo'), 'payment-methods');
         }
 
         DB::table('payment_methods')->insert([
@@ -92,9 +92,8 @@ class PaymentMethodController extends Controller
 
         $logoPath = $method->logo_path;
         if ($request->hasFile('logo')) {
-            // Hapus logo lama
-            if ($logoPath) Storage::disk('public')->delete($logoPath);
-            $logoPath = $request->file('logo')->store('payment-methods', 'public');
+            if ($logoPath) upload_delete($logoPath);
+            $logoPath = upload_store($request->file('logo'), 'payment-methods');
         }
 
         DB::table('payment_methods')->where('id', $id)->update([
@@ -162,7 +161,7 @@ class PaymentMethodController extends Controller
         }
 
         if ($method->logo_path) {
-            Storage::disk('public')->delete($method->logo_path);
+            upload_delete($method->logo_path);
         }
 
         DB::table('payment_methods')->where('id', $id)->delete();

@@ -65,7 +65,7 @@
                         </td>
                         <td>
                             @if($m->logo_path)
-                                <img src="{{ Storage::url($m->logo_path) }}" alt="{{ $m->name }}"
+                                <img src="{{ upload_url($m->logo_path) }}" alt="{{ $m->name }}"
                                     style="height:24px; object-fit:contain">
                             @else
                                 <span class="text-muted">—</span>

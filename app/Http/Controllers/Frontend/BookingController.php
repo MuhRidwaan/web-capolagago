@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\PaymentSetting;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Services\BookingService;
@@ -17,6 +18,16 @@ class BookingController extends Controller
         private BookingService $bookingService,
         private MidtransService $midtransService,
     ) {}
+
+    private function midtransClientKey(): string
+    {
+        return (string) PaymentSetting::get('midtrans_client_key', config('midtrans.client_key', ''));
+    }
+
+    private function midtransServerKey(): string
+    {
+        return (string) PaymentSetting::get('midtrans_server_key', config('midtrans.server_key', ''));
+    }
 
     public function index(Request $request)
     {
@@ -99,7 +110,7 @@ class BookingController extends Controller
             'prefilledVisitDate' => (string) $request->query('date', ''),
             'prefilledGuests' => max(1, (int) $request->query('guests', 2)),
             'searchQuery' => $searchQuery,
-            'midtransClientKey' => (string) config('midtrans.client_key', ''),
+            'midtransClientKey' => $this->midtransClientKey(),
         ]);
     }
 
@@ -270,7 +281,7 @@ class BookingController extends Controller
 
         if (($booking['payment_provider'] ?? null) === 'midtrans') {
             try {
-                if ((string) config('midtrans.server_key', '') === '' || (string) config('midtrans.client_key', '') === '') {
+                if ($this->midtransServerKey() === '' || $this->midtransClientKey() === '') {
                     throw new \RuntimeException('Konfigurasi Midtrans belum lengkap.');
                 }
 
@@ -294,7 +305,7 @@ class BookingController extends Controller
                     'provider' => 'midtrans',
                     'mode' => 'snap',
                     'snap_token' => $snapToken,
-                    'client_key' => (string) config('midtrans.client_key', ''),
+                    'client_key' => $this->midtransClientKey(),
                 ];
 
                 DB::table('payments')
@@ -311,7 +322,7 @@ class BookingController extends Controller
                     'provider' => 'midtrans',
                     'mode' => 'snap',
                     'snap_token' => null,
-                    'client_key' => (string) config('midtrans.client_key', ''),
+                    'client_key' => $this->midtransClientKey(),
                     'error' => $exception->getMessage(),
                 ];
             }
@@ -400,7 +411,7 @@ class BookingController extends Controller
             'booking' => $booking,
             'items' => $items,
             'payment' => $payment,
-            'midtransClientKey' => (string) config('midtrans.client_key', ''),
+            'midtransClientKey' => $this->midtransClientKey(),
             'statusLabels' => [
                 'pending' => 'Pending',
                 'waiting_payment' => 'Menunggu Pembayaran',
@@ -425,7 +436,7 @@ class BookingController extends Controller
         abort_if(($payment['payment_status'] ?? null) !== 'pending', 422, 'Pembayaran ini sudah tidak berada pada status pending.');
         abort_if(($payment['booking_status'] ?? null) === 'cancelled', 422, 'Booking sudah dibatalkan.');
 
-        if ((string) config('midtrans.server_key', '') === '' || (string) config('midtrans.client_key', '') === '') {
+        if ($this->midtransServerKey() === '' || $this->midtransClientKey() === '') {
             return response()->json([
                 'message' => 'Konfigurasi Midtrans belum lengkap.',
             ], 422);
@@ -477,7 +488,7 @@ class BookingController extends Controller
                 'provider' => 'midtrans',
                 'mode' => 'snap',
                 'snap_token' => $snapToken,
-                'client_key' => (string) config('midtrans.client_key', ''),
+                'client_key' => $this->midtransClientKey(),
             ],
             'redirect_url' => route('ticket.booking.status', ['token' => $payment['public_token']]),
         ]);
@@ -555,7 +566,7 @@ class BookingController extends Controller
                 ->with('error', 'Status booking tidak ditemukan setelah proses pembayaran.');
         }
 
-        return redirect()->route('ticket.booking.status', ['token' => $publicToken]);
+        return redirect()->route('ticket.booking.status', ['token' => $publicToken, 'auto_sync' => '1']);
     }
 
     private function extractMidtransVaNumber(object|array|null $payload): ?string

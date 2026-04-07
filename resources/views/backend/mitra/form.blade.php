@@ -156,7 +156,7 @@
                                     <small class="text-muted d-block mb-2">Opsional. Upload logo mitra jika tersedia.</small>
                                     @if ($mitra->logo_path)
                                         <div class="mt-2">
-                                            <img src="{{ \Illuminate\Support\Facades\Storage::url($mitra->logo_path) }}" alt="Logo" style="max-width:110px;border-radius:.5rem;">
+                                            <img src="{{ upload_url($mitra->logo_path) }}" alt="Logo" style="max-width:110px;border-radius:.5rem;">
                                             <div class="form-check mt-2">
                                                 <input type="checkbox" class="form-check-input" id="remove_logo" name="remove_logo" value="1">
                                                 <label class="form-check-label" for="remove_logo">Hapus logo saat ini</label>

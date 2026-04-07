@@ -13,8 +13,8 @@ class MidtransService
     public function __construct()
     {
         // Prioritaskan key dari database, fallback ke config/.env
-        Config::$serverKey    = PaymentSetting::get('midtrans_server_key', config('midtrans.server_key'));
-        Config::$clientKey    = PaymentSetting::get('midtrans_client_key', config('midtrans.client_key'));
+        Config::$serverKey    = trim((string) PaymentSetting::get('midtrans_server_key', config('midtrans.server_key')));
+        Config::$clientKey    = trim((string) PaymentSetting::get('midtrans_client_key', config('midtrans.client_key')));
         Config::$isProduction = (bool) PaymentSetting::get('midtrans_is_production', config('midtrans.is_production'));
         Config::$isSanitized  = config('midtrans.is_sanitized');
         Config::$is3ds        = (bool) PaymentSetting::get('midtrans_is_3ds', config('midtrans.is_3ds'));

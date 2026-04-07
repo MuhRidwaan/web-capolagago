@@ -109,7 +109,7 @@
                             </div>
                             @if($method?->logo_path)
                             <div class="mt-2 d-flex align-items-center">
-                                <img src="{{ Storage::url($method->logo_path) }}" alt="Logo"
+                                <img src="{{ upload_url($method->logo_path) }}" alt="Logo"
                                     style="height:32px; object-fit:contain" class="mr-2 border p-1">
                                 <small class="text-muted">Logo saat ini. Upload baru untuk mengganti.</small>
                             </div>

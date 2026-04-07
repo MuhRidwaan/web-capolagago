@@ -73,7 +73,7 @@ class MitraController extends Controller
             $user->syncRoles(['Mitra']);
 
             $logoPath = $request->hasFile('logo')
-                ? $request->file('logo')->store('mitra-logos', 'public')
+                ? upload_store($request->file('logo'), 'mitra-logos')
                 : null;
 
             MitraProfile::create([
@@ -127,16 +127,15 @@ class MitraController extends Controller
 
             $logoPath = $mitra->logo_path;
             if ($request->boolean('remove_logo') && $logoPath) {
-                Storage::disk('public')->delete($logoPath);
+                upload_delete($logoPath);
                 $logoPath = null;
             }
 
             if ($request->hasFile('logo')) {
                 if ($logoPath) {
-                    Storage::disk('public')->delete($logoPath);
+                    upload_delete($logoPath);
                 }
-
-                $logoPath = $request->file('logo')->store('mitra-logos', 'public');
+                $logoPath = upload_store($request->file('logo'), 'mitra-logos');
             }
 
             $mitra->update([
@@ -183,7 +182,7 @@ class MitraController extends Controller
 
         DB::transaction(function () use ($mitra) {
             if ($mitra->logo_path) {
-                Storage::disk('public')->delete($mitra->logo_path);
+                upload_delete($mitra->logo_path);
             }
 
             $user = $mitra->user;

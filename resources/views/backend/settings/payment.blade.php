@@ -90,10 +90,25 @@
                                     Server Key
                                     <span class="badge badge-secondary ml-1">Secret</span>
                                 </label>
+                                @if(filled($settings['midtrans_server_key']->value ?? null))
+                                <div class="alert alert-light border mb-2 py-2 px-3 d-flex align-items-center justify-content-between" id="server_key_display_box">
+                                    <code id="server_key_display" class="text-dark" style="word-break:break-all;font-size:0.82rem;">••••••••••••••••••••••••••••••••</code>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary ml-2 flex-shrink-0 reveal-key"
+                                        data-value="{{ $settings['midtrans_server_key']->value }}"
+                                        data-target="server_key_display"
+                                        data-copy="server_key_copy">
+                                        <i class="fas fa-eye mr-1"></i> Lihat
+                                    </button>
+                                </div>
+                                <button type="button" id="server_key_copy" class="btn btn-xs btn-outline-secondary mb-2 d-none"
+                                    data-value="{{ $settings['midtrans_server_key']->value }}">
+                                    <i class="fas fa-copy mr-1"></i> Salin
+                                </button>
+                                @endif
                                 <div class="input-group">
                                     <input type="password" id="server_key" name="server_key"
                                         class="form-control @error('server_key') is-invalid @enderror"
-                                        placeholder="{{ filled($settings['midtrans_server_key']->value ?? null) ? '••••••••••••••••••••' : 'SB-Mid-server-xxxx...' }}"
+                                        placeholder="{{ filled($settings['midtrans_server_key']->value ?? null) ? 'Isi untuk mengganti key yang tersimpan' : 'SB-Mid-server-xxxx...' }}"
                                         autocomplete="new-password">
                                     <div class="input-group-append">
                                         <button class="btn btn-outline-secondary toggle-password" type="button"
@@ -114,10 +129,25 @@
                                     Client Key
                                     <span class="badge badge-secondary ml-1">Secret</span>
                                 </label>
+                                @if(filled($settings['midtrans_client_key']->value ?? null))
+                                <div class="alert alert-light border mb-2 py-2 px-3 d-flex align-items-center justify-content-between" id="client_key_display_box">
+                                    <code id="client_key_display" class="text-dark" style="word-break:break-all;font-size:0.82rem;">••••••••••••••••••••••••••••••••</code>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary ml-2 flex-shrink-0 reveal-key"
+                                        data-value="{{ $settings['midtrans_client_key']->value }}"
+                                        data-target="client_key_display"
+                                        data-copy="client_key_copy">
+                                        <i class="fas fa-eye mr-1"></i> Lihat
+                                    </button>
+                                </div>
+                                <button type="button" id="client_key_copy" class="btn btn-xs btn-outline-secondary mb-2 d-none"
+                                    data-value="{{ $settings['midtrans_client_key']->value }}">
+                                    <i class="fas fa-copy mr-1"></i> Salin
+                                </button>
+                                @endif
                                 <div class="input-group">
                                     <input type="password" id="client_key" name="client_key"
                                         class="form-control @error('client_key') is-invalid @enderror"
-                                        placeholder="{{ filled($settings['midtrans_client_key']->value ?? null) ? '••••••••••••••••••••' : 'SB-Mid-client-xxxx...' }}"
+                                        placeholder="{{ filled($settings['midtrans_client_key']->value ?? null) ? 'Isi untuk mengganti key yang tersimpan' : 'SB-Mid-client-xxxx...' }}"
                                         autocomplete="new-password">
                                     <div class="input-group-append">
                                         <button class="btn btn-outline-secondary toggle-password" type="button"
@@ -221,6 +251,11 @@
                                 <td>
                                     @if(filled($settings['midtrans_server_key']->value ?? null))
                                         <span class="badge badge-success"><i class="fas fa-check mr-1"></i>Tersimpan</span>
+                                        <div class="mt-1">
+                                            <code class="text-xs" style="word-break:break-all;">
+                                                {{ substr($settings['midtrans_server_key']->value, 0, 20) }}...
+                                            </code>
+                                        </div>
                                     @else
                                         <span class="badge badge-danger"><i class="fas fa-times mr-1"></i>Belum diisi</span>
                                     @endif
@@ -231,6 +266,11 @@
                                 <td>
                                     @if(filled($settings['midtrans_client_key']->value ?? null))
                                         <span class="badge badge-success"><i class="fas fa-check mr-1"></i>Tersimpan</span>
+                                        <div class="mt-1">
+                                            <code class="text-xs" style="word-break:break-all;">
+                                                {{ substr($settings['midtrans_client_key']->value, 0, 20) }}...
+                                            </code>
+                                        </div>
                                     @else
                                         <span class="badge badge-danger"><i class="fas fa-times mr-1"></i>Belum diisi</span>
                                     @endif
@@ -283,7 +323,7 @@
 
 @push('scripts')
 <script>
-    // Toggle show/hide password field
+    // Toggle show/hide untuk input field (ganti key)
     document.querySelectorAll('.toggle-password').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const targetId = this.dataset.target;
@@ -296,6 +336,47 @@
                 input.type = 'password';
                 icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
+        });
+    });
+
+    // Reveal key tersimpan
+    document.querySelectorAll('.reveal-key').forEach(function (btn) {
+        let revealed = false;
+        btn.addEventListener('click', function () {
+            const display = document.getElementById(this.dataset.target);
+            const copyBtn = document.getElementById(this.dataset.copy);
+            const value = this.dataset.value;
+            const icon = this.querySelector('i');
+
+            if (!revealed) {
+                display.textContent = value;
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+                this.innerHTML = '<i class="fas fa-eye-slash mr-1"></i> Sembunyikan';
+                if (copyBtn) copyBtn.classList.remove('d-none');
+                revealed = true;
+            } else {
+                display.textContent = '••••••••••••••••••••••••••••••••';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+                this.innerHTML = '<i class="fas fa-eye mr-1"></i> Lihat';
+                if (copyBtn) copyBtn.classList.add('d-none');
+                revealed = false;
+            }
+        });
+    });
+
+    // Salin key ke clipboard
+    document.querySelectorAll('[id$="_copy"]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const value = this.dataset.value;
+            navigator.clipboard.writeText(value).then(() => {
+                const original = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check mr-1"></i> Tersalin!';
+                this.classList.replace('btn-outline-secondary', 'btn-success');
+                setTimeout(() => {
+                    this.innerHTML = original;
+                    this.classList.replace('btn-success', 'btn-outline-secondary');
+                }, 2000);
+            });
         });
     });
 </script>

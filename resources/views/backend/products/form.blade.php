@@ -221,7 +221,7 @@
                                 @forelse ($product->images as $image)
                                     <div class="col-lg-4 mb-4">
                                         <div class="card h-100 border">
-                                            <img src="{{ \Illuminate\Support\Facades\Storage::url($image->image_path) }}" alt="{{ $image->alt_text }}" style="height:180px;object-fit:cover;" class="card-img-top">
+                                            <img src="{{ upload_url($image->image_path) }}" alt="{{ $image->alt_text }}" style="height:180px;object-fit:cover;" class="card-img-top">
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label class="small font-weight-bold">Alt Text</label>

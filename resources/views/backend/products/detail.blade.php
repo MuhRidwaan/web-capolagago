@@ -62,10 +62,10 @@
                     @if($product->images->count())
                         {{-- Foto utama --}}
                         @php $primary = $product->images->firstWhere('is_primary', true) ?? $product->images->first(); @endphp
-                        <a href="{{ Storage::url($primary->image_path) }}"
+                        <a href="{{ upload_url($primary->image_path) }}"
                             data-toggle="lightbox" data-gallery="product-gallery"
                             data-title="{{ $primary->alt_text ?? $product->name }}">
-                            <img src="{{ Storage::url($primary->image_path) }}"
+                            <img src="{{ upload_url($primary->image_path) }}"
                                 alt="{{ $primary->alt_text ?? $product->name }}"
                                 class="img-fluid rounded mb-3 w-100"
                                 style="max-height:380px; object-fit:cover;">
@@ -76,10 +76,10 @@
                         <div class="row">
                             @foreach($product->images as $img)
                             <div class="col-4 col-md-3 mb-2 position-relative">
-                                <a href="{{ Storage::url($img->image_path) }}"
+                                <a href="{{ upload_url($img->image_path) }}"
                                     data-toggle="lightbox" data-gallery="product-gallery"
                                     data-title="{{ $img->alt_text ?? $product->name }}">
-                                    <img src="{{ Storage::url($img->image_path) }}"
+                                    <img src="{{ upload_url($img->image_path) }}"
                                         alt="{{ $img->alt_text }}"
                                         class="img-thumb {{ $img->is_primary ? 'border border-warning' : '' }}">
                                 </a>

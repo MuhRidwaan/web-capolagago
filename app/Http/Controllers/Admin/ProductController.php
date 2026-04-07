@@ -184,7 +184,7 @@ class ProductController extends Controller
             $imagePaths = $product->images->pluck('image_path')->filter()->all();
             $product->delete();
             foreach ($imagePaths as $imagePath) {
-                Storage::disk('public')->delete($imagePath);
+                upload_delete($imagePath);
             }
         } catch (QueryException) {
             return back()->with('error', 'Produk tidak bisa dihapus karena masih terhubung dengan data transaksi atau ulasan.');
@@ -313,7 +313,7 @@ class ProductController extends Controller
 
         foreach ($product->images as $image) {
             if ($deleteImageIds->contains($image->id)) {
-                Storage::disk('public')->delete($image->image_path);
+                upload_delete($image->image_path);
                 $image->delete();
                 continue;
             }
@@ -338,7 +338,7 @@ class ProductController extends Controller
         $hasPrimary = $product->images()->where('is_primary', true)->exists();
 
         foreach ($request->file('new_images') as $index => $uploadedImage) {
-            $path = $uploadedImage->store('products', 'public');
+            $path = upload_store($uploadedImage, 'products');
 
             ProductImage::create([
                 'product_id' => $product->id,

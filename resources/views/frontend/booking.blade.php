@@ -896,14 +896,14 @@
                                 confirmationMessage.textContent = 'Pembayaran Midtrans berhasil. Kamu akan diarahkan ke halaman status booking.';
                                 setFeedback(`Pembayaran Midtrans berhasil untuk booking ${result.booking.booking_code}.`, 'info');
                                 if (result.redirect_url) {
-                                    window.location.href = result.redirect_url;
+                                    window.location.href = result.redirect_url + '?auto_sync=1';
                                 }
                             },
                             onPending: () => {
                                 confirmationMessage.textContent = 'Pembayaran Midtrans masih menunggu penyelesaian. Kamu akan diarahkan ke halaman status booking.';
                                 setFeedback(`Pembayaran Midtrans sedang menunggu penyelesaian untuk booking ${result.booking.booking_code}.`, 'warning');
                                 if (result.redirect_url) {
-                                    window.location.href = result.redirect_url;
+                                    window.location.href = result.redirect_url + '?auto_sync=1';
                                 }
                             },
                             onError: () => {

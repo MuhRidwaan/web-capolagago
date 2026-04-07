@@ -57,6 +57,22 @@ Route::post('/booking-ticket/status/{token}/sync-payment', [FrontendBookingContr
 Route::get('/booking/finish', [FrontendBookingController::class, 'finish'])
     ->name('ticket.booking.finish');
 
+// Debug Midtrans key — HAPUS setelah selesai debug
+if (config('app.debug')) {
+    Route::get('/debug/midtrans-key', function () {
+        $serverKey = \App\Models\PaymentSetting::get('midtrans_server_key', '');
+        $clientKey = \App\Models\PaymentSetting::get('midtrans_client_key', '');
+        return response()->json([
+            'server_key_length' => strlen($serverKey),
+            'server_key_prefix' => substr($serverKey, 0, 15),
+            'server_key_suffix' => substr($serverKey, -5),
+            'client_key_length' => strlen($clientKey),
+            'client_key_prefix' => substr($clientKey, 0, 15),
+            'is_production'     => \App\Models\PaymentSetting::get('midtrans_is_production'),
+        ]);
+    });
+}
+
 // Webhook Midtrans — no auth, no CSRF (server-to-server)
 Route::post('/payment/webhook/midtrans', [MidtransWebhookController::class, 'handle'])
     ->name('payment.webhook.midtrans');

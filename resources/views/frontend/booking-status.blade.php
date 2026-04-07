@@ -474,10 +474,10 @@
 
                 window.snap.pay(result.payment_gateway.snap_token, {
                     onSuccess: () => {
-                        window.location.href = result.redirect_url;
+                        window.location.href = result.redirect_url + '?auto_sync=1';
                     },
                     onPending: () => {
-                        window.location.href = result.redirect_url;
+                        window.location.href = result.redirect_url + '?auto_sync=1';
                     },
                     onClose: () => {
                         setFeedback('Popup pembayaran ditutup. Booking masih menunggu pembayaran.', 'warning');
@@ -494,7 +494,12 @@
             }
         });
 
-        openModal();
+        // Auto-sync status saat halaman dimuat (tanpa buka modal)
+        // Ini untuk handle kasus redirect dari Snap setelah bayar
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('auto_sync') === '1' && syncButton) {
+            handleSyncStatus(syncButton);
+        }
     })();
 </script>
 @endif
