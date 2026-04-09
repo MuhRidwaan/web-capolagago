@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,6 +13,8 @@ class HomeController extends Controller
 {
     public function index()
     {
+        $pendingGuestBooking = $this->resolvePendingGuestBooking();
+
         $preferredFeaturedSlugs = collect([
             'glamping-riverside-luxury',
             'standard-camping-ground',
@@ -74,7 +77,63 @@ class HomeController extends Controller
             'mainCategories' => $mainCategories,
             'addonProducts' => $addonProducts,
             'heroProducts' => $heroProducts,
+            'pendingGuestBooking' => $pendingGuestBooking,
         ]);
+    }
+
+    private function resolvePendingGuestBooking(): ?array
+    {
+        $publicToken = (string) session('guest_pending_booking_token', '');
+
+        if ($publicToken === '') {
+            return null;
+        }
+
+        $booking = DB::table('bookings as b')
+            ->join('payments as py', 'py.booking_id', '=', 'b.id')
+            ->leftJoin('booking_items as bi', function ($join) {
+                $join->on('bi.booking_id', '=', 'b.id')
+                    ->where('bi.is_addon', '=', false);
+            })
+            ->select(
+                'b.id',
+                'b.booking_code',
+                'b.public_token',
+                'b.status as booking_status',
+                'b.total_amount',
+                'py.status as payment_status',
+                'py.expired_at',
+                'bi.product_name_snapshot as main_product_name'
+            )
+            ->where('b.public_token', $publicToken)
+            ->latest('py.created_at')
+            ->first();
+
+        if (! $booking) {
+            session()->forget('guest_pending_booking_token');
+
+            return null;
+        }
+
+        $isPendingBooking = in_array($booking->booking_status, ['pending', 'waiting_payment'], true);
+        $isPendingPayment = ($booking->payment_status ?? null) === 'pending';
+
+        if (! $isPendingBooking || ! $isPendingPayment) {
+            session()->forget('guest_pending_booking_token');
+
+            return null;
+        }
+
+        return [
+            'booking_code' => $booking->booking_code,
+            'public_token' => $booking->public_token,
+            'main_product_name' => $booking->main_product_name ?: 'Pesanan Anda',
+            'total_amount' => (float) $booking->total_amount,
+            'payment_status' => $booking->payment_status,
+            'expires_at' => $booking->expired_at
+                ? Carbon::parse($booking->expired_at)->timezone('Asia/Jakarta')
+                : null,
+        ];
     }
 
     public function wisata(Request $request)

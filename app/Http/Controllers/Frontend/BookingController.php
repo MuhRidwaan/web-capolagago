@@ -323,6 +323,8 @@ class BookingController extends Controller
             }
         }
 
+        session()->put('guest_pending_booking_token', $booking['public_token']);
+
         return response()->json([
             'message' => 'Booking berhasil dibuat dan sedang menunggu pembayaran.',
             'booking' => $booking,
@@ -397,6 +399,7 @@ class BookingController extends Controller
         }
 
         $reviewEligibility = $this->reviewEligibility($booking, $payment);
+        $this->syncGuestPendingBookingSession($booking, $payment);
 
         return view('frontend.booking-status', [
             'booking' => $booking,
@@ -666,6 +669,8 @@ class BookingController extends Controller
                     ->update(['status' => 'confirmed', 'updated_at' => now()]);
             }
 
+            $this->syncGuestPendingBookingSessionByToken($token, $paymentStatus);
+
             return response()->json(['status' => $paymentStatus]);
         } catch (\Throwable $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 422);
@@ -842,5 +847,34 @@ class BookingController extends Controller
                 'review_count' => $stats->total ?? 0,
                 'updated_at' => now(),
             ]);
+    }
+
+    private function syncGuestPendingBookingSession(object $booking, ?object $payment): void
+    {
+        $isPendingBooking = in_array($booking->status, ['pending', 'waiting_payment'], true);
+        $isPendingPayment = ($payment?->status ?? null) === 'pending';
+
+        if ($isPendingBooking && $isPendingPayment) {
+            session()->put('guest_pending_booking_token', $booking->public_token);
+
+            return;
+        }
+
+        if (session('guest_pending_booking_token') === $booking->public_token) {
+            session()->forget('guest_pending_booking_token');
+        }
+    }
+
+    private function syncGuestPendingBookingSessionByToken(string $publicToken, string $paymentStatus): void
+    {
+        if ($paymentStatus === 'pending') {
+            session()->put('guest_pending_booking_token', $publicToken);
+
+            return;
+        }
+
+        if (session('guest_pending_booking_token') === $publicToken) {
+            session()->forget('guest_pending_booking_token');
+        }
     }
 }

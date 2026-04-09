@@ -50,7 +50,36 @@
     };
 @endphp
 
-<section id="home" class="pt-16 sm:pt-20 md:pt-24">
+@if (! empty($pendingGuestBooking))
+    <section class="border-b border-amber-200 bg-amber-50 pt-16 sm:pt-20 md:pt-24">
+        <div class="mx-auto max-w-[1920px] px-4 py-4 md:px-8">
+            <div class="flex flex-col gap-4 rounded-[24px] border border-amber-200 bg-white/80 px-4 py-4 shadow-sm backdrop-blur sm:px-5 md:flex-row md:items-center md:justify-between">
+                <div class="min-w-0">
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">Pembayaran Belum Selesai</p>
+                    <p class="mt-2 text-base font-semibold text-slate-900">
+                        {{ $pendingGuestBooking['main_product_name'] }} masih menunggu pembayaran.
+                    </p>
+                    <p class="mt-1 text-sm leading-6 text-slate-600">
+                        Kode booking {{ $pendingGuestBooking['booking_code'] }}
+                        @if ($pendingGuestBooking['expires_at'])
+                            • Bayar sebelum {{ $pendingGuestBooking['expires_at']->translatedFormat('d M Y, H:i') }} WIB
+                        @endif
+                    </p>
+                </div>
+                <div class="flex flex-col gap-3 sm:flex-row">
+                    <a href="{{ route('ticket.booking.status', ['token' => $pendingGuestBooking['public_token']]) }}" class="inline-flex items-center justify-center rounded-2xl bg-amber-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-600">
+                        Lanjutkan Pembayaran
+                    </a>
+                    <a href="{{ route('ticket.booking.status', ['token' => $pendingGuestBooking['public_token']]) }}" class="inline-flex items-center justify-center rounded-2xl border border-amber-200 bg-white px-5 py-3 text-sm font-semibold text-amber-800 transition hover:bg-amber-50">
+                        Lihat Status Booking
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+@endif
+
+<section id="home" class="{{ ! empty($pendingGuestBooking) ? '' : 'pt-16 sm:pt-20 md:pt-24' }}">
     <div class="relative overflow-hidden py-12 sm:py-14 md:py-16 lg:py-20" style="background:linear-gradient(135deg, #1a3a4a 0%, #2d5a6b 50%, #3d7a8a 100%)">
         <div class="mx-auto max-w-[1920px] px-4 md:px-8">
             <div class="flex flex-col gap-6 sm:gap-8 lg:flex-row lg:items-center lg:justify-between">
