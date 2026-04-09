@@ -48,7 +48,6 @@ class MidtransWebhookController extends Controller
                     ->update([
                         'status'                 => $paymentStatus,
                         'gateway_transaction_id' => $transactionId,
-                        'gateway_response'       => json_encode($notification),
                         'va_number'              => $vaNumber,
                         'paid_at'                => $paidAt,
                         'updated_at'             => now(),
@@ -58,6 +57,30 @@ class MidtransWebhookController extends Controller
                     Log::warning('Midtrans webhook: payment not found', ['order_id' => $orderId]);
                     return;
                 }
+
+                $existingResponse = DB::table('payments')
+                    ->where('payment_code', $orderId)
+                    ->value('gateway_response');
+
+                $decodedExisting = json_decode((string) $existingResponse, true);
+                $mergedResponse = array_replace_recursive(
+                    is_array($decodedExisting) ? $decodedExisting : [],
+                    array_filter([
+                        'provider' => 'midtrans',
+                        'transaction_status' => $notification->transaction_status ?? null,
+                        'transaction_id' => $transactionId,
+                        'payment_type' => $paymentType,
+                        'va_numbers' => isset($notification->va_numbers) ? json_decode(json_encode($notification->va_numbers), true) : null,
+                        'raw_notification' => json_decode(json_encode($notification), true),
+                    ], fn ($value) => $value !== null)
+                );
+
+                DB::table('payments')
+                    ->where('payment_code', $orderId)
+                    ->update([
+                        'gateway_response' => json_encode($mergedResponse),
+                        'updated_at' => now(),
+                    ]);
 
                 // Sinkronisasi status booking
                 if ($paymentStatus === 'paid') {

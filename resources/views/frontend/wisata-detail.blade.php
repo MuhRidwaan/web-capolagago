@@ -85,7 +85,7 @@
 
         <div class="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.72fr)] xl:items-start">
             <article class="overflow-hidden rounded-[32px] bg-white shadow-[0_24px_70px_rgba(2,6,23,0.28)]">
-                <div class="grid min-h-[560px] gap-0 lg:grid-cols-[minmax(0,1.1fr)_minmax(340px,0.9fr)]">
+                <div class="grid gap-0 lg:min-h-[560px] lg:grid-cols-[minmax(0,1.1fr)_minmax(340px,0.9fr)]">
                     <div class="relative min-h-[360px] overflow-hidden">
                         <img src="{{ $heroImage }}" alt="{{ $product->name }}" class="absolute inset-0 h-full w-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-slate-950/5"></div>
@@ -120,8 +120,8 @@
                         <div class="flex items-start justify-between gap-4">
                             <div>
                                 <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-500">Harga Paket</p>
-                                <div class="mt-2 flex items-end gap-2">
-                                    <p class="text-3xl font-bold tracking-tight text-teal-700 sm:text-4xl">
+                                <div class="mt-2 flex flex-wrap items-end gap-2">
+                                    <p class="break-words text-3xl font-bold tracking-tight text-teal-700 sm:text-4xl">
                                         Rp {{ number_format((float) $product->price, 0, ',', '.') }}
                                     </p>
                                     <span class="pb-1 text-sm font-medium text-slate-500">{{ $product->price_label }}</span>
@@ -133,15 +133,15 @@
                         </div>
 
                         <div class="mt-6 grid gap-3 rounded-[28px] border border-slate-200 bg-slate-50 p-4">
-                            <div class="flex items-center justify-between gap-4 text-sm">
+                            <div class="flex items-start justify-between gap-4 text-sm">
                                 <span class="text-slate-500">Durasi</span>
-                                <strong class="text-slate-900">{{ $product->duration_hours ? number_format((float) $product->duration_hours, 1) . ' jam' : 'Menginap / sesuai paket' }}</strong>
+                                <strong class="text-right text-slate-900">{{ $product->duration_hours ? number_format((float) $product->duration_hours, 1) . ' jam' : 'Menginap / sesuai paket' }}</strong>
                             </div>
-                            <div class="flex items-center justify-between gap-4 text-sm">
+                            <div class="flex items-start justify-between gap-4 text-sm">
                                 <span class="text-slate-500">Kapasitas</span>
-                                <strong class="text-slate-900">{{ $product->max_capacity }} slot / unit</strong>
+                                <strong class="text-right text-slate-900">{{ $product->max_capacity }} slot / unit</strong>
                             </div>
-                            <div class="flex items-center justify-between gap-4 text-sm">
+                            <div class="flex items-start justify-between gap-4 text-sm">
                                 <span class="text-slate-500">Penyedia</span>
                                 <strong class="text-right text-slate-900">{{ $product->mitra?->business_name ?? 'Capolaga' }}</strong>
                             </div>
@@ -160,7 +160,7 @@
                             Harga, fasilitas, dan biaya parkir dapat berubah tergantung musim, hari libur, atau kebijakan pengelola.
                         </div>
 
-                        <div class="mt-6 grid grid-cols-3 gap-3">
+                        <div class="mt-6 grid gap-3 sm:grid-cols-3">
                             @foreach ([
                                 ['label' => 'Rating', 'value' => number_format($ratingValue, 1)],
                                 ['label' => 'Ulasan', 'value' => $reviewCount . ' publik'],

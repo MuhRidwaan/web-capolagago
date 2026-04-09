@@ -21,7 +21,7 @@
             </div>
             <input type="hidden" name="date" value="{{ request('date', $today) }}" />
             <input type="hidden" name="guests" value="{{ request('guests', 2) }}" />
-            <button type="submit" class="inline-flex h-12 items-center justify-center rounded-lg bg-white px-6 text-sm font-semibold text-teal-700 transition hover:bg-teal-50">Filter</button>
+            <button type="submit" class="inline-flex h-12 w-full items-center justify-center rounded-lg bg-white px-6 text-sm font-semibold text-teal-700 transition hover:bg-teal-50 md:w-auto">Filter</button>
         </form>
     </div>
 </section>
@@ -45,14 +45,14 @@
 
 <section class="py-10 md:py-12">
     <div class="container mx-auto px-4">
-        <div class="mb-6 flex items-center justify-between gap-4">
+        <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <p class="text-slate-500">Menampilkan <span class="font-semibold text-slate-900">{{ $products->count() }}</span> hasil</p>
-            <form action="{{ route('frontend.wisata') }}" method="GET">
+            <form action="{{ route('frontend.wisata') }}" method="GET" class="w-full sm:w-auto">
                 <input type="hidden" name="q" value="{{ $searchQuery }}" />
                 <input type="hidden" name="category" value="{{ $selectedCategory }}" />
                 <input type="hidden" name="date" value="{{ request('date', $today) }}" />
                 <input type="hidden" name="guests" value="{{ request('guests', 2) }}" />
-                <select name="sort" onchange="this.form.submit()" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+                <select name="sort" onchange="this.form.submit()" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 sm:w-auto">
                     <option value="popular" @selected($selectedSort === 'popular')>Urutkan: Populer</option>
                     <option value="price_low" @selected($selectedSort === 'price_low')>Harga: Rendah ke Tinggi</option>
                     <option value="price_high" @selected($selectedSort === 'price_high')>Harga: Tinggi ke Rendah</option>
@@ -91,11 +91,11 @@
                             <span class="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500">{{ $product->min_pax }}-{{ $product->max_pax }} Orang</span>
                             <span class="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500">{{ $product->price_label }}</span>
                         </div>
-                        <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-200 pt-4">
-                            <a href="{{ route('frontend.wisata.show', ['slug' => $product->slug]) }}" class="inline-flex items-center rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-teal-300 hover:text-teal-700">
+                        <div class="mt-4 flex flex-col gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:flex-wrap sm:items-center">
+                            <a href="{{ route('frontend.wisata.show', ['slug' => $product->slug]) }}" class="inline-flex w-full items-center justify-center rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-teal-300 hover:text-teal-700 sm:w-auto">
                                 Detail Paket
                             </a>
-                            <a href="{{ route('ticket.booking.product', ['slug' => $product->slug, 'date' => request('date', $today), 'guests' => request('guests', 2)]) }}" class="inline-flex items-center rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">
+                            <a href="{{ route('ticket.booking.product', ['slug' => $product->slug, 'date' => request('date', $today), 'guests' => request('guests', 2)]) }}" class="inline-flex w-full items-center justify-center rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-teal-700 sm:w-auto">
                                 Pesan Sekarang
                             </a>
                         </div>

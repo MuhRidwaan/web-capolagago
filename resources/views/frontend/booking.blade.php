@@ -55,6 +55,7 @@
     $mainProductCount = $mainProducts->count();
     $addonProductCount = $addonProducts->count();
     $searchResultCount = $mainProductCount + $addonProductCount;
+    $productDetailBaseUrl = rtrim(route('ticket.booking.product', ['slug' => '__slug__'], false), '/__slug__');
 @endphp
 
 <section class="border-b border-slate-200 bg-white pt-8">
@@ -88,13 +89,13 @@
     <div class="mx-auto grid max-w-[1680px] gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8">
         <div class="space-y-6">
             <section class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-                <div class="flex flex-wrap gap-2">
-                    <button type="button" data-step-indicator="1" class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-900">1. Pilih Produk</button>
-                    <span class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">2. Tanggal &amp; Slot</span>
-                    <button type="button" data-step-indicator="2" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">3. Add-on</button>
-                    <button type="button" data-step-indicator="3" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">4. Keranjang</button>
-                    <button type="button" data-step-indicator="4" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">5. Checkout</button>
-                    <button type="button" data-step-indicator="5" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">6. Konfirmasi</button>
+                <div class="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+                    <button type="button" data-step-indicator="1" class="shrink-0 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 sm:px-4 sm:py-2.5 sm:text-sm">1. Pilih Produk</button>
+                    <span class="shrink-0 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500 sm:px-4 sm:py-2.5 sm:text-sm">2. Tanggal &amp; Slot</span>
+                    <button type="button" data-step-indicator="2" class="shrink-0 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500 sm:px-4 sm:py-2.5 sm:text-sm">3. Add-on</button>
+                    <button type="button" data-step-indicator="3" class="shrink-0 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500 sm:px-4 sm:py-2.5 sm:text-sm">4. Keranjang</button>
+                    <button type="button" data-step-indicator="4" class="shrink-0 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500 sm:px-4 sm:py-2.5 sm:text-sm">5. Checkout</button>
+                    <button type="button" data-step-indicator="5" class="shrink-0 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500 sm:px-4 sm:py-2.5 sm:text-sm">6. Konfirmasi</button>
                 </div>
                 <div id="flow-feedback" class="hidden"></div>
             </section>
@@ -135,11 +136,11 @@
 
                 <div id="addon-grid" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
 
-                <div class="mt-6 flex items-center justify-between gap-3">
-                    <button type="button" data-step-prev="1" class="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">
+                <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <button type="button" data-step-prev="1" class="w-full rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 sm:w-auto">
                         Kembali
                     </button>
-                    <button type="button" data-step-next="3" class="rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800">
+                    <button type="button" data-step-next="3" class="w-full rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 sm:w-auto">
                         Lanjut ke Keranjang
                     </button>
                 </div>
@@ -160,7 +161,7 @@
                         </div>
 
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                            <div class="flex items-center justify-between gap-4">
+                            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Add-on Activity</p>
                                 <span id="addon-count" class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600">0 dipilih</span>
                             </div>
@@ -171,37 +172,37 @@
                     <aside class="rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-4">
                         <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Estimasi Harga</p>
                         <div class="mt-4 space-y-3 text-sm text-slate-700">
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-start justify-between gap-3">
                                 <span>Paket utama</span>
-                                <span id="summary-base">Rp 0</span>
+                                <span id="summary-base" class="text-right">Rp 0</span>
                             </div>
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-start justify-between gap-3">
                                 <span>Add-on</span>
-                                <span id="summary-addon">Rp 0</span>
+                                <span id="summary-addon" class="text-right">Rp 0</span>
                             </div>
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-start justify-between gap-3">
                                 <span>Kuantitas</span>
-                                <span id="summary-quantity">0 item</span>
+                                <span id="summary-quantity" class="text-right">0 item</span>
                             </div>
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-start justify-between gap-3">
                                 <span>Service fee</span>
-                                <span id="summary-fee">Rp 0</span>
+                                <span id="summary-fee" class="text-right">Rp 0</span>
                             </div>
                             <div class="border-t border-slate-200 pt-3">
-                                <div class="flex items-center justify-between text-base font-bold text-slate-900">
+                                <div class="flex items-start justify-between gap-3 text-base font-bold text-slate-900">
                                     <span>Total</span>
-                                    <span id="summary-total">Rp 0</span>
+                                    <span id="summary-total" class="text-right">Rp 0</span>
                                 </div>
                             </div>
                         </div>
                     </aside>
                 </div>
 
-                <div class="mt-6 flex items-center justify-between gap-3">
-                    <button type="button" data-step-prev="2" class="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">
+                <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <button type="button" data-step-prev="2" class="w-full rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 sm:w-auto">
                         Kembali
                     </button>
-                    <button type="button" data-step-next="4" class="rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800">
+                    <button type="button" data-step-next="4" class="w-full rounded-2xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 sm:w-auto">
                         Lanjut ke Checkout
                     </button>
                 </div>
@@ -261,26 +262,26 @@
                     <aside class="rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-4">
                         <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Ringkasan Pembayaran</p>
                         <div class="mt-4 space-y-3 text-sm">
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-start justify-between gap-3">
                                 <span class="text-slate-600">Paket</span>
-                                <span id="checkout-base">Rp 0</span>
+                                <span id="checkout-base" class="text-right">Rp 0</span>
                             </div>
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-start justify-between gap-3">
                                 <span class="text-slate-600">Add-on</span>
-                                <span id="checkout-addon">Rp 0</span>
+                                <span id="checkout-addon" class="text-right">Rp 0</span>
                             </div>
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-start justify-between gap-3">
                                 <span class="text-slate-600">Kuantitas</span>
-                                <span id="checkout-quantity">0 item</span>
+                                <span id="checkout-quantity" class="text-right">0 item</span>
                             </div>
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-start justify-between gap-3">
                                 <span class="text-slate-600">Service fee</span>
-                                <span id="checkout-fee">Rp 0</span>
+                                <span id="checkout-fee" class="text-right">Rp 0</span>
                             </div>
                             <div class="border-t border-slate-200 pt-3">
-                                <div class="flex items-center justify-between text-base font-bold">
+                                <div class="flex items-start justify-between gap-3 text-base font-bold">
                                     <span>Total bayar</span>
-                                    <span id="checkout-total">Rp 0</span>
+                                    <span id="checkout-total" class="text-right">Rp 0</span>
                                 </div>
                             </div>
                             <p id="payment-method-helper" class="rounded-xl bg-white px-3 py-2 text-xs text-slate-500"></p>
@@ -353,12 +354,12 @@
         </div>
 
         <aside class="h-fit rounded-3xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-24">
-            <div class="flex items-center justify-between gap-3">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Ringkasan Live</p>
                     <h2 class="mt-1 text-base font-bold text-slate-900">Booking customer</h2>
                 </div>
-                <span id="sidebar-addon-count" class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">0 add-on</span>
+                <span id="sidebar-addon-count" class="w-fit rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">0 add-on</span>
             </div>
 
             <div class="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
@@ -366,7 +367,7 @@
                 <div class="mt-3 grid gap-2">
                     <input id="trip-date-input" type="date" readonly class="w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-2.5 text-sm text-slate-700 outline-none" />
                     <input id="trip-guests-input" type="number" min="1" value="2" readonly class="w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-700 outline-none" />
-                    <div class="flex items-center justify-between gap-2 text-sm text-slate-700">
+                    <div class="flex flex-col gap-2 text-sm text-slate-700 sm:flex-row sm:items-center sm:justify-between">
                         <p id="sidebar-visit-date" class="rounded-full bg-white px-3 py-2 font-semibold text-slate-900">Belum dipilih</p>
                         <p id="sidebar-visit-guests" class="rounded-full bg-white px-3 py-2 font-semibold text-slate-900">2 orang</p>
                     </div>
@@ -384,18 +385,18 @@
             </div>
 
             <div class="mt-3 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-4 text-white">
-                <div class="flex items-center justify-between text-sm text-slate-300">
+                <div class="flex items-start justify-between gap-3 text-sm text-slate-300">
                     <span>Estimasi subtotal</span>
-                    <span id="sidebar-subtotal">Rp 0</span>
+                    <span id="sidebar-subtotal" class="text-right">Rp 0</span>
                 </div>
-                <div class="mt-2 flex items-center justify-between text-sm text-slate-300">
+                <div class="mt-2 flex items-start justify-between gap-3 text-sm text-slate-300">
                     <span>Service fee</span>
-                    <span id="sidebar-fee">Rp 0</span>
+                    <span id="sidebar-fee" class="text-right">Rp 0</span>
                 </div>
                 <div class="mt-4 border-t border-white/10 pt-4">
-                    <div class="flex items-center justify-between text-base font-bold">
+                    <div class="flex items-start justify-between gap-3 text-base font-bold">
                         <span>Total</span>
-                        <span id="sidebar-total">Rp 0</span>
+                        <span id="sidebar-total" class="text-right">Rp 0</span>
                     </div>
                 </div>
             </div>
@@ -434,10 +435,10 @@
         const confirmationMessage = document.getElementById('confirmation-message');
         const confirmationStatusLink = document.getElementById('confirmation-status-link');
         const csrfToken = checkoutForm.querySelector('input[name="_token"]').value;
-        const availabilityUrl = @json(route('ticket.booking.availability'));
-        const estimateUrl = @json(route('ticket.booking.estimate'));
-        const checkoutUrl = @json(route('ticket.booking.checkout'));
-        const productDetailBaseUrl = @json(rtrim(route('ticket.booking.product', ['slug' => '__slug__']), '/__slug__'));
+        const availabilityUrl = @json(route('ticket.booking.availability', [], false));
+        const estimateUrl = @json(route('ticket.booking.estimate', [], false));
+        const checkoutUrl = @json(route('ticket.booking.checkout', [], false));
+        const productDetailBaseUrl = @json($productDetailBaseUrl);
 
         const state = {
             currentStep: mainProducts.some((product) => product.slug === preselectedSlug) ? 2 : 1,
@@ -497,7 +498,7 @@
                 const isCurrent = stepNumber === state.currentStep;
                 const isCompleted = stepNumber < state.currentStep;
 
-                indicator.className = `rounded-lg border px-4 py-2 text-sm font-semibold transition ${
+                indicator.className = `shrink-0 rounded-2xl border px-3 py-2 text-xs font-semibold transition sm:px-4 sm:py-2.5 sm:text-sm ${
                     isCurrent
                         ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
                         : isCompleted

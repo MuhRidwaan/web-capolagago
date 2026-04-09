@@ -308,15 +308,10 @@ class BookingController extends Controller
                     'client_key' => $this->midtransClientKey(),
                 ];
 
-                DB::table('payments')
-                    ->where('payment_code', $booking['payment_code'])
-                    ->update([
-                        'gateway_response' => json_encode([
-                            'provider' => 'midtrans',
-                            'snap_token' => $snapToken,
-                        ]),
-                        'updated_at' => now(),
-                    ]);
+                $this->storeMergedGatewayResponse($booking['payment_code'], [
+                    'provider' => 'midtrans',
+                    'snap_token' => $snapToken,
+                ]);
             } catch (\Throwable $exception) {
                 $paymentGateway = [
                     'provider' => 'midtrans',
@@ -447,11 +442,8 @@ class BookingController extends Controller
             ->where('payment_code', $payment['payment_code'])
             ->value('gateway_response');
 
-        $snapToken = null;
-        if ($existingResponse) {
-            $decoded = json_decode($existingResponse, true);
-            $snapToken = $decoded['snap_token'] ?? null;
-        }
+        $decodedResponse = $this->decodeGatewayResponse($existingResponse);
+        $snapToken = $decodedResponse['snap_token'] ?? null;
 
         // Kalau tidak ada token lama, buat baru
         if (! $snapToken) {
@@ -466,18 +458,63 @@ class BookingController extends Controller
                     $payment['items'],
                 );
 
-                DB::table('payments')
-                    ->where('payment_code', $payment['payment_code'])
-                    ->update([
-                        'gateway_response' => json_encode([
-                            'provider' => 'midtrans',
-                            'snap_token' => $snapToken,
-                        ]),
-                        'updated_at' => now(),
-                    ]);
+                $this->storeMergedGatewayResponse($payment['payment_code'], [
+                    'provider' => 'midtrans',
+                    'snap_token' => $snapToken,
+                ]);
             } catch (\Throwable $exception) {
+                $message = $exception->getMessage();
+
+                if (str_contains(strtolower($message), 'order_id') && str_contains(strtolower($message), 'digunakan')) {
+                    try {
+                        $result = $this->midtransService->checkStatus($payment['payment_code']);
+                        $paymentStatus = $this->midtransService->resolvePaymentStatus($result);
+
+                        DB::table('payments')
+                            ->where('payment_code', $payment['payment_code'])
+                            ->update([
+                                'status' => $paymentStatus,
+                                'gateway_transaction_id' => $result->transaction_id ?? null,
+                                'va_number' => $this->extractMidtransVaNumber($result),
+                                'qr_url' => $this->extractMidtransQrUrl($result),
+                                'paid_at' => $paymentStatus === 'paid' ? now() : null,
+                                'updated_at' => now(),
+                            ]);
+
+                        $this->storeMergedGatewayResponse($payment['payment_code'], [
+                            'provider' => 'midtrans',
+                            'transaction_status' => $result->transaction_status ?? null,
+                            'transaction_id' => $result->transaction_id ?? null,
+                            'payment_type' => $result->payment_type ?? null,
+                            'va_numbers' => isset($result->va_numbers) ? json_decode(json_encode($result->va_numbers), true) : null,
+                            'actions' => isset($result->actions) ? json_decode(json_encode($result->actions), true) : null,
+                            'raw_result' => json_decode(json_encode($result), true),
+                        ]);
+
+                        if ($paymentStatus === 'paid') {
+                            DB::table('bookings')
+                                ->where('booking_code', $payment['payment_code'])
+                                ->where('status', '!=', 'cancelled')
+                                ->update(['status' => 'confirmed', 'updated_at' => now()]);
+                        }
+                    } catch (\Throwable) {
+                        // Cukup tampilkan pesan fallback di bawah.
+                    }
+
+                    return response()->json([
+                        'message' => 'Transaksi Midtrans untuk booking ini sudah pernah dibuat. Gunakan detail pembayaran yang tampil di halaman ini atau klik cek status pembayaran.',
+                        'payment_gateway' => [
+                            'provider' => 'midtrans',
+                            'mode' => 'snap',
+                            'snap_token' => null,
+                            'client_key' => $this->midtransClientKey(),
+                        ],
+                        'redirect_url' => route('ticket.booking.status', ['token' => $payment['public_token']]),
+                    ]);
+                }
+
                 return response()->json([
-                    'message' => 'Snap token Midtrans belum bisa disiapkan. ' . $exception->getMessage(),
+                    'message' => 'Snap token Midtrans belum bisa disiapkan. ' . $message,
                 ], 422);
             }
         }
@@ -531,10 +568,19 @@ class BookingController extends Controller
                     'gateway_transaction_id' => $result->transaction_id ?? null,
                     'va_number' => $this->extractMidtransVaNumber($result),
                     'qr_url' => $this->extractMidtransQrUrl($result),
-                    'gateway_response' => json_encode($result),
                     'paid_at' => $paymentStatus === 'paid' ? now() : null,
                     'updated_at' => now(),
                 ]);
+
+            $this->storeMergedGatewayResponse($payment->payment_code, [
+                'provider' => 'midtrans',
+                'transaction_status' => $result->transaction_status ?? null,
+                'transaction_id' => $result->transaction_id ?? null,
+                'payment_type' => $result->payment_type ?? null,
+                'va_numbers' => isset($result->va_numbers) ? json_decode(json_encode($result->va_numbers), true) : null,
+                'actions' => isset($result->actions) ? json_decode(json_encode($result->actions), true) : null,
+                'raw_result' => json_decode(json_encode($result), true),
+            ]);
 
             if ($paymentStatus === 'paid') {
                 DB::table('bookings')
@@ -609,5 +655,43 @@ class BookingController extends Controller
         $data = is_array($payload) ? $payload : (array) $payload;
 
         return isset($data['qr_url']) ? (string) $data['qr_url'] : null;
+    }
+
+    private function decodeGatewayResponse(mixed $payload): array
+    {
+        if (is_array($payload)) {
+            return $payload;
+        }
+
+        if (is_object($payload)) {
+            return json_decode(json_encode($payload), true) ?: [];
+        }
+
+        if (! is_string($payload) || trim($payload) === '') {
+            return [];
+        }
+
+        $decoded = json_decode($payload, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    private function storeMergedGatewayResponse(string $paymentCode, array $payload): void
+    {
+        $existing = DB::table('payments')
+            ->where('payment_code', $paymentCode)
+            ->value('gateway_response');
+
+        $merged = array_replace_recursive(
+            $this->decodeGatewayResponse($existing),
+            array_filter($payload, fn ($value) => $value !== null)
+        );
+
+        DB::table('payments')
+            ->where('payment_code', $paymentCode)
+            ->update([
+                'gateway_response' => json_encode($merged),
+                'updated_at' => now(),
+            ]);
     }
 }

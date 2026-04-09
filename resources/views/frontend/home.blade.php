@@ -215,7 +215,7 @@
                 </svg>
             </a>
         </div>
-        <div class="grid grid-cols-1 gap-4 overflow-x-hidden xl:grid-cols-4 2xl:gap-5">
+        <div class="grid grid-cols-1 gap-4 overflow-x-hidden md:grid-cols-2 xl:grid-cols-4 2xl:gap-5">
             @forelse ($featuredProducts as $product)
                 @php
                     $detailUrl = route('frontend.wisata.show', ['slug' => $product->slug]);
@@ -249,11 +249,11 @@
                             </div>
                         </div>
                     </a>
-                    <div class="flex items-center justify-between gap-2 border-t border-slate-200 px-4 py-4 sm:px-5">
-                        <a href="{{ $detailUrl }}" class="inline-flex items-center rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-sky-300 hover:text-sky-700">
+                    <div class="flex flex-col gap-2 border-t border-slate-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                        <a href="{{ $detailUrl }}" class="inline-flex w-full items-center justify-center rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-sky-300 hover:text-sky-700 sm:w-auto">
                             Detail
                         </a>
-                        <a href="{{ $bookingUrl }}" class="inline-flex items-center rounded-md bg-[#2d9da8] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#2d9da8]/90">
+                        <a href="{{ $bookingUrl }}" class="inline-flex w-full items-center justify-center rounded-md bg-[#2d9da8] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#2d9da8]/90 sm:w-auto">
                             Booking
                         </a>
                     </div>
@@ -291,7 +291,7 @@
                 @endphp
 
                 <div
-                    class="flex items-center gap-3 rounded-[18px] border border-slate-200 bg-white px-4 py-4 opacity-80 sm:gap-4 sm:px-5"
+                    class="flex items-start gap-3 rounded-[18px] border border-slate-200 bg-white px-4 py-4 opacity-80 sm:items-center sm:gap-4 sm:px-5"
                     aria-disabled="true">
                     <div class="flex h-10 w-10 items-center justify-center rounded-xl {{ $style['bg'] }} {{ $style['text'] }}">
                         @if ($style['icon'] === 'waves')

@@ -92,14 +92,14 @@
                     </div>
                     <div class="divide-y divide-slate-200">
                         @foreach ($items as $item)
-                            <div class="flex items-start justify-between gap-4 px-4 py-4">
+                            <div class="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                                 <div>
                                     <p class="text-sm font-semibold text-slate-900">{{ $item->product_name_snapshot }}</p>
                                     <p class="mt-1 text-xs text-slate-500">
                                         {{ $item->is_addon ? 'Add-on' : 'Produk utama' }} • {{ $item->quantity }} x Rp {{ number_format((float) $item->unit_price, 0, ',', '.') }}
                                     </p>
                                 </div>
-                                <p class="text-sm font-bold text-slate-900">Rp {{ number_format((float) $item->subtotal, 0, ',', '.') }}</p>
+                                <p class="text-sm font-bold text-slate-900 sm:text-right">Rp {{ number_format((float) $item->subtotal, 0, ',', '.') }}</p>
                             </div>
                         @endforeach
                     </div>
@@ -119,28 +119,28 @@
                 <h2 class="text-lg font-bold text-slate-900">Status Pembayaran</h2>
                 @if ($payment)
                     <div class="mt-4 space-y-3 text-sm text-slate-700">
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-start justify-between gap-3">
                             <span>Metode</span>
-                            <span class="font-semibold text-slate-900">{{ $payment->payment_method_name ?? '-' }}</span>
+                            <span class="text-right font-semibold text-slate-900">{{ $payment->payment_method_name ?? '-' }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-start justify-between gap-3">
                             <span>Referensi</span>
-                            <span class="font-semibold text-slate-900">{{ $payment->payment_code }}</span>
+                            <span class="break-all text-right font-semibold text-slate-900">{{ $payment->payment_code }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-start justify-between gap-3">
                             <span>Total</span>
-                            <span class="font-semibold text-slate-900">Rp {{ number_format((float) $payment->amount, 0, ',', '.') }}</span>
+                            <span class="text-right font-semibold text-slate-900">Rp {{ number_format((float) $payment->amount, 0, ',', '.') }}</span>
                         </div>
                         @if ($payment->paid_at)
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-start justify-between gap-3">
                                 <span>Dibayar pada</span>
-                                <span class="font-semibold text-slate-900">{{ \Illuminate\Support\Carbon::parse($payment->paid_at)->translatedFormat('d F Y H:i') }}</span>
+                                <span class="text-right font-semibold text-slate-900">{{ \Illuminate\Support\Carbon::parse($payment->paid_at)->translatedFormat('d F Y H:i') }}</span>
                             </div>
                         @endif
                         @if ($payment->expired_at)
-                            <div class="flex items-center justify-between">
+                            <div class="flex items-start justify-between gap-3">
                                 <span>Batas bayar</span>
-                                <span class="font-semibold text-slate-900">{{ \Illuminate\Support\Carbon::parse($payment->expired_at)->translatedFormat('d F Y H:i') }}</span>
+                                <span class="text-right font-semibold text-slate-900">{{ \Illuminate\Support\Carbon::parse($payment->expired_at)->translatedFormat('d F Y H:i') }}</span>
                             </div>
                         @endif
                         @if ($payment->va_number)
@@ -159,13 +159,13 @@
                                 </button>
                                 <button type="button"
                                     id="resume-payment-button"
-                                    data-resume-url="{{ route('ticket.booking.resume-payment', ['token' => $booking->public_token]) }}"
+                                    data-resume-url="{{ route('ticket.booking.resume-payment', ['token' => $booking->public_token], false) }}"
                                     class="mt-3 inline-flex w-full items-center justify-center rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800">
                                     Lanjutkan Pembayaran
                                 </button>
                                 <button type="button"
                                     id="sync-payment-button"
-                                    data-sync-url="{{ route('ticket.booking.sync-payment', ['token' => $booking->public_token]) }}"
+                                    data-sync-url="{{ route('ticket.booking.sync-payment', ['token' => $booking->public_token], false) }}"
                                     class="mt-2 inline-flex w-full items-center justify-center rounded-2xl border border-emerald-300 bg-white px-4 py-2.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50">
                                     Cek Status Pembayaran
                                 </button>
@@ -181,18 +181,18 @@
             <section class="rounded-2xl border border-slate-200 bg-white p-5">
                 <h2 class="text-lg font-bold text-slate-900">Total Tagihan</h2>
                 <div class="mt-4 space-y-3 text-sm text-slate-700">
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-start justify-between gap-3">
                         <span>Subtotal</span>
-                        <span>Rp {{ number_format((float) $booking->subtotal, 0, ',', '.') }}</span>
+                        <span class="text-right">Rp {{ number_format((float) $booking->subtotal, 0, ',', '.') }}</span>
                     </div>
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-start justify-between gap-3">
                         <span>Service fee</span>
-                        <span>Rp {{ number_format((float) $booking->service_fee, 0, ',', '.') }}</span>
+                        <span class="text-right">Rp {{ number_format((float) $booking->service_fee, 0, ',', '.') }}</span>
                     </div>
                     <div class="border-t border-slate-200 pt-3">
-                        <div class="flex items-center justify-between text-base font-bold text-slate-900">
+                        <div class="flex items-start justify-between gap-3 text-base font-bold text-slate-900">
                             <span>Total</span>
-                            <span>Rp {{ number_format((float) $booking->total_amount, 0, ',', '.') }}</span>
+                            <span class="text-right">Rp {{ number_format((float) $booking->total_amount, 0, ',', '.') }}</span>
                         </div>
                     </div>
                 </div>
@@ -203,7 +203,7 @@
 
 @if ($payment && ($payment->status ?? null) === 'pending')
     <div id="payment-detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 px-4 py-6">
-        <div class="w-full max-w-md overflow-hidden rounded-[28px] bg-white shadow-2xl">
+        <div class="max-h-[calc(100vh-3rem)] w-full max-w-md overflow-y-auto rounded-[28px] bg-white shadow-2xl">
             <div class="flex items-start justify-between gap-4 bg-slate-800 px-5 py-4 text-white">
                 <div>
                     <p class="text-sm font-semibold">{{ config('app.name') }}</p>
@@ -215,7 +215,7 @@
             <div class="border-b border-slate-200 px-5 py-4">
                 <div class="flex items-start justify-between gap-4">
                     <div>
-                        <p class="text-3xl font-bold text-slate-900">Rp {{ number_format((float) $payment->amount, 0, ',', '.') }}</p>
+                        <p class="break-words text-2xl font-bold text-slate-900 sm:text-3xl">Rp {{ number_format((float) $payment->amount, 0, ',', '.') }}</p>
                         <p class="mt-2 text-xs text-slate-500">Booking {{ $booking->booking_code }}</p>
                     </div>
                     <button type="button" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
@@ -232,7 +232,7 @@
             </div>
 
             <div class="space-y-5 px-5 py-5">
-                <div class="flex items-center justify-between gap-4">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                     <div>
                         <p class="text-lg font-bold text-slate-900">{{ $payment->payment_method_name ?? 'Metode Pembayaran' }}</p>
                         <p class="mt-1 text-sm text-slate-600">
@@ -253,7 +253,7 @@
                 @if ($payment->va_number)
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Virtual account number</p>
-                        <div class="mt-2 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+                        <div class="mt-2 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
                             <p class="break-all text-lg font-bold text-slate-900">{{ $payment->va_number }}</p>
                             <button type="button" data-copy-value="{{ $payment->va_number }}" class="payment-copy-button text-sm font-semibold text-indigo-600 transition hover:text-indigo-800">
                                 Copy
@@ -270,7 +270,7 @@
                 @else
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $paymentReferenceLabel }}</p>
-                        <div class="mt-2 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+                        <div class="mt-2 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
                             <p class="break-all text-base font-bold text-slate-900">{{ $paymentReferenceValue }}</p>
                             <button type="button" data-copy-value="{{ $paymentReferenceValue }}" class="payment-copy-button text-sm font-semibold text-indigo-600 transition hover:text-indigo-800">
                                 Copy
@@ -467,7 +467,16 @@
                 }
 
                 if (!result.payment_gateway?.snap_token || !window.snap) {
-                    throw new Error('Snap Midtrans belum tersedia di browser ini.');
+                    setFeedback(
+                        result.message || 'Detail pembayaran tersedia di halaman ini. Silakan lanjutkan dengan referensi pembayaran yang sudah ada.',
+                        'warning'
+                    );
+
+                    if (modal) {
+                        openModal();
+                    }
+
+                    return;
                 }
 
                 setFeedback('Snap token berhasil disiapkan. Popup pembayaran akan dibuka.', 'info');

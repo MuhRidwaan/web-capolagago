@@ -45,20 +45,20 @@
     <div class="mx-auto grid max-w-[1680px] gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8">
         <div class="space-y-6">
             <section class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-                <div class="flex flex-wrap gap-2">
-                    <span class="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700">1. Pilih Produk</span>
-                    <span class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-900">2. Tanggal &amp; Slot</span>
-                    <span class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">3. Add-on</span>
-                    <span class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">4. Keranjang</span>
-                    <span class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">5. Checkout</span>
-                    <span class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500">6. Konfirmasi</span>
+                <div class="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+                    <span class="shrink-0 rounded-2xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 sm:px-4 sm:py-2.5 sm:text-sm">1. Pilih Produk</span>
+                    <span class="shrink-0 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 sm:px-4 sm:py-2.5 sm:text-sm">2. Tanggal &amp; Slot</span>
+                    <span class="shrink-0 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500 sm:px-4 sm:py-2.5 sm:text-sm">3. Add-on</span>
+                    <span class="shrink-0 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500 sm:px-4 sm:py-2.5 sm:text-sm">4. Keranjang</span>
+                    <span class="shrink-0 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500 sm:px-4 sm:py-2.5 sm:text-sm">5. Checkout</span>
+                    <span class="shrink-0 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500 sm:px-4 sm:py-2.5 sm:text-sm">6. Konfirmasi</span>
                 </div>
             </section>
 
             <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <div class="grid gap-6 xl:grid-cols-[180px_minmax(0,1fr)]">
+            <div class="grid gap-5 xl:grid-cols-[180px_minmax(0,1fr)]">
                 <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
-                    <img src="{{ $productImage }}" alt="{{ $product->name }}" class="h-full w-full object-cover" />
+                    <img src="{{ $productImage }}" alt="{{ $product->name }}" class="h-56 w-full object-cover sm:h-72 xl:h-full" />
                 </div>
 
                 <div>
@@ -70,8 +70,8 @@
                             <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">Featured</span>
                         @endif
                     </div>
-                    <h2 class="mt-4 text-3xl font-bold leading-tight text-slate-900">{{ $product->name }}</h2>
-                    <p class="mt-4 text-sm leading-7 text-slate-600">{{ $product->short_desc ?: 'Deskripsi singkat belum tersedia.' }}</p>
+                    <h2 class="mt-4 text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">{{ $product->name }}</h2>
+                    <p class="mt-4 text-sm leading-6 text-slate-600 sm:leading-7">{{ $product->short_desc ?: 'Deskripsi singkat belum tersedia.' }}</p>
 
                     <div class="mt-5 flex flex-wrap gap-3">
                         <span class="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
@@ -85,7 +85,7 @@
             </div>
 
             <div class="mt-8 border-t border-slate-200 pt-6">
-                <div class="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px_auto] md:items-end">
+                <div class="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px] md:items-end">
                     <div class="block">
                         <span class="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Tanggal Kunjungan</span>
                         <button type="button" id="calendar-trigger" class="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-sm text-slate-700 outline-none transition hover:border-emerald-300 focus:border-emerald-400">
@@ -98,13 +98,10 @@
                         <span class="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Jumlah Peserta</span>
                         <input id="guest-input" type="number" min="1" value="{{ $prefilledGuests }}" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-emerald-400" />
                     </label>
-                    <button type="button" id="check-availability-button" class="inline-flex h-12 items-center justify-center rounded-2xl bg-emerald-700 px-5 text-sm font-semibold text-white transition hover:bg-emerald-800">
-                        Cek Ketersediaan Slot
-                    </button>
                 </div>
             </div>
 
-            <div id="calendar-panel" class="mt-4 hidden max-w-3xl rounded-3xl border border-slate-200 bg-slate-50 p-3 sm:p-3.5">
+            <div id="calendar-panel" class="mt-4 hidden rounded-3xl border border-slate-200 bg-slate-50 p-3 sm:p-3.5">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Kalender Kuota</p>
@@ -123,17 +120,19 @@
 
                 <div id="calendar-status" class="mt-3 hidden rounded-2xl border px-3 py-2.5 text-xs"></div>
 
-                <div class="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                    <div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                        <div class="px-1 py-1.5">Min</div>
-                        <div class="px-1 py-1.5">Sen</div>
-                        <div class="px-1 py-1.5">Sel</div>
-                        <div class="px-1 py-1.5">Rab</div>
-                        <div class="px-1 py-1.5">Kam</div>
-                        <div class="px-1 py-1.5">Jum</div>
-                        <div class="px-1 py-1.5">Sab</div>
+                <div class="mt-3 overflow-x-auto">
+                    <div class="min-w-[560px] overflow-hidden rounded-2xl border border-slate-200 bg-white sm:min-w-0">
+                        <div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                            <div class="px-1 py-1.5">Min</div>
+                            <div class="px-1 py-1.5">Sen</div>
+                            <div class="px-1 py-1.5">Sel</div>
+                            <div class="px-1 py-1.5">Rab</div>
+                            <div class="px-1 py-1.5">Kam</div>
+                            <div class="px-1 py-1.5">Jum</div>
+                            <div class="px-1 py-1.5">Sab</div>
+                        </div>
+                        <div id="calendar-grid" class="grid grid-cols-7"></div>
                     </div>
-                    <div id="calendar-grid" class="grid grid-cols-7"></div>
                 </div>
 
                 <div class="mt-3 flex flex-wrap gap-1.5 text-[10px] font-medium text-slate-600">
@@ -159,7 +158,7 @@
             <div id="availability-feedback" class="mt-5 hidden rounded-2xl border px-4 py-3 text-sm"></div>
 
             <div class="mt-6 flex justify-end">
-                <a id="continue-booking-link" href="{{ route('ticket.booking', ['product' => $product->slug, 'date' => $prefilledVisitDate, 'guests' => $prefilledGuests]) }}" aria-disabled="true" class="pointer-events-none inline-flex items-center justify-center rounded-2xl bg-slate-300 px-5 py-3 text-sm font-semibold text-white transition">
+                <a id="continue-booking-link" href="{{ route('ticket.booking', ['product' => $product->slug, 'date' => $prefilledVisitDate, 'guests' => $prefilledGuests]) }}" aria-disabled="true" class="pointer-events-none inline-flex w-full items-center justify-center rounded-2xl bg-slate-300 px-5 py-3 text-sm font-semibold text-white transition sm:w-auto">
                     Lanjut ke Booking
                 </a>
             </div>
@@ -194,9 +193,9 @@
 
 <script>
     (() => {
-        const availabilityUrl = @json(route('ticket.booking.availability'));
-        const calendarUrl = @json(route('ticket.booking.product.calendar', ['slug' => $product->slug]));
-        const continueBookingBaseUrl = @json(route('ticket.booking'));
+        const availabilityUrl = @json(route('ticket.booking.availability', [], false));
+        const calendarUrl = @json(route('ticket.booking.product.calendar', ['slug' => $product->slug], false));
+        const continueBookingBaseUrl = @json(route('ticket.booking', [], false));
         const product = @json($productPayload);
 
         const visitDateInput = document.getElementById('visit-date-input');
@@ -204,7 +203,6 @@
         const calendarTriggerLabel = document.getElementById('calendar-trigger-label');
         const calendarPanel = document.getElementById('calendar-panel');
         const guestInput = document.getElementById('guest-input');
-        const checkAvailabilityButton = document.getElementById('check-availability-button');
         const availabilityFeedback = document.getElementById('availability-feedback');
         const continueBookingLink = document.getElementById('continue-booking-link');
         const summaryDate = document.getElementById('summary-date');
@@ -281,8 +279,8 @@
 
             continueBookingLink.setAttribute('aria-disabled', canContinue ? 'false' : 'true');
             continueBookingLink.className = canContinue
-                ? 'inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800'
-                : 'pointer-events-none inline-flex items-center justify-center rounded-2xl bg-slate-300 px-5 py-3 text-sm font-semibold text-white transition';
+                ? 'inline-flex w-full items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto'
+                : 'pointer-events-none inline-flex w-full items-center justify-center rounded-2xl bg-slate-300 px-5 py-3 text-sm font-semibold text-white transition sm:w-auto';
         };
 
         const setFeedback = (message, tone = 'info') => {
@@ -480,8 +478,15 @@
                 total_guests: guestInput.value,
             });
 
-            checkAvailabilityButton.disabled = true;
-            checkAvailabilityButton.textContent = 'Memeriksa slot...';
+            if (!visitDateInput.value || !guestInput.value) {
+                state.availability = null;
+                summaryStatus.className = 'rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600';
+                summaryStatus.textContent = 'Belum dicek';
+                setFeedback('Pilih tanggal kunjungan dan jumlah peserta untuk melihat ketersediaan slot.', 'info');
+                updateContinueButton();
+
+                return;
+            }
 
             try {
                 const response = await fetch(`${availabilityUrl}?${params.toString()}`, {
@@ -502,13 +507,10 @@
                 summaryStatus.textContent = 'Gagal dicek';
                 setFeedback('Gagal mengecek ketersediaan slot saat ini.', 'danger');
                 updateContinueButton();
-            } finally {
-                checkAvailabilityButton.disabled = false;
-                checkAvailabilityButton.textContent = 'Cek Ketersediaan Slot';
             }
         };
 
-        visitDateInput.addEventListener('input', () => {
+        visitDateInput.addEventListener('input', async () => {
             const nextMonth = (visitDateInput.value || state.month).slice(0, 7);
             state.availability = null;
             summaryStatus.className = 'rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600';
@@ -518,11 +520,13 @@
 
             if (nextMonth !== state.month) {
                 state.month = nextMonth;
-                loadCalendar();
+                await loadCalendar();
+                await checkAvailability();
                 return;
             }
 
             renderCalendar();
+            await checkAvailability();
         });
         calendarTrigger.addEventListener('click', async () => {
             state.calendarOpen = !state.calendarOpen;
@@ -539,7 +543,9 @@
             syncSummary();
             updateContinueButton();
         });
-        checkAvailabilityButton.addEventListener('click', checkAvailability);
+        guestInput.addEventListener('change', async () => {
+            await checkAvailability();
+        });
         calendarPrevButton.addEventListener('click', () => {
             state.month = shiftMonth(state.month, -1);
             loadCalendar();
@@ -554,6 +560,9 @@
         syncCalendarVisibility();
         if (state.calendarOpen) {
             loadCalendar();
+        }
+        if (visitDateInput.value && guestInput.value) {
+            checkAvailability();
         }
     })();
 </script>
