@@ -26,6 +26,37 @@
     }
 @endphp
 
+@push('head')
+<style>
+    #calendar-grid.is-animating {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    #calendar-grid {
+        transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .calendar-shell {
+        max-width: 100%;
+    }
+
+    @media (max-width: 639px) {
+        .calendar-shell {
+            width: calc(100% + 0.75rem);
+            margin-left: -0.375rem;
+            margin-right: -0.375rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .calendar-shell {
+            max-width: 46rem;
+        }
+    }
+</style>
+@endpush
+
 <section class="border-b border-slate-200 bg-white pt-8">
     <div class="mx-auto max-w-[1680px] px-4 py-6 sm:px-6 lg:px-8">
         <div class="max-w-4xl">
@@ -43,7 +74,7 @@
 
 <section class="bg-[#f8fafc] pb-12 pt-6 md:pt-8">
     <div class="mx-auto grid max-w-[1680px] gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8">
-        <div class="space-y-6">
+        <div class="min-w-0 space-y-6">
             <section class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                 <div class="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
                     <span class="shrink-0 rounded-2xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 sm:px-4 sm:py-2.5 sm:text-sm">1. Pilih Produk</span>
@@ -55,8 +86,8 @@
                 </div>
             </section>
 
-            <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <div class="grid gap-5 xl:grid-cols-[180px_minmax(0,1fr)]">
+            <section class="min-w-0 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <div class="min-w-0 grid gap-5 xl:grid-cols-[180px_minmax(0,1fr)]">
                 <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
                     <img src="{{ $productImage }}" alt="{{ $product->name }}" class="h-56 w-full object-cover sm:h-72 xl:h-full" />
                 </div>
@@ -102,56 +133,60 @@
             </div>
 
             <div id="calendar-panel" class="mt-4 hidden rounded-3xl border border-slate-200 bg-slate-50 p-3 sm:p-3.5">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Kalender Kuota</p>
-                        <h3 id="calendar-label" class="mt-1 text-base font-bold text-slate-900">Memuat kalender...</h3>
-                        <p class="mt-1 text-[11px] text-slate-600 sm:text-xs">Klik tanggal untuk memilih kunjungan dan lihat sisa kuota.</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button type="button" id="calendar-prev-button" class="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-xs text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
-                            &larr;
-                        </button>
-                        <button type="button" id="calendar-next-button" class="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-xs text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
-                            &rarr;
-                        </button>
-                    </div>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Kalender Kuota</p>
+                    <p class="mt-1 text-[11px] text-slate-600 sm:text-xs">Klik tanggal untuk memilih kunjungan dan lihat sisa kuota.</p>
                 </div>
 
                 <div id="calendar-status" class="mt-3 hidden rounded-2xl border px-3 py-2.5 text-xs"></div>
 
-                <div class="mt-3 overflow-x-auto">
-                    <div class="min-w-[560px] overflow-hidden rounded-2xl border border-slate-200 bg-white sm:min-w-0">
-                        <div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-center text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                            <div class="px-1 py-1.5">Min</div>
-                            <div class="px-1 py-1.5">Sen</div>
-                            <div class="px-1 py-1.5">Sel</div>
-                            <div class="px-1 py-1.5">Rab</div>
-                            <div class="px-1 py-1.5">Kam</div>
-                            <div class="px-1 py-1.5">Jum</div>
-                            <div class="px-1 py-1.5">Sab</div>
+                <div class="calendar-shell mx-auto mt-4 min-w-0 rounded-[24px] border border-emerald-100 bg-white p-2.5 shadow-[0_18px_40px_rgba(15,23,42,0.06)] sm:rounded-[28px] sm:p-4">
+                    <div class="mb-2.5 flex items-center justify-between gap-2 sm:mb-3 sm:gap-3">
+                        <button type="button" id="calendar-prev-button" class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-sm text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700 sm:h-9 sm:w-9">
+                            &larr;
+                        </button>
+                        <div class="text-center">
+                            <h3 id="calendar-label" class="text-base font-bold text-slate-900 sm:text-lg">Memuat kalender...</h3>
                         </div>
-                        <div id="calendar-grid" class="grid grid-cols-7"></div>
+                        <button type="button" id="calendar-next-button" class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-sm text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700 sm:h-9 sm:w-9">
+                            &rarr;
+                        </button>
                     </div>
-                </div>
-
-                <div class="mt-3 flex flex-wrap gap-1.5 text-[10px] font-medium text-slate-600">
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-2 py-1">
-                        <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-                        Tersedia
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-2 py-1">
-                        <span class="h-2 w-2 rounded-full bg-amber-500"></span>
-                        Kuota tipis / penuh
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-2 py-1">
-                        <span class="h-2 w-2 rounded-full bg-rose-500"></span>
-                        Diblokir
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-2 py-1">
-                        <span class="h-2 w-2 rounded-full bg-slate-400"></span>
-                        Belum diatur
-                    </span>
+                    <div class="mb-2.5 grid grid-cols-7 gap-0.5 text-center text-[9px] font-semibold text-slate-500 sm:mb-3 sm:gap-1.5 sm:text-[11px]">
+                        <div class="py-1">Min</div>
+                        <div class="py-1">Sen</div>
+                        <div class="py-1">Sel</div>
+                        <div class="py-1">Rab</div>
+                        <div class="py-1">Kam</div>
+                        <div class="py-1">Jum</div>
+                        <div class="py-1">Sab</div>
+                    </div>
+                    <div class="rounded-[20px] border border-slate-200 bg-slate-50 p-1 sm:rounded-[22px] sm:p-2">
+                        <div class="overflow-hidden rounded-[18px] bg-white">
+                            <div id="calendar-grid" class="grid grid-cols-7 gap-px bg-emerald-50/50"></div>
+                        </div>
+                    </div>
+                    <div class="mt-3 grid grid-cols-2 gap-2 text-[10px] font-medium text-slate-600 sm:flex sm:flex-wrap sm:text-[11px]">
+                        <span class="inline-flex items-center justify-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1.5 text-emerald-700 sm:justify-start">
+                            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                            Tersedia
+                        </span>
+                        <span class="inline-flex items-center justify-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-2.5 py-1.5 text-amber-700 sm:justify-start">
+                            <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                            Penuh
+                        </span>
+                        <span class="inline-flex items-center justify-center gap-1.5 rounded-full border border-rose-100 bg-rose-50 px-2.5 py-1.5 text-rose-700 sm:justify-start">
+                            <span class="h-2 w-2 rounded-full bg-rose-500"></span>
+                            Tidak tersedia
+                        </span>
+                        <span class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-slate-600 sm:justify-start">
+                            <span class="h-2 w-2 rounded-full bg-slate-400"></span>
+                            Belum diatur
+                        </span>
+                    </div>
+                    <p class="mt-3 text-sm leading-6 text-slate-500">
+                        Pilih tanggal yang tersedia untuk kunjungan Anda.
+                    </p>
                 </div>
             </div>
 
@@ -165,7 +200,7 @@
             </section>
         </div>
 
-        <aside class="h-fit rounded-3xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-24">
+        <aside class="min-w-0 h-fit rounded-3xl border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-24">
             <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Ringkasan Pesanan</p>
             <div class="mt-4 rounded-2xl bg-slate-50 p-3">
                 <p class="font-semibold text-slate-900">{{ $product->name }}</p>
@@ -219,7 +254,10 @@
             calendar: null,
             calendarOpen: Boolean(visitDateInput.value),
             availability: null,
+            activeLoadToken: 0,
         };
+
+        const todayMonth = new Date().toISOString().slice(0, 7);
 
         const formatDisplayDate = (value) => {
             if (!value) {
@@ -251,6 +289,24 @@
             const date = new Date(year, month - 1 + delta, 1);
 
             return `${date.getFullYear()}-${pad(date.getMonth() + 1)}`;
+        };
+
+        const syncCalendarNav = () => {
+            const isPastLimit = state.month <= todayMonth;
+
+            calendarPrevButton.disabled = isPastLimit;
+            calendarPrevButton.className = isPastLimit
+                ? 'inline-flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 text-xs text-slate-300'
+                : 'inline-flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-xs text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700';
+        };
+
+        const animateCalendarGrid = () => {
+            calendarGrid.classList.add('is-animating');
+            window.requestAnimationFrame(() => {
+                window.requestAnimationFrame(() => {
+                    calendarGrid.classList.remove('is-animating');
+                });
+            });
         };
 
         const syncCalendarVisibility = () => {
@@ -310,9 +366,10 @@
         const getDayToneClasses = (day) => {
             if (day.is_past) {
                 return {
-                    button: 'cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300',
+                    button: 'cursor-not-allowed border-slate-200 bg-slate-50 text-slate-300',
                     badge: 'bg-slate-200 text-slate-500',
                     meta: 'text-slate-400',
+                    accent: 'bg-slate-300',
                 };
             }
 
@@ -321,6 +378,7 @@
                     button: 'border-rose-200 bg-rose-50 text-rose-900 hover:border-rose-300',
                     badge: 'bg-rose-100 text-rose-800',
                     meta: 'text-rose-700',
+                    accent: 'bg-rose-500',
                 };
             }
 
@@ -329,6 +387,7 @@
                     button: 'border-amber-200 bg-amber-50 text-amber-900 hover:border-amber-300',
                     badge: 'bg-amber-100 text-amber-800',
                     meta: 'text-amber-700',
+                    accent: 'bg-amber-500',
                 };
             }
 
@@ -337,6 +396,7 @@
                     button: 'cursor-not-allowed border-slate-200 bg-slate-50 text-slate-500',
                     badge: 'bg-slate-200 text-slate-700',
                     meta: 'text-slate-500',
+                    accent: 'bg-slate-400',
                 };
             }
 
@@ -344,6 +404,7 @@
                 button: 'border-emerald-200 bg-emerald-50 text-emerald-900 hover:border-emerald-400',
                 badge: 'bg-emerald-100 text-emerald-800',
                 meta: 'text-emerald-700',
+                accent: 'bg-emerald-500',
             };
         };
 
@@ -353,7 +414,7 @@
             if (!calendar) {
                 calendarLabel.textContent = getMonthLabel(state.month);
                 calendarGrid.innerHTML = `
-                    <div class="col-span-7 p-6 text-center text-sm text-slate-500">
+                    <div class="col-span-7 p-8 text-center text-sm text-slate-500">
                         Kalender kuota belum tersedia.
                     </div>
                 `;
@@ -365,7 +426,7 @@
             const firstDate = new Date(`${calendar.month}-01T00:00:00`);
             const firstWeekday = firstDate.getDay();
             const leadingEmptyCells = Array.from({ length: firstWeekday }, () => {
-                return '<div class="min-h-[60px] border-b border-r border-slate-100 bg-slate-50/70"></div>';
+                return '<div class="min-h-[54px] rounded-xl bg-transparent sm:min-h-[92px]"></div>';
             }).join('');
 
             const dayCells = calendar.days.map((day) => {
@@ -374,40 +435,109 @@
                 const isClickable = day.status === 'available' && !day.is_past;
                 const isDisabled = !isClickable;
                 const buttonStateClass = isSelected
-                    ? 'ring-2 ring-emerald-400 ring-offset-2 ring-offset-white'
+                    ? 'relative z-10 border-emerald-400 bg-emerald-50 shadow-[0_0_0_2px_rgba(16,185,129,0.14)]'
                     : '';
                 const quotaLabel = day.status === 'blocked'
-                    ? 'Diblokir'
+                    ? 'Tutup'
                     : day.status === 'full'
                         ? 'Penuh'
                         : day.status === 'default'
-                            ? '0'
+                            ? 'Info'
                             : `${day.remaining_capacity}`;
+                const showDesktopBadge = day.status !== 'available';
+                const mobileStatus = day.status === 'available'
+                    ? `${day.remaining_capacity} slot`
+                    : day.status === 'full'
+                        ? 'Kuota habis'
+                        : day.status === 'blocked'
+                            ? 'Ditutup'
+                            : day.is_past
+                                ? 'Lewat'
+                                : 'Belum diatur';
+                const desktopStatus = day.status === 'available'
+                    ? `Kuota tersedia: ${day.remaining_capacity}`
+                    : day.status === 'full'
+                        ? 'Kuota habis'
+                        : day.status === 'blocked'
+                            ? 'Slot ditutup'
+                            : day.is_past
+                                ? 'Tanggal lewat'
+                                : 'Belum diatur';
+                const buttonLabel = `${day.date} - ${desktopStatus}`;
+                const mobileBadge = day.status === 'available'
+                    ? `${day.remaining_capacity}`
+                    : day.status === 'full'
+                        ? '!'
+                        : day.status === 'blocked'
+                            ? 'x'
+                            : day.is_past
+                                ? '-'
+                                : '?';
+                const mobileBadgeClass = day.status === 'available'
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : day.status === 'full'
+                        ? 'bg-amber-100 text-amber-700'
+                        : day.status === 'blocked'
+                            ? 'bg-rose-100 text-rose-700'
+                            : 'bg-slate-200 text-slate-500';
+                const mobileDayClass = day.is_past
+                    ? 'text-slate-400'
+                    : day.status === 'blocked'
+                        ? 'text-rose-800'
+                        : day.status === 'full'
+                            ? 'text-amber-800'
+                            : day.status === 'available'
+                                ? 'text-emerald-900'
+                                : 'text-slate-600';
+                const mobileQuotaText = day.status === 'available'
+                    ? `${day.remaining_capacity}`
+                    : day.status === 'full'
+                        ? 'Penuh'
+                        : day.status === 'blocked'
+                            ? 'Tutup'
+                            : '';
+                const showMobileQuotaText = day.status === 'available' || day.status === 'full' || day.status === 'blocked';
+                const desktopCardClass = day.is_past
+                    ? 'bg-slate-50'
+                    : day.status === 'available'
+                        ? 'bg-emerald-50'
+                        : day.status === 'full'
+                            ? 'bg-amber-50'
+                            : day.status === 'blocked'
+                                ? 'bg-rose-50'
+                                : 'bg-slate-50';
 
                 return `
                     <button
                         type="button"
                         data-calendar-date="${day.date}"
+                        aria-label="${buttonLabel}"
+                        title="${buttonLabel}"
                         ${isDisabled ? 'disabled' : ''}
-                        class="min-h-[60px] border-b border-r border-slate-100 p-1 text-left align-top transition ${tones.button} ${buttonStateClass}"
+                        class="group min-h-[60px] rounded-[10px] border border-transparent bg-white px-1.5 py-1 text-left align-top transition ${tones.button} ${buttonStateClass} sm:min-h-[92px] sm:rounded-xl sm:p-2"
                     >
-                        <div class="flex items-start justify-between gap-2">
-                            <span class="text-[10px] font-bold">${day.day}</span>
-                            <span class="rounded-full px-1.5 py-0.5 text-[8px] font-semibold ${tones.badge}">
+                        <div class="flex items-start justify-between gap-1 sm:gap-2">
+                            <div class="flex items-center gap-1 sm:gap-2">
+                                <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full ${tones.accent} sm:h-2.5 sm:w-2.5"></span>
+                                <span class="text-[10px] font-bold ${mobileDayClass} sm:text-sm sm:text-slate-900">${day.day}</span>
+                            </div>
+                            <span class="${showDesktopBadge ? 'hidden rounded-full px-2 py-1 text-[9px] font-semibold leading-none sm:inline-flex sm:text-[10px]' : 'hidden'} ${tones.badge}">
                                 ${quotaLabel}
                             </span>
+                            <span class="inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[7px] font-bold leading-none ${mobileBadgeClass} sm:hidden">
+                                ${mobileBadge}
+                            </span>
                         </div>
-                        <p class="mt-1 text-[9px] leading-3.5 font-medium ${tones.meta}">
-                            ${day.status === 'available'
-                                ? `Kuota tersedia: ${day.remaining_capacity}`
-                                : day.status === 'full'
-                                    ? 'Kuota habis'
-                                    : day.status === 'blocked'
-                                        ? 'Slot ditutup'
-                                        : day.is_past
-                                            ? 'Tanggal lewat'
-                                            : '0'}
+                        <p class="${showMobileQuotaText ? 'mt-1 block text-[8px] font-semibold leading-none sm:hidden' : 'hidden'} ${tones.meta}">
+                            ${mobileQuotaText}
                         </p>
+                        <div class="hidden sm:block">
+                            <div class="mt-2 rounded-2xl ${desktopCardClass} px-2 py-1.5">
+                                <p class="text-[11px] font-semibold ${tones.meta}">
+                                    ${day.status === 'available' ? `${day.remaining_capacity} slot` : desktopStatus}
+                                </p>
+                            </div>
+                        </div>
                     </button>
                 `;
             }).join('');
@@ -431,8 +561,12 @@
         };
 
         const loadCalendar = async () => {
+            const loadToken = Date.now();
+            state.activeLoadToken = loadToken;
+            syncCalendarNav();
+            animateCalendarGrid();
             calendarGrid.innerHTML = `
-                <div class="col-span-7 p-6 text-center text-sm text-slate-500">
+                <div class="col-span-7 p-8 text-center text-sm text-slate-500">
                     Memuat kuota per tanggal...
                 </div>
             `;
@@ -452,10 +586,18 @@
                     throw new Error(result.message || 'Kalender kuota belum bisa dimuat.');
                 }
 
+                if (state.activeLoadToken !== loadToken) {
+                    return;
+                }
+
                 state.calendar = result;
                 renderCalendar();
                 setCalendarStatus('Kalender kuota berhasil dimuat. Hanya tanggal yang tersedia yang bisa dipilih.', 'info');
             } catch (error) {
+                if (state.activeLoadToken !== loadToken) {
+                    return;
+                }
+
                 state.calendar = null;
                 renderCalendar();
                 setCalendarStatus(error.message || 'Kalender kuota belum bisa dimuat.', 'danger');
@@ -547,6 +689,10 @@
             await checkAvailability();
         });
         calendarPrevButton.addEventListener('click', () => {
+            if (state.month <= todayMonth) {
+                return;
+            }
+
             state.month = shiftMonth(state.month, -1);
             loadCalendar();
         });
@@ -558,6 +704,7 @@
         syncSummary();
         updateContinueButton();
         syncCalendarVisibility();
+        syncCalendarNav();
         if (state.calendarOpen) {
             loadCalendar();
         }

@@ -21,6 +21,7 @@
         body {
             background-color: var(--bg);
             color: var(--fg);
+            overflow-x: clip;
         }
 
         .bg-background { background-color: var(--bg); }
@@ -36,7 +37,7 @@
     @stack('head')
 </head>
 <body class="font-sans antialiased">
-    <main class="min-h-screen">
+    <main class="min-h-screen overflow-x-clip">
         @yield('content')
         @include('frontend.layouts.footer')
     </main>

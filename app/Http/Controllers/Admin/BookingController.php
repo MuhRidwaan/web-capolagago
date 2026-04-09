@@ -182,18 +182,27 @@ class BookingController extends Controller
         DB::table('booking_items')->insert($itemRows);
         $this->bookingSlotService->syncBookedSlotsForBooking($bookingId);
 
-        return redirect()->route('admin.bookings.show', $bookingId)
+        return redirect()->route('admin.bookings.show', $bookingCode)
             ->with('success', "Booking {$bookingCode} berhasil dibuat.");
     }
 
-    public function show(int $id)
+    public function show(string $id)
     {
         $mitraId = $this->mitraId();
 
         $query = DB::table('bookings as b')
             ->join('users as u', 'u.id', '=', 'b.user_id')
             ->select('b.*', 'u.name as user_name', 'u.email as user_email')
-            ->where('b.id', $id);
+            ->where(function ($where) use ($id) {
+                if (ctype_digit($id)) {
+                    $where->where('b.id', (int) $id)
+                        ->orWhere('b.booking_code', $id);
+
+                    return;
+                }
+
+                $where->where('b.booking_code', $id);
+            });
 
         if ($mitraId) {
             $query->whereExists(function ($sub) use ($mitraId) {
@@ -211,13 +220,13 @@ class BookingController extends Controller
         $items = DB::table('booking_items as bi')
             ->join('products as p', 'p.id', '=', 'bi.product_id')
             ->select('bi.*', 'p.slug as product_slug')
-            ->where('bi.booking_id', $id)
+            ->where('bi.booking_id', $booking->id)
             ->get();
 
         $payment = DB::table('payments as py')
             ->leftJoin('payment_methods as pm', 'pm.id', '=', 'py.payment_method_id')
             ->select('py.*', 'pm.name as method_name', 'pm.type as method_type')
-            ->where('py.booking_id', $id)
+            ->where('py.booking_id', $booking->id)
             ->latest('py.created_at')
             ->first();
 

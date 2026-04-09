@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Str;
 
+$appUrl = (string) env('APP_URL', 'http://localhost');
+$appScheme = parse_url($appUrl, PHP_URL_SCHEME);
+
 return [
 
     /*
@@ -156,7 +159,7 @@ return [
     |
     */
 
-    'domain' => env('SESSION_DOMAIN'),
+    'domain' => env('SESSION_DOMAIN') ?: null,
 
     /*
     |--------------------------------------------------------------------------
@@ -169,7 +172,7 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    'secure' => env('SESSION_SECURE_COOKIE', $appScheme === 'https'),
 
     /*
     |--------------------------------------------------------------------------

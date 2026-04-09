@@ -2,10 +2,13 @@
     $homeUrl = route('frontend.home');
     $wisataUrl = route('frontend.wisata');
     $bookingUrl = route('ticket.booking');
+    $aboutUrl = route('frontend.about');
     $adminUrl = route('admin.dashboard');
     $isHome = request()->routeIs('frontend.home');
     $isWisata = request()->routeIs('frontend.wisata*');
-    $isBooking = request()->routeIs('ticket.booking');
+    $isBooking = request()->routeIs('ticket.booking*');
+    $isAbout = request()->routeIs('frontend.about');
+    $addonUrl = $homeUrl . '#addon';
     $currentUser = auth()->user();
 
     $navClass = static function (bool $active): string {
@@ -13,6 +16,9 @@
             ? 'inline-flex items-center rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white'
             : 'inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium text-slate-500 transition-colors hover:text-slate-900';
     };
+
+    $navActiveClass = 'inline-flex items-center rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white';
+    $navInactiveClass = 'inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium text-slate-500 transition-colors hover:text-slate-900';
 @endphp
 
 <header class="fixed left-0 right-0 top-0 z-50 border-b border-slate-200/70 bg-white/95 backdrop-blur-sm transition-all duration-300">
@@ -27,11 +33,11 @@
             </a>
 
             <div class="hidden items-center gap-2 lg:flex">
-                <a class="{{ $navClass($isHome) }}" href="{{ $homeUrl }}">Home</a>
-                <a class="{{ $navClass($isBooking) }}" href="{{ $bookingUrl }}">Booking</a>
-                <a class="{{ $navClass($isWisata) }}" href="{{ $wisataUrl }}">Paket Wisata</a>
-                <a class="{{ $navClass(false) }}" href="{{ $homeUrl }}#addon">Add-on Activity</a>
-                <a class="{{ $navClass(false) }}" href="{{ $homeUrl }}#about">Tentang Kami</a>
+                <a data-nav-item="home" data-nav-active-class="{{ $navActiveClass }}" data-nav-inactive-class="{{ $navInactiveClass }}" class="{{ $navClass($isHome) }}" href="{{ $homeUrl }}">Home</a>
+                <a data-nav-item="booking" data-nav-active-class="{{ $navActiveClass }}" data-nav-inactive-class="{{ $navInactiveClass }}" class="{{ $navClass($isBooking) }}" href="{{ $bookingUrl }}">Booking</a>
+                <a data-nav-item="wisata" data-nav-active-class="{{ $navActiveClass }}" data-nav-inactive-class="{{ $navInactiveClass }}" class="{{ $navClass($isWisata) }}" href="{{ $wisataUrl }}">Paket Wisata</a>
+                <a data-nav-item="addon" data-nav-active-class="{{ $navActiveClass }}" data-nav-inactive-class="{{ $navInactiveClass }}" class="{{ $navClass(false) }}" href="{{ $addonUrl }}">Add-on Activity</a>
+                <a data-nav-item="about" data-nav-active-class="{{ $navActiveClass }}" data-nav-inactive-class="{{ $navInactiveClass }}" class="{{ $navClass($isAbout) }}" href="{{ $aboutUrl }}">Tentang Kami</a>
             </div>
 
             <div class="hidden items-center gap-3 lg:flex">
@@ -66,11 +72,11 @@
 
                 <div class="absolute right-0 top-full mt-3 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl">
                     <div class="space-y-2">
-                        <a class="{{ $navClass($isHome) }} w-full justify-start" href="{{ $homeUrl }}">Home</a>
-                        <a class="{{ $navClass($isBooking) }} w-full justify-start" href="{{ $bookingUrl }}">Booking</a>
-                        <a class="{{ $navClass($isWisata) }} w-full justify-start" href="{{ $wisataUrl }}">Paket Wisata</a>
-                        <a class="{{ $navClass(false) }} w-full justify-start" href="{{ $homeUrl }}#addon">Add-on Activity</a>
-                        <a class="{{ $navClass(false) }} w-full justify-start" href="{{ $homeUrl }}#about">Tentang Kami</a>
+                        <a data-nav-item="home" data-nav-active-class="{{ $navActiveClass }} w-full justify-start" data-nav-inactive-class="{{ $navInactiveClass }} w-full justify-start" class="{{ $navClass($isHome) }} w-full justify-start" href="{{ $homeUrl }}">Home</a>
+                        <a data-nav-item="booking" data-nav-active-class="{{ $navActiveClass }} w-full justify-start" data-nav-inactive-class="{{ $navInactiveClass }} w-full justify-start" class="{{ $navClass($isBooking) }} w-full justify-start" href="{{ $bookingUrl }}">Booking</a>
+                        <a data-nav-item="wisata" data-nav-active-class="{{ $navActiveClass }} w-full justify-start" data-nav-inactive-class="{{ $navInactiveClass }} w-full justify-start" class="{{ $navClass($isWisata) }} w-full justify-start" href="{{ $wisataUrl }}">Paket Wisata</a>
+                        <a data-nav-item="addon" data-nav-active-class="{{ $navActiveClass }} w-full justify-start" data-nav-inactive-class="{{ $navInactiveClass }} w-full justify-start" class="{{ $navClass(false) }} w-full justify-start" href="{{ $addonUrl }}">Add-on Activity</a>
+                        <a data-nav-item="about" data-nav-active-class="{{ $navActiveClass }} w-full justify-start" data-nav-inactive-class="{{ $navInactiveClass }} w-full justify-start" class="{{ $navClass($isAbout) }} w-full justify-start" href="{{ $aboutUrl }}">Tentang Kami</a>
                     </div>
 
                     <form action="{{ $wisataUrl }}" method="GET" class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
@@ -102,3 +108,37 @@
         </nav>
     </div>
 </header>
+
+@push('scripts')
+<script>
+    (() => {
+        const navItems = Array.from(document.querySelectorAll('[data-nav-item]'));
+
+        if (!navItems.length) {
+            return;
+        }
+
+        const setActiveItem = (activeKey) => {
+            navItems.forEach((item) => {
+                const activeClass = item.dataset.navActiveClass;
+                const inactiveClass = item.dataset.navInactiveClass;
+                item.className = item.dataset.navItem === activeKey ? activeClass : inactiveClass;
+            });
+        };
+
+        const syncAddonState = () => {
+            const isHomePath = window.location.pathname === new URL(@json($homeUrl), window.location.origin).pathname;
+            const isAddonHash = window.location.hash === '#addon';
+
+            if (isHomePath && isAddonHash) {
+                setActiveItem('addon');
+            } else if (isHomePath) {
+                setActiveItem('home');
+            }
+        };
+
+        syncAddonState();
+        window.addEventListener('hashchange', syncAddonState);
+    })();
+</script>
+@endpush

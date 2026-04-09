@@ -34,6 +34,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
 
 // ── Public ────────────────────────────────────────────────────────────────────
 Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
+Route::view('/about', 'frontend.about')->name('frontend.about');
 Route::get('/wisata', [HomeController::class, 'wisata'])->name('frontend.wisata');
 Route::get('/wisata/{slug}', [HomeController::class, 'wisataDetail'])->name('frontend.wisata.show');
 Route::view('/welcome', 'welcome')->name('welcome');

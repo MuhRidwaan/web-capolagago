@@ -2,6 +2,7 @@
     $homeUrl = route('frontend.home');
     $wisataUrl = route('frontend.wisata');
     $bookingUrl = route('ticket.booking');
+    $aboutUrl = route('frontend.about');
     $ctaBackgroundUrl = asset('images/glamping.jpg');
 @endphp
 
@@ -15,7 +16,7 @@
 
         <div class="relative mx-auto max-w-[1440px] px-4 py-10 md:px-8 md:py-14">
             <div class="grid gap-8 lg:gap-10 xl:grid-cols-[minmax(0,38rem)_minmax(320px,30rem)] xl:items-center xl:justify-between">
-                <div class="max-w-[38rem]">
+                <div class="min-w-0 max-w-[38rem]">
                     <h2 class="max-w-sm text-3xl font-bold leading-[1.05] tracking-tight text-white sm:text-4xl">
                         Rencanakan<br />
                         Petualanganmu<br />
@@ -57,7 +58,7 @@
                     </div>
                 </div>
 
-                <div class="w-full rounded-[26px] border border-white/15 bg-white/10 p-5 shadow-2xl backdrop-blur-sm sm:p-6 xl:max-w-[30rem] xl:justify-self-end xl:p-7">
+                <div class="min-w-0 w-full rounded-[26px] border border-white/15 bg-white/10 p-5 shadow-2xl backdrop-blur-sm sm:p-6 xl:max-w-[30rem] xl:justify-self-end xl:p-7">
                     <h3 class="text-lg font-bold text-white xl:text-[2rem] xl:leading-none">Butuh Bantuan?</h3>
                     <p class="mt-3 text-sm leading-6 text-white/75">
                         Tim kami siap membantu Anda merencanakan perjalanan wisata yang sempurna.
@@ -96,7 +97,7 @@
     <div class="border-t border-white/10 bg-[#1e475b]">
         <div class="mx-auto max-w-[1440px] px-4 py-10 md:px-8 md:py-12">
             <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-[1.2fr_0.8fr_1fr_1fr]">
-                <div>
+                <div class="min-w-0">
                     <a href="{{ $homeUrl }}" class="inline-flex items-center gap-2 text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-[#35c3d1]" aria-hidden="true">
                             <path d="m17 14 3 3.3a1 1 0 0 1-.7 1.7H4.7a1 1 0 0 1-.7-1.7L7 14h-.3a1 1 0 0 1-.7-1.7L9 9h-.2A1 1 0 0 1 8 7.3L12 3l4 4.3a1 1 0 0 1-.8 1.7H15l3 3.3a1 1 0 0 1-.7 1.7H17Z"></path>
@@ -109,18 +110,18 @@
                     </p>
                 </div>
 
-                <div>
+                <div class="min-w-0">
                     <h3 class="text-sm font-bold uppercase tracking-[0.18em] text-white">Navigasi</h3>
                     <ul class="mt-5 space-y-3 text-sm text-white/70">
                         <li><a href="{{ $homeUrl }}" class="transition hover:text-white">Home</a></li>
                         <li><a href="{{ $bookingUrl }}" class="transition hover:text-white">Booking</a></li>
                         <li><a href="{{ $wisataUrl }}" class="transition hover:text-white">Paket Wisata</a></li>
                         <li><a href="{{ $homeUrl }}#addon" class="transition hover:text-white">Add-on Activity</a></li>
-                        <li><a href="{{ $homeUrl }}#about" class="transition hover:text-white">Tentang Kami</a></li>
+                        <li><a href="{{ $aboutUrl }}" class="transition hover:text-white">Tentang Kami</a></li>
                     </ul>
                 </div>
 
-                <div>
+                <div class="min-w-0">
                     <h3 class="text-sm font-bold uppercase tracking-[0.18em] text-white">Layanan</h3>
                     <ul class="mt-5 space-y-3 text-sm text-white/70">
                         <li><a href="{{ $wisataUrl }}?category=glamping" class="transition hover:text-white">Glamping</a></li>
@@ -132,7 +133,7 @@
                     </ul>
                 </div>
 
-                <div>
+                <div class="min-w-0">
                     <h3 class="text-sm font-bold uppercase tracking-[0.18em] text-white">Kontak</h3>
                     <ul class="mt-5 space-y-4 text-sm text-white/70">
                         <li>Capolaga, Subang, Jawa Barat</li>
