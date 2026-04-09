@@ -60,8 +60,8 @@ Route::post('/booking-ticket/status/{token}/sync-payment', [FrontendBookingContr
 Route::get('/booking/finish', [FrontendBookingController::class, 'finish'])
     ->name('ticket.booking.finish');
 
-// Debug Midtrans key — HAPUS setelah selesai debug
-if (config('app.debug')) {
+// Debug routes hanya untuk local development.
+if (app()->environment('local')) {
     Route::get('/debug/midtrans-key', function () {
         $serverKey = \App\Models\PaymentSetting::get('midtrans_server_key', '');
         $clientKey = \App\Models\PaymentSetting::get('midtrans_client_key', '');
@@ -73,6 +73,13 @@ if (config('app.debug')) {
             'client_key_prefix' => substr($clientKey, 0, 15),
             'is_production'     => \App\Models\PaymentSetting::get('midtrans_is_production'),
         ]);
+    });
+
+    Route::prefix('/debug/errors')->group(function () {
+        Route::get('/419', fn () => response()->view('errors.419', [], 419))->name('debug.errors.419');
+        Route::get('/404', fn () => response()->view('errors.404', [], 404))->name('debug.errors.404');
+        Route::get('/500', fn () => response()->view('errors.500', [], 500))->name('debug.errors.500');
+        Route::get('/503', fn () => response()->view('errors.503', [], 503))->name('debug.errors.503');
     });
 }
 
