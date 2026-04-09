@@ -217,8 +217,12 @@
         </div>
         <div class="grid grid-cols-1 gap-4 overflow-x-hidden xl:grid-cols-4 2xl:gap-5">
             @forelse ($featuredProducts as $product)
+                @php
+                    $detailUrl = route('frontend.wisata.show', ['slug' => $product->slug]);
+                    $bookingUrl = route('ticket.booking.product', ['slug' => $product->slug, 'date' => request('date', $today), 'guests' => request('guests', 2)]);
+                @endphp
                 <article class="min-w-0 w-full overflow-hidden rounded-[24px] bg-white ring-1 ring-slate-200/70">
-                    <a href="{{ route('ticket.booking.product', ['slug' => $product->slug, 'date' => request('date', $today), 'guests' => request('guests', 2)]) }}" class="block">
+                    <a href="{{ $detailUrl }}" class="block">
                         <div class="group/image relative h-[215px] overflow-hidden bg-slate-100 sm:h-[230px] md:h-[260px] xl:h-[305px]">
                             <img src="{{ $featuredImageFor($product) }}" alt="{{ $product->name }}" class="h-full w-full object-cover transition duration-500 ease-out group-hover/image:scale-105" />
                             @if ($loop->first)
@@ -245,6 +249,14 @@
                             </div>
                         </div>
                     </a>
+                    <div class="flex items-center justify-between gap-2 border-t border-slate-200 px-4 py-4 sm:px-5">
+                        <a href="{{ $detailUrl }}" class="inline-flex items-center rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-sky-300 hover:text-sky-700">
+                            Detail
+                        </a>
+                        <a href="{{ $bookingUrl }}" class="inline-flex items-center rounded-md bg-[#2d9da8] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#2d9da8]/90">
+                            Booking
+                        </a>
+                    </div>
                 </article>
             @empty
                 <div class="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">

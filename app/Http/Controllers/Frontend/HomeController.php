@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -126,6 +127,68 @@ class HomeController extends Controller
             'searchQuery' => $searchQuery,
             'selectedCategory' => $categoryQuery,
             'selectedSort' => $sortQuery,
+        ]);
+    }
+
+    public function wisataDetail(Request $request, string $slug)
+    {
+        $product = Product::query()
+            ->with(['category', 'mitra', 'primaryImage', 'images', 'activityTags'])
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->whereHas('category', fn ($query) => $query->where('type', 'internal'))
+            ->firstOrFail();
+
+        $reviewSummary = DB::table('reviews')
+            ->where('product_id', $product->id)
+            ->where('is_published', true)
+            ->selectRaw('COUNT(*) as total_reviews, AVG(rating) as average_rating')
+            ->first();
+
+        $recentReviews = DB::table('reviews as r')
+            ->join('users as u', 'u.id', '=', 'r.user_id')
+            ->where('r.product_id', $product->id)
+            ->where('r.is_published', true)
+            ->select([
+                'r.rating',
+                'r.comment',
+                'r.created_at',
+                'u.name as user_name',
+            ])
+            ->orderByDesc('r.created_at')
+            ->limit(6)
+            ->get();
+
+        $parkingRates = [
+            [
+                'vehicle' => 'Motor',
+                'price' => 5000,
+                'note' => 'per kunjungan',
+            ],
+            [
+                'vehicle' => 'Mobil',
+                'price' => 10000,
+                'note' => 'per kunjungan',
+            ],
+            [
+                'vehicle' => 'Hiace / Elf',
+                'price' => 25000,
+                'note' => 'rombongan kecil',
+            ],
+            [
+                'vehicle' => 'Bus wisata',
+                'price' => 50000,
+                'note' => 'rombongan besar',
+            ],
+        ];
+
+        return view('frontend.wisata-detail', [
+            'product' => $product,
+            'reviewSummary' => $reviewSummary,
+            'recentReviews' => $recentReviews,
+            'parkingRates' => $parkingRates,
+            'prefilledDate' => (string) $request->query('date', now()->toDateString()),
+            'prefilledGuests' => max(1, (int) $request->query('guests', 2)),
         ]);
     }
 }

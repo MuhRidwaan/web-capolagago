@@ -11,7 +11,7 @@ if (! function_exists('upload_url')) {
     function upload_url(?string $path, ?string $fallback = null): string
     {
         if (blank($path)) {
-            return $fallback ?? asset('images/placeholder.png');
+            return $fallback ?? asset('images/glamping.jpg');
         }
 
         // Jika sudah berupa URL penuh, kembalikan apa adanya
@@ -19,7 +19,14 @@ if (! function_exists('upload_url')) {
             return $path;
         }
 
-        return asset('uploads/' . ltrim($path, '/'));
+        $relativePath = 'uploads/' . ltrim($path, '/');
+        $fullPath = public_path($relativePath);
+
+        if (! file_exists($fullPath)) {
+            return $fallback ?? asset('images/glamping.jpg');
+        }
+
+        return asset($relativePath);
     }
 }
 

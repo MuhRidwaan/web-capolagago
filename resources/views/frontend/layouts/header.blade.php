@@ -4,7 +4,7 @@
     $bookingUrl = route('ticket.booking');
     $adminUrl = route('admin.dashboard');
     $isHome = request()->routeIs('frontend.home');
-    $isWisata = request()->routeIs('frontend.wisata');
+    $isWisata = request()->routeIs('frontend.wisata*');
     $isBooking = request()->routeIs('ticket.booking');
     $currentUser = auth()->user();
 

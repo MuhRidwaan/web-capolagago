@@ -91,8 +91,10 @@
                             <span class="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500">{{ $product->min_pax }}-{{ $product->max_pax }} Orang</span>
                             <span class="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500">{{ $product->price_label }}</span>
                         </div>
-                        <div class="mt-4 flex items-center justify-between border-t border-slate-200 pt-4">
-                            <span class="text-sm text-slate-500">{{ $product->category?->label ?? 'Produk' }}</span>
+                        <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-200 pt-4">
+                            <a href="{{ route('frontend.wisata.show', ['slug' => $product->slug]) }}" class="inline-flex items-center rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-teal-300 hover:text-teal-700">
+                                Detail Paket
+                            </a>
                             <a href="{{ route('ticket.booking.product', ['slug' => $product->slug, 'date' => request('date', $today), 'guests' => request('guests', 2)]) }}" class="inline-flex items-center rounded-md bg-teal-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">
                                 Pesan Sekarang
                             </a>
