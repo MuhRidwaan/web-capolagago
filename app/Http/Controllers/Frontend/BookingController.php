@@ -333,40 +333,34 @@ class BookingController extends Controller
 
     public function status(string $token)
     {
-        $booking = DB::table('bookings as b')
-            ->join('users as u', 'u.id', '=', 'b.user_id')
-            ->select(
-                'b.id',
-                'b.booking_code',
-                'b.public_token',
-                'b.visit_date',
-                'b.checkout_date',
-                'b.total_guests',
-                'b.subtotal',
-                'b.service_fee',
-                'b.total_amount',
-                'b.status',
-                'b.notes',
-                'b.created_at',
-                'u.name as customer_name',
-                'u.email as customer_email'
-            )
-            ->where('b.public_token', $token)
-            ->first();
+        $booking = $this->findBookingByPublicToken($token);
 
         abort_if(! $booking, 404);
 
-        $items = DB::table('booking_items')
+        $items = DB::table('booking_items as bi')
+            ->leftJoin('products as p', 'p.id', '=', 'bi.product_id')
+            ->leftJoin('reviews as r', function ($join) use ($booking) {
+                $join->on('r.product_id', '=', 'bi.product_id')
+                    ->where('r.booking_id', '=', $booking->id)
+                    ->where('r.user_id', '=', $booking->user_id);
+            })
             ->select(
-                'product_name_snapshot',
-                'quantity',
-                'unit_price',
-                'subtotal',
-                'is_addon'
+                'bi.product_id',
+                'bi.product_name_snapshot',
+                'bi.quantity',
+                'bi.unit_price',
+                'bi.subtotal',
+                'bi.is_addon',
+                'p.slug as product_slug',
+                'r.id as review_id',
+                'r.rating as review_rating',
+                'r.comment as review_comment',
+                'r.is_published as review_is_published',
+                'r.updated_at as review_updated_at'
             )
-            ->where('booking_id', $booking->id)
-            ->orderBy('is_addon')
-            ->orderBy('id')
+            ->where('bi.booking_id', $booking->id)
+            ->orderBy('bi.is_addon')
+            ->orderBy('bi.id')
             ->get();
 
         $payment = DB::table('payments as py')
@@ -402,10 +396,13 @@ class BookingController extends Controller
             }
         }
 
+        $reviewEligibility = $this->reviewEligibility($booking, $payment);
+
         return view('frontend.booking-status', [
             'booking' => $booking,
             'items' => $items,
             'payment' => $payment,
+            'reviewEligibility' => $reviewEligibility,
             'midtransClientKey' => $this->midtransClientKey(),
             'statusLabels' => [
                 'pending' => 'Pending',
@@ -420,6 +417,87 @@ class BookingController extends Controller
                 'expired' => 'Kedaluwarsa',
             ],
         ]);
+    }
+
+    public function storeReview(Request $request, string $token)
+    {
+        $booking = $this->findBookingByPublicToken($token);
+        abort_if(! $booking, 404);
+
+        $payment = DB::table('payments as py')
+            ->leftJoin('payment_methods as pm', 'pm.id', '=', 'py.payment_method_id')
+            ->select('py.status', 'pm.provider as payment_provider')
+            ->where('py.booking_id', $booking->id)
+            ->latest('py.created_at')
+            ->first();
+
+        $reviewEligibility = $this->reviewEligibility($booking, $payment);
+
+        if (! $reviewEligibility['allowed']) {
+            return redirect()
+                ->route('ticket.booking.status', ['token' => $token])
+                ->with('review_error', $reviewEligibility['message']);
+        }
+
+        $data = $request->validate([
+            'product_id' => ['required', 'integer'],
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'comment' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $bookingItem = DB::table('booking_items as bi')
+            ->leftJoin('products as p', 'p.id', '=', 'bi.product_id')
+            ->select('bi.product_id', 'bi.product_name_snapshot', 'p.slug as product_slug')
+            ->where('bi.booking_id', $booking->id)
+            ->where('bi.product_id', (int) $data['product_id'])
+            ->where('bi.is_addon', false)
+            ->first();
+
+        if (! $bookingItem) {
+            return redirect()
+                ->route('ticket.booking.status', ['token' => $token])
+                ->with('review_error', 'Produk yang dipilih tidak tersedia untuk diulas pada booking ini.')
+                ->withInput();
+        }
+
+        $comment = trim((string) ($data['comment'] ?? ''));
+        $existingReview = DB::table('reviews')
+            ->where('user_id', $booking->user_id)
+            ->where('booking_id', $booking->id)
+            ->where('product_id', (int) $data['product_id'])
+            ->first();
+
+        if ($existingReview) {
+            DB::table('reviews')
+                ->where('id', $existingReview->id)
+                ->update([
+                    'rating' => (int) $data['rating'],
+                    'comment' => $comment !== '' ? $comment : null,
+                    'is_published' => true,
+                    'updated_at' => now(),
+                ]);
+
+            $message = 'Ulasan berhasil diperbarui.';
+        } else {
+            DB::table('reviews')->insert([
+                'user_id' => $booking->user_id,
+                'booking_id' => $booking->id,
+                'product_id' => (int) $data['product_id'],
+                'rating' => (int) $data['rating'],
+                'comment' => $comment !== '' ? $comment : null,
+                'is_published' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $message = 'Ulasan berhasil dikirim.';
+        }
+
+        $this->recalcProductRating((int) $data['product_id']);
+
+        return redirect()
+            ->route('ticket.booking.status', ['token' => $token])
+            ->with('review_success', $message . ' Terima kasih sudah berbagi pengalaman untuk ' . $bookingItem->product_name_snapshot . '.');
     }
 
     public function resumePayment(string $token)
@@ -691,6 +769,77 @@ class BookingController extends Controller
             ->where('payment_code', $paymentCode)
             ->update([
                 'gateway_response' => json_encode($merged),
+                'updated_at' => now(),
+            ]);
+    }
+
+    private function findBookingByPublicToken(string $token): ?object
+    {
+        return DB::table('bookings as b')
+            ->join('users as u', 'u.id', '=', 'b.user_id')
+            ->select(
+                'b.id',
+                'b.user_id',
+                'b.booking_code',
+                'b.public_token',
+                'b.visit_date',
+                'b.checkout_date',
+                'b.total_guests',
+                'b.subtotal',
+                'b.service_fee',
+                'b.total_amount',
+                'b.status',
+                'b.notes',
+                'b.created_at',
+                'u.name as customer_name',
+                'u.email as customer_email'
+            )
+            ->where('b.public_token', $token)
+            ->first();
+    }
+
+    private function reviewEligibility(object $booking, ?object $payment): array
+    {
+        if (! in_array($booking->status, ['confirmed', 'checked_in', 'completed'], true)) {
+            return [
+                'allowed' => false,
+                'message' => 'Ulasan dapat dikirim setelah booking dikonfirmasi atau kunjungan selesai.',
+            ];
+        }
+
+        if (Carbon::parse($booking->visit_date)->isFuture()) {
+            return [
+                'allowed' => false,
+                'message' => 'Ulasan baru bisa dikirim setelah tanggal kunjungan berlangsung.',
+            ];
+        }
+
+        if ($payment && ($payment->payment_provider ?? null) === 'midtrans' && ($payment->status ?? null) !== 'paid') {
+            return [
+                'allowed' => false,
+                'message' => 'Ulasan baru tersedia setelah pembayaran terkonfirmasi.',
+            ];
+        }
+
+        return [
+            'allowed' => true,
+            'message' => 'Bagikan pengalamanmu setelah kunjungan selesai agar calon tamu lain mendapat gambaran yang lebih jelas.',
+        ];
+    }
+
+    private function recalcProductRating(int $productId): void
+    {
+        $stats = DB::table('reviews')
+            ->where('product_id', $productId)
+            ->where('is_published', true)
+            ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as total')
+            ->first();
+
+        DB::table('products')
+            ->where('id', $productId)
+            ->update([
+                'rating_avg' => round($stats->avg_rating ?? 0, 2),
+                'review_count' => $stats->total ?? 0,
                 'updated_at' => now(),
             ]);
     }

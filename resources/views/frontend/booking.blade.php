@@ -225,7 +225,15 @@
                             </label>
                             <label class="block">
                                 <span class="mb-2 block text-sm font-semibold text-slate-700">No. WhatsApp</span>
-                                <input name="phone" type="tel" required inputmode="tel" maxlength="16" autocomplete="tel" pattern="^(?:\\+62|62|0)8[0-9]{7,13}$" title="Gunakan format nomor Indonesia, misalnya 081234567890 atau 6281234567890." class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" placeholder="08xxxxxxxxxx" />
+                                <input name="phone" type="tel" required 
+                                    inputmode="tel" 
+                                    maxlength="16" 
+                                    autocomplete="tel" 
+                                    pattern="^\+?[1-9]\d{6,14}$"
+                                    title="Gunakan format internasional, misalnya +6281234567890 atau +14155552671"
+                                    class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400"
+                                    placeholder="+6281234567890"
+                                    />
                             </label>
                         </div>
 

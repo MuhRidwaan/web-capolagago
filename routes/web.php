@@ -51,6 +51,8 @@ Route::post('/booking-ticket/checkout', [FrontendBookingController::class, 'chec
     ->name('ticket.booking.checkout');
 Route::get('/booking-ticket/status/{token}', [FrontendBookingController::class, 'status'])
     ->name('ticket.booking.status');
+Route::post('/booking-ticket/status/{token}/reviews', [FrontendBookingController::class, 'storeReview'])
+    ->name('ticket.booking.review.store');
 Route::post('/booking-ticket/status/{token}/resume-payment', [FrontendBookingController::class, 'resumePayment'])
     ->name('ticket.booking.resume-payment');
 Route::post('/booking-ticket/status/{token}/sync-payment', [FrontendBookingController::class, 'syncPaymentStatus'])

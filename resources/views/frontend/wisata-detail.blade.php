@@ -335,27 +335,32 @@
                     <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">4</span>
                     <h2 class="text-xl font-bold text-slate-900">Biaya Parkir</h2>
                 </div>
-                <p class="mt-3 text-sm leading-6 text-slate-600">
-                    Estimasi biaya parkir berikut berlaku untuk area wisata dan bisa berubah mengikuti kebijakan pengelola atau musim kunjungan.
-                </p>
+
+                <div class="mt-4 rounded-[24px] border border-emerald-100 bg-emerald-50 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">Informasi Penting</p>
+                    <div class="mt-3 space-y-2 text-sm leading-6 text-emerald-900">
+                        <p>Biaya parkir <strong>belum termasuk</strong> harga paket wisata dan dibayarkan terpisah di area lokasi.</p>
+                        <p>Tarif berikut adalah <strong>estimasi per kendaraan untuk satu kali kunjungan</strong>.</p>                    </div>
+                </div>
 
                 <div class="mt-4 space-y-3">
                     @foreach ($parkingRates as $rate)
-                        <div class="flex items-center justify-between gap-4 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3">
-                            <div>
+                        <div class="flex flex-col gap-3 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="min-w-0">
                                 <p class="font-semibold text-slate-900">{{ $rate['vehicle'] }}</p>
-                                <p class="text-xs text-slate-500">{{ $rate['note'] }}</p>
+                                <p class="mt-1 text-xs text-slate-500">{{ $rate['note'] }}</p>
                             </div>
-                            <div class="text-right">
-                                <p class="text-sm font-bold text-teal-700">Rp {{ number_format($rate['price'], 0, ',', '.') }}</p>
-                                <p class="text-xs text-slate-500">estimasi</p>
+                            <div class="rounded-2xl bg-white px-3 py-2 text-left sm:text-right">
+                                <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Tarif Parkir</p>
+                                <p class="mt-1 text-sm font-bold text-teal-700">Rp {{ number_format($rate['price'], 0, ',', '.') }}</p>
+                                <p class="text-xs text-slate-500">per kendaraan</p>
                             </div>
                         </div>
                     @endforeach
                 </div>
 
                 <div class="mt-4 rounded-3xl bg-amber-50 p-4 text-sm leading-6 text-amber-900">
-                    Saran kami, siapkan uang tunai kecil dan konfirmasi ke mitra jika datang dengan bus besar atau rombongan khusus.
+                    Siapkan uang tunai kecil untuk parkir dan gunakan tarif di atas sebagai panduan awal.
                 </div>
             </article>
 

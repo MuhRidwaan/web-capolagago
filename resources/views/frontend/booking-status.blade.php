@@ -37,6 +37,10 @@
     $paymentReferenceValue = $payment && $payment->va_number
         ? $payment->va_number
         : ($payment->payment_code ?? null);
+
+    $reviewAllowed = (bool) ($reviewEligibility['allowed'] ?? false);
+    $reviewMessage = (string) ($reviewEligibility['message'] ?? '');
+    $oldReviewProductId = (int) old('product_id', 0);
 @endphp
 
 <section class="border-b border-slate-200 bg-white pt-20 md:pt-24">
@@ -73,6 +77,25 @@
         <div class="space-y-6">
             <section class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
                 <h2 class="text-lg font-bold text-slate-900">Ringkasan Booking</h2>
+
+                @if (session('review_success'))
+                    <div class="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+                        {{ session('review_success') }}
+                    </div>
+                @endif
+
+                @if (session('review_error'))
+                    <div class="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900">
+                        {{ session('review_error') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
+
                 <div class="mt-5 grid gap-4 sm:grid-cols-2">
                     <div class="rounded-2xl bg-slate-50 p-4">
                         <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Atas Nama</p>
@@ -111,6 +134,109 @@
                         <p class="mt-2 text-sm text-slate-700">{{ $booking->notes }}</p>
                     </div>
                 @endif
+            </section>
+
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">Tulis Ulasan</h2>
+                        <p class="mt-1 text-sm text-slate-600">{{ $reviewMessage }}</p>
+                    </div>
+                    <span class="inline-flex w-fit rounded-full border px-3 py-1 text-xs font-semibold {{ $reviewAllowed ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-800' }}">
+                        {{ $reviewAllowed ? 'Ulasan dibuka' : 'Belum tersedia' }}
+                    </span>
+                </div>
+
+                <div class="mt-5 space-y-4">
+                    @foreach ($items->where('is_addon', false) as $item)
+                        @php
+                            $isActiveOldReview = $oldReviewProductId === (int) $item->product_id;
+                            $currentRating = (int) ($isActiveOldReview ? old('rating', $item->review_rating) : ($item->review_rating ?? 0));
+                            $currentComment = (string) ($isActiveOldReview ? old('comment', $item->review_comment) : ($item->review_comment ?? ''));
+                        @endphp
+
+                        <article class="rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                <div class="min-w-0">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <h3 class="text-base font-semibold text-slate-900">{{ $item->product_name_snapshot }}</h3>
+                                        @if ($item->review_id)
+                                            <span class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                                                Sudah diulas
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <p class="mt-1 text-sm text-slate-600">
+                                        Ceritakan pengalamanmu agar calon tamu lain lebih yakin sebelum booking.
+                                    </p>
+                                    @if ($item->product_slug)
+                                        <a href="{{ route('frontend.wisata.show', ['slug' => $item->product_slug]) }}" class="mt-2 inline-flex text-sm font-semibold text-teal-700 transition hover:text-teal-800">
+                                            Lihat halaman paket
+                                        </a>
+                                    @endif
+                                </div>
+
+                                @if ($item->review_id && $item->review_updated_at)
+                                    <p class="text-xs text-slate-500">
+                                        Diperbarui {{ \Illuminate\Support\Carbon::parse($item->review_updated_at)->translatedFormat('d M Y H:i') }}
+                                    </p>
+                                @endif
+                            </div>
+
+                            @if ($reviewAllowed)
+                                <form action="{{ route('ticket.booking.review.store', ['token' => $booking->public_token]) }}" method="POST" class="mt-4 space-y-4">
+                                    @csrf
+                                    <input type="hidden" name="product_id" value="{{ $item->product_id }}">
+
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-900">Rating</p>
+                                        <div class="mt-2 flex flex-wrap gap-2">
+                                            @for ($rating = 5; $rating >= 1; $rating--)
+                                                <label class="cursor-pointer">
+                                                    <input
+                                                        type="radio"
+                                                        name="rating"
+                                                        value="{{ $rating }}"
+                                                        class="peer sr-only"
+                                                        {{ $currentRating === $rating ? 'checked' : '' }}
+                                                    >
+                                                    <span class="inline-flex rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition peer-checked:border-teal-600 peer-checked:bg-teal-600 peer-checked:text-white">
+                                                        {{ $rating }} ★
+                                                    </span>
+                                                </label>
+                                            @endfor
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label for="review-comment-{{ $item->product_id }}" class="text-sm font-semibold text-slate-900">Ceritakan pengalamanmu</label>
+                                        <textarea
+                                            id="review-comment-{{ $item->product_id }}"
+                                            name="comment"
+                                            rows="4"
+                                            maxlength="1000"
+                                            class="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-100"
+                                            placeholder="Apa yang paling kamu suka, dan apa yang perlu ditingkatkan?"
+                                        >{{ $currentComment }}</textarea>
+                                    </div>
+
+                                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                        <p class="text-xs text-slate-500">
+                                            Ulasan akan langsung tampil di halaman paket selama masih relevan dan sopan.
+                                        </p>
+                                        <button type="submit" class="inline-flex items-center justify-center rounded-2xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal-800">
+                                            {{ $item->review_id ? 'Perbarui Ulasan' : 'Kirim Ulasan' }}
+                                        </button>
+                                    </div>
+                                </form>
+                            @else
+                                <div class="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-4 text-sm text-slate-600">
+                                    Form ulasan akan dibuka otomatis setelah booking memenuhi syarat untuk diulas.
+                                </div>
+                            @endif
+                        </article>
+                    @endforeach
+                </div>
             </section>
         </div>
 
