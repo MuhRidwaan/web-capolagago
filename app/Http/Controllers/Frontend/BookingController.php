@@ -338,91 +338,28 @@ class BookingController extends Controller
 
     public function status(string $token)
     {
-        $booking = $this->findBookingByPublicToken($token);
-
-        abort_if(! $booking, 404);
-
-        $items = DB::table('booking_items as bi')
-            ->leftJoin('products as p', 'p.id', '=', 'bi.product_id')
-            ->leftJoin('reviews as r', function ($join) use ($booking) {
-                $join->on('r.product_id', '=', 'bi.product_id')
-                    ->where('r.booking_id', '=', $booking->id)
-                    ->where('r.user_id', '=', $booking->user_id);
-            })
-            ->select(
-                'bi.product_id',
-                'bi.product_name_snapshot',
-                'bi.quantity',
-                'bi.unit_price',
-                'bi.subtotal',
-                'bi.is_addon',
-                'p.slug as product_slug',
-                'r.id as review_id',
-                'r.rating as review_rating',
-                'r.comment as review_comment',
-                'r.is_published as review_is_published',
-                'r.updated_at as review_updated_at'
-            )
-            ->where('bi.booking_id', $booking->id)
-            ->orderBy('bi.is_addon')
-            ->orderBy('bi.id')
-            ->get();
-
-        $payment = DB::table('payments as py')
-            ->leftJoin('payment_methods as pm', 'pm.id', '=', 'py.payment_method_id')
-            ->select(
-                'py.payment_code',
-                'py.amount',
-                'py.fee_amount',
-                'py.status',
-                'py.va_number',
-                'py.qr_url',
-                'py.gateway_transaction_id',
-                'py.gateway_response',
-                'py.paid_at',
-                'py.expired_at',
-                'pm.name as payment_method_name',
-                'pm.provider as payment_provider',
-                'pm.type as payment_type'
-            )
-            ->where('py.booking_id', $booking->id)
-            ->latest('py.created_at')
-            ->first();
-
-        if ($payment) {
-            $gatewayResponse = json_decode((string) ($payment->gateway_response ?? ''), true);
-
-            if (! $payment->va_number) {
-                $payment->va_number = $this->extractMidtransVaNumber($gatewayResponse);
-            }
-
-            if (! $payment->qr_url) {
-                $payment->qr_url = $this->extractMidtransQrUrl($gatewayResponse);
-            }
-        }
-
-        $reviewEligibility = $this->reviewEligibility($booking, $payment);
+        $viewData = $this->statusViewData($token);
+        $booking = $viewData['booking'];
+        $payment = $viewData['payment'];
+        $reviewEligibility = $viewData['reviewEligibility'];
         $this->syncGuestPendingBookingSession($booking, $payment);
 
         return view('frontend.booking-status', [
-            'booking' => $booking,
-            'items' => $items,
-            'payment' => $payment,
-            'reviewEligibility' => $reviewEligibility,
+            ...$viewData,
             'midtransClientKey' => $this->midtransClientKey(),
-            'statusLabels' => [
-                'pending' => 'Pending',
-                'waiting_payment' => 'Menunggu Pembayaran',
-                'confirmed' => 'Terkonfirmasi',
-                'checked_in' => 'Checked In',
-                'completed' => 'Selesai',
-                'cancelled' => 'Dibatalkan',
-                'refunded' => 'Refunded',
-                'paid' => 'Lunas',
-                'failed' => 'Gagal',
-                'expired' => 'Kedaluwarsa',
-            ],
         ]);
+    }
+
+    public function invoice(string $token)
+    {
+        $viewData = $this->statusViewData($token);
+
+        return response()
+            ->view('frontend.booking-invoice', [
+                ...$viewData,
+                'printedAt' => now(),
+            ])
+            ->header('Content-Type', 'text/html; charset=UTF-8');
     }
 
     public function storeReview(Request $request, string $token)
@@ -806,6 +743,93 @@ class BookingController extends Controller
             ->where('b.public_token', $token)
             ->where('b.user_id', Auth::id())
             ->first();
+    }
+
+    private function statusViewData(string $token): array
+    {
+        $booking = $this->findBookingByPublicToken($token);
+
+        abort_if(! $booking, 404);
+
+        $items = DB::table('booking_items as bi')
+            ->leftJoin('products as p', 'p.id', '=', 'bi.product_id')
+            ->leftJoin('reviews as r', function ($join) use ($booking) {
+                $join->on('r.product_id', '=', 'bi.product_id')
+                    ->where('r.booking_id', '=', $booking->id)
+                    ->where('r.user_id', '=', $booking->user_id);
+            })
+            ->select(
+                'bi.product_id',
+                'bi.product_name_snapshot',
+                'bi.quantity',
+                'bi.unit_price',
+                'bi.subtotal',
+                'bi.is_addon',
+                'p.slug as product_slug',
+                'r.id as review_id',
+                'r.rating as review_rating',
+                'r.comment as review_comment',
+                'r.is_published as review_is_published',
+                'r.updated_at as review_updated_at'
+            )
+            ->where('bi.booking_id', $booking->id)
+            ->orderBy('bi.is_addon')
+            ->orderBy('bi.id')
+            ->get();
+
+        $payment = DB::table('payments as py')
+            ->leftJoin('payment_methods as pm', 'pm.id', '=', 'py.payment_method_id')
+            ->select(
+                'py.payment_code',
+                'py.amount',
+                'py.fee_amount',
+                'py.status',
+                'py.va_number',
+                'py.qr_url',
+                'py.gateway_transaction_id',
+                'py.gateway_response',
+                'py.paid_at',
+                'py.expired_at',
+                'pm.name as payment_method_name',
+                'pm.provider as payment_provider',
+                'pm.type as payment_type'
+            )
+            ->where('py.booking_id', $booking->id)
+            ->latest('py.created_at')
+            ->first();
+
+        if ($payment) {
+            $gatewayResponse = json_decode((string) ($payment->gateway_response ?? ''), true);
+
+            if (! $payment->va_number) {
+                $payment->va_number = $this->extractMidtransVaNumber($gatewayResponse);
+            }
+
+            if (! $payment->qr_url) {
+                $payment->qr_url = $this->extractMidtransQrUrl($gatewayResponse);
+            }
+        }
+
+        $statusLabels = [
+            'pending' => 'Pending',
+            'waiting_payment' => 'Menunggu Pembayaran',
+            'confirmed' => 'Terkonfirmasi',
+            'checked_in' => 'Checked In',
+            'completed' => 'Selesai',
+            'cancelled' => 'Dibatalkan',
+            'refunded' => 'Refunded',
+            'paid' => 'Lunas',
+            'failed' => 'Gagal',
+            'expired' => 'Kedaluwarsa',
+        ];
+
+        return [
+            'booking' => $booking,
+            'items' => $items,
+            'payment' => $payment,
+            'reviewEligibility' => $this->reviewEligibility($booking, $payment),
+            'statusLabels' => $statusLabels,
+        ];
     }
 
     private function reviewEligibility(object $booking, ?object $payment): array

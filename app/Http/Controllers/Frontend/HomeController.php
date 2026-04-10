@@ -11,9 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $pendingGuestBooking = $this->resolvePendingGuestBooking();
+        $searchQuery = trim((string) $request->query('q', ''));
 
         $preferredFeaturedSlugs = collect([
             'glamping-riverside-luxury',
@@ -22,16 +23,40 @@ class HomeController extends Controller
             'rafting-ciater-adventure',
         ]);
 
-        $featuredProducts = Product::query()
+        $featuredProductsQuery = Product::query()
             ->with(['category', 'primaryImage'])
             ->where('is_active', true)
-            ->whereIn('slug', $preferredFeaturedSlugs)
-            ->get();
+            ->whereHas('category', fn ($query) => $query->where('type', 'internal'));
 
-        if ($featuredProducts->count() < 4) {
+        if ($searchQuery !== '') {
+            $featuredProducts = $featuredProductsQuery
+                ->where(function ($query) use ($searchQuery) {
+                    $query
+                        ->where('name', 'like', "%{$searchQuery}%")
+                        ->orWhere('slug', 'like', "%{$searchQuery}%")
+                        ->orWhere('short_desc', 'like', "%{$searchQuery}%")
+                        ->orWhereHas('category', function ($categoryQuery) use ($searchQuery) {
+                            $categoryQuery
+                                ->where('name', 'like', "%{$searchQuery}%")
+                                ->orWhere('label', 'like', "%{$searchQuery}%");
+                        });
+                })
+                ->orderByDesc('is_featured')
+                ->orderByDesc('rating_avg')
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get();
+        } else {
+            $featuredProducts = (clone $featuredProductsQuery)
+                ->whereIn('slug', $preferredFeaturedSlugs)
+                ->get();
+        }
+
+        if ($searchQuery === '' && $featuredProducts->count() < 4) {
             $fallbackProducts = Product::query()
                 ->with(['category', 'primaryImage'])
                 ->where('is_active', true)
+                ->whereHas('category', fn ($query) => $query->where('type', 'internal'))
                 ->whereNotIn('slug', $featuredProducts->pluck('slug'))
                 ->orderByDesc('is_featured')
                 ->orderBy('sort_order')
@@ -42,10 +67,23 @@ class HomeController extends Controller
             $featuredProducts = $featuredProducts->concat($fallbackProducts);
         }
 
-        $featuredProducts = $preferredFeaturedSlugs
-            ->map(fn ($slug) => $featuredProducts->firstWhere('slug', $slug))
-            ->filter()
-            ->values();
+        if ($searchQuery === '') {
+            $orderedPreferredProducts = $preferredFeaturedSlugs
+                ->map(fn ($slug) => $featuredProducts->firstWhere('slug', $slug))
+                ->filter()
+                ->values();
+
+            $fallbackProducts = $featuredProducts
+                ->reject(fn ($product) => $preferredFeaturedSlugs->contains($product->slug))
+                ->values();
+
+            $featuredProducts = $orderedPreferredProducts
+                ->concat($fallbackProducts)
+                ->take(4)
+                ->values();
+        } else {
+            $featuredProducts = $featuredProducts->values();
+        }
 
         $mainCategories = ProductCategory::query()
             ->where('is_active', true)
@@ -60,7 +98,6 @@ class HomeController extends Controller
             ->orderByDesc('is_featured')
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->limit(12)
             ->get();
 
         $heroProducts = Product::query()
@@ -72,11 +109,25 @@ class HomeController extends Controller
             ->limit(3)
             ->get();
 
+        $heroStats = DB::table('reviews')
+            ->where('is_published', true)
+            ->selectRaw('AVG(rating) as average_rating, COUNT(*) as total_reviews')
+            ->first();
+
+        $travelerStats = DB::table('bookings')
+            ->whereIn('status', ['confirmed', 'checked_in', 'completed'])
+            ->selectRaw('COALESCE(SUM(total_guests), 0) as total_travelers')
+            ->first();
+
         return view('frontend.home', [
             'featuredProducts' => $featuredProducts,
+            'homeSearchQuery' => $searchQuery,
             'mainCategories' => $mainCategories,
             'addonProducts' => $addonProducts,
             'heroProducts' => $heroProducts,
+            'heroAverageRating' => (float) ($heroStats->average_rating ?? 0),
+            'heroTotalReviews' => (int) ($heroStats->total_reviews ?? 0),
+            'heroTotalTravelers' => (int) ($travelerStats->total_travelers ?? 0),
             'pendingGuestBooking' => $pendingGuestBooking,
         ]);
     }

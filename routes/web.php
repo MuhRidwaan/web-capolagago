@@ -127,6 +127,8 @@ Route::middleware('auth')->group(function () {
         ->name('ticket.booking.checkout');
     Route::get('/booking-ticket/status/{token}', [FrontendBookingController::class, 'status'])
         ->name('ticket.booking.status');
+    Route::get('/booking-ticket/status/{token}/invoice', [FrontendBookingController::class, 'invoice'])
+        ->name('ticket.booking.invoice');
     Route::post('/booking-ticket/status/{token}/reviews', [FrontendBookingController::class, 'storeReview'])
         ->name('ticket.booking.review.store');
     Route::post('/booking-ticket/status/{token}/resume-payment', [FrontendBookingController::class, 'resumePayment'])

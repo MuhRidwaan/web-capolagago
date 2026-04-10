@@ -9,10 +9,30 @@
 @php
     $startingProduct = $heroProducts->first() ?? $featuredProducts->first();
     $today = now()->format('Y-m-d');
-    $featuredRatings = $featuredProducts->filter(fn ($product) => (float) $product->rating_avg > 0);
-    $averageRating = $featuredRatings->isNotEmpty()
-        ? number_format((float) $featuredRatings->avg('rating_avg'), 1)
-        : '4.9';
+    $heroSlides = collect([
+        [
+            'image' => asset('images/glamping.jpg'),
+            'eyebrow' => 'Stay Close to Nature',
+            'title' => 'Glamping premium dengan suasana hutan yang tenang',
+            'description' => 'Cocok untuk staycation singkat, quality time keluarga, dan momen healing di Capolaga.',
+        ],
+        [
+            'image' => asset('images/camping.jpg'),
+            'eyebrow' => 'Weekend Outdoor Escape',
+            'title' => 'Area camping luas untuk trip santai sampai gathering seru',
+            'description' => 'Nikmati udara sejuk, area hijau yang lega, dan pengalaman camping yang lebih praktis.',
+        ],
+        [
+            'image' => asset('images/rafting.jpg'),
+            'eyebrow' => 'Adventure Experience',
+            'title' => 'Tambahkan aktivitas seru untuk liburan yang lebih berkesan',
+            'description' => 'Dari rafting sampai aktivitas outdoor lain, semua bisa direncanakan dalam satu platform.',
+        ],
+    ]);
+    $averageRating = $heroAverageRating > 0
+        ? number_format($heroAverageRating, 1)
+        : '0.0';
+    $travelerLabel = number_format($heroTotalTravelers, 0, ',', '.') . '+ Wisatawan';
     $featuredImageFor = static function ($product) {
         $storedImage = (string) ($product->primary_image_url ?? '');
         if ($storedImage !== '') {
@@ -80,69 +100,108 @@
 @endif
 
 <section id="home" class="{{ ! empty($pendingGuestBooking) ? '' : 'pt-16 sm:pt-20 md:pt-24' }}">
-    <div class="relative overflow-hidden py-12 sm:py-14 md:py-16 lg:py-20" style="background:linear-gradient(135deg, #1a3a4a 0%, #2d5a6b 50%, #3d7a8a 100%)">
-        <div class="mx-auto max-w-[1920px] px-4 md:px-8">
-            <div class="flex flex-col gap-6 sm:gap-8 lg:flex-row lg:items-center lg:justify-between">
-                <div class="max-w-xl">
-                    <h1 class="mb-4 text-[2.1rem] font-bold leading-[1.05] text-white sm:text-4xl lg:text-5xl">
-                        Experience Nature Adventure<br />at Capolaga
-                    </h1>
-                    <p class="mb-6 max-w-lg text-sm leading-7 text-white/80 sm:text-base md:text-lg">
-                        Pesan camping, glamping &amp; aktivitas petualangan dalam satu platform.
-                    </p>
-                    <a href="{{ $startingProduct ? route('ticket.booking.product', ['slug' => $startingProduct->slug]) : route('ticket.booking') }}"
-                        class="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-semibold text-[#1a3a4a] transition hover:bg-white/90 sm:px-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="h-4 w-4" aria-hidden="true">
-                            <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path>
-                        </svg>
-                        Book Now
-                    </a>
+    <div class="relative overflow-hidden bg-slate-900">
+        <div id="hero-slider" class="absolute inset-0">
+            @foreach ($heroSlides as $index => $slide)
+                <article
+                    class="hero-slide absolute inset-0 transition-opacity duration-700 {{ $index === 0 ? 'opacity-100' : 'pointer-events-none opacity-0' }}"
+                    data-slide-index="{{ $index }}"
+                    aria-hidden="{{ $index === 0 ? 'false' : 'true' }}">
+                    <img src="{{ $slide['image'] }}" alt="{{ $slide['title'] }}" class="absolute inset-0 h-full w-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-r from-[#183648]/95 via-[#234f63]/82 to-[#4c95a3]/45"></div>
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_left,_rgba(125,211,252,0.18),_transparent_30%),radial-gradient(circle_at_right,_rgba(94,234,212,0.16),_transparent_24%)]"></div>
+                </article>
+            @endforeach
+        </div>
+
+        <div class="relative mx-auto max-w-[1920px] px-4 py-8 sm:py-9 md:px-8 md:py-10 lg:py-12">
+            <div class="grid min-h-[300px] gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(420px,0.9fr)] lg:items-center xl:min-h-[340px]">
+                <div class="flex flex-col justify-center">
+                    <div class="max-w-[560px] lg:pl-2">
+                        <h1 class="mb-4 text-[1.85rem] font-bold leading-[1.05] text-white sm:text-[3.2rem] lg:text-[3.95rem]">
+                            Experience Nature<br />Adventure<br />at Capolaga
+                        </h1>
+                        <p class="mb-6 max-w-[520px] text-sm leading-7 text-white/80 sm:text-base md:text-[1rem]">
+                            Pesan camping, glamping &amp; aktivitas petualangan dalam satu platform.
+                        </p>
+                        <a href="{{ $startingProduct ? route('ticket.booking.product', ['slug' => $startingProduct->slug]) : route('ticket.booking') }}"
+                            class="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-semibold text-[#1a3a4a] transition hover:bg-white/90 sm:px-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="h-4 w-4" aria-hidden="true">
+                                <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path>
+                            </svg>
+                            Book Now
+                        </a>
+                    </div>
                 </div>
 
-                <div class="flex flex-col items-start gap-4 lg:items-end">
-                    <div class="flex flex-wrap items-center gap-2 text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="h-5 w-5 fill-yellow-400 text-yellow-400" aria-hidden="true">
-                            <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
-                        </svg>
-                        <span class="font-semibold">{{ $averageRating }} Rating</span>
-                        <span class="text-white/70">&middot;</span>
-                        <span class="text-white/80">500+ Wisatawan</span>
+                <div class="flex flex-col items-start justify-center gap-4 lg:items-end lg:pr-6">
+                    <div class="space-y-4 lg:mt-2">
+                        <div class="flex flex-wrap items-center gap-2 text-white lg:justify-end">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="h-5 w-5 fill-yellow-400 text-yellow-400" aria-hidden="true">
+                                <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
+                            </svg>
+                            <span class="text-[0.95rem] font-semibold">{{ $averageRating }} Rating</span>
+                            <span class="text-white/70">&middot;</span>
+                            <span class="text-[0.95rem] text-white/80">{{ $travelerLabel }}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2 lg:justify-end">
+                            <span class="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                    class="h-4 w-4" aria-hidden="true">
+                                    <path d="M3.5 21 14 3"></path>
+                                    <path d="M20.5 21 10 3"></path>
+                                    <path d="M15.5 21 12 15l-3.5 6"></path>
+                                    <path d="M2 21h20"></path>
+                                </svg>
+                                Camping
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                    class="h-4 w-4" aria-hidden="true">
+                                    <path d="M3.5 21 14 3"></path>
+                                    <path d="M20.5 21 10 3"></path>
+                                    <path d="M15.5 21 12 15l-3.5 6"></path>
+                                    <path d="M2 21h20"></path>
+                                </svg>
+                                Glamping
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                    class="h-4 w-4" aria-hidden="true">
+                                    <path d="m8 3 4 8 5-5 5 15H2L8 3z"></path>
+                                </svg>
+                                Adventure
+                            </span>
+                        </div>
                     </div>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-3 py-2 text-xs font-medium text-white backdrop-blur-sm sm:px-4 sm:text-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="h-4 w-4" aria-hidden="true">
-                                <path d="M3.5 21 14 3"></path>
-                                <path d="M20.5 21 10 3"></path>
-                                <path d="M15.5 21 12 15l-3.5 6"></path>
-                                <path d="M2 21h20"></path>
-                            </svg>
-                            Camping
-                        </span>
-                        <span class="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-3 py-2 text-xs font-medium text-white backdrop-blur-sm sm:px-4 sm:text-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="h-4 w-4" aria-hidden="true">
-                                <path d="M3.5 21 14 3"></path>
-                                <path d="M20.5 21 10 3"></path>
-                                <path d="M15.5 21 12 15l-3.5 6"></path>
-                                <path d="M2 21h20"></path>
-                            </svg>
-                            Glamping
-                        </span>
-                        <span class="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-3 py-2 text-xs font-medium text-white backdrop-blur-sm sm:px-4 sm:text-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="h-4 w-4" aria-hidden="true">
-                                <path d="m8 3 4 8 5-5 5 15H2L8 3z"></path>
-                            </svg>
-                            Adventure
-                        </span>
+
+                    <div class="hidden items-center justify-between gap-3 lg:ml-auto lg:pt-4">
+                        <div class="flex items-center gap-2">
+                            @foreach ($heroSlides as $index => $slide)
+                                <button
+                                    type="button"
+                                    class="hero-slider-dot h-2.5 rounded-full bg-white/50 transition-all {{ $index === 0 ? 'w-8 bg-white' : 'w-2.5' }}"
+                                    data-target-slide="{{ $index }}"
+                                    aria-label="Tampilkan slide {{ $index + 1 }}"
+                                    aria-pressed="{{ $index === 0 ? 'true' : 'false' }}"></button>
+                            @endforeach
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button type="button" id="hero-slider-prev" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-slate-950/35 text-white transition hover:bg-slate-950/55" aria-label="Slide sebelumnya">
+                                <span aria-hidden="true">&larr;</span>
+                            </button>
+                            <button type="button" id="hero-slider-next" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-slate-950/35 text-white transition hover:bg-slate-950/55" aria-label="Slide berikutnya">
+                                <span aria-hidden="true">&rarr;</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -151,7 +210,7 @@
 
     <div class="border-b border-border bg-white">
         <div class="mx-auto max-w-[1920px] px-4 py-4 md:px-8 md:py-5">
-            <form action="{{ route('ticket.booking') }}" method="GET" class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(220px,0.9fr)_minmax(220px,0.9fr)_260px] xl:items-end">
+            <form action="{{ route('frontend.home') }}" method="GET" class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(220px,0.9fr)_minmax(220px,0.9fr)_260px] xl:items-end">
                 <div class="grid grid-cols-1 gap-4">
                     <label class="block">
                         <span class="mb-1.5 block text-xs uppercase tracking-wide text-muted-foreground">Cari Pengalaman</span>
@@ -244,6 +303,17 @@
                 </svg>
             </a>
         </div>
+        @if (! empty($homeSearchQuery))
+            <div class="mb-6 flex flex-col gap-2 rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between">
+                <p>
+                    Hasil pencarian untuk <span class="font-semibold text-slate-900">"{{ $homeSearchQuery }}"</span>:
+                    <span class="font-semibold text-slate-900">{{ $featuredProducts->count() }}</span> produk
+                </p>
+                <a href="{{ route('frontend.home') }}#paket" class="inline-flex text-sm font-semibold text-sky-600 transition hover:text-sky-700">
+                    Reset pencarian
+                </a>
+            </div>
+        @endif
         <div class="grid grid-cols-1 gap-4 overflow-x-hidden md:grid-cols-2 xl:grid-cols-4 2xl:gap-5">
             @forelse ($featuredProducts as $product)
                 @php
@@ -307,8 +377,9 @@
             </svg>
             <h2 class="text-[20px] font-bold tracking-tight text-slate-900 md:text-[22px]">Explore Around Capolaga</h2>
         </div>
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-            @forelse ($addonProducts->take(4)->values() as $index => $product)
+        <div class="overflow-x-auto pb-2 xl:pb-3">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-flow-col xl:grid-rows-2 xl:auto-cols-[430px]">
+            @forelse ($addonProducts->values() as $index => $product)
                 @php
                     $iconStyles = [
                         ['bg' => 'bg-blue-50', 'text' => 'text-blue-600', 'icon' => 'waves'],
@@ -365,7 +436,72 @@
                     Add-on activity belum tersedia.
                 </div>
             @endforelse
+            </div>
         </div>
     </div>
 </section>
+
+@push('scripts')
+<script>
+    (() => {
+        const slider = document.getElementById('hero-slider');
+        if (!slider) return;
+
+        const slides = Array.from(slider.querySelectorAll('.hero-slide'));
+        const dots = Array.from(document.querySelectorAll('.hero-slider-dot'));
+        const prevButton = document.getElementById('hero-slider-prev');
+        const nextButton = document.getElementById('hero-slider-next');
+        let activeIndex = 0;
+        let autoPlayId = null;
+
+        const renderSlide = (index) => {
+            activeIndex = (index + slides.length) % slides.length;
+
+            slides.forEach((slide, slideIndex) => {
+                const isActive = slideIndex === activeIndex;
+                slide.classList.toggle('opacity-100', isActive);
+                slide.classList.toggle('opacity-0', !isActive);
+                slide.classList.toggle('pointer-events-none', !isActive);
+                slide.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+            });
+
+            dots.forEach((dot, dotIndex) => {
+                const isActive = dotIndex === activeIndex;
+                dot.classList.toggle('w-8', isActive);
+                dot.classList.toggle('w-2.5', !isActive);
+                dot.classList.toggle('bg-white', isActive);
+                dot.classList.toggle('bg-white/50', !isActive);
+                dot.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+        };
+
+        const restartAutoPlay = () => {
+            window.clearInterval(autoPlayId);
+            autoPlayId = window.setInterval(() => {
+                renderSlide(activeIndex + 1);
+            }, 4500);
+        };
+
+        prevButton?.addEventListener('click', () => {
+            renderSlide(activeIndex - 1);
+            restartAutoPlay();
+        });
+
+        nextButton?.addEventListener('click', () => {
+            renderSlide(activeIndex + 1);
+            restartAutoPlay();
+        });
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                renderSlide(index);
+                restartAutoPlay();
+            });
+        });
+
+        renderSlide(0);
+        restartAutoPlay();
+    })();
+</script>
+@endpush
 @endsection
