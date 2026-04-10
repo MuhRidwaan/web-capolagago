@@ -221,18 +221,18 @@
                         <div class="grid gap-4 sm:grid-cols-2">
                             <label class="block">
                                 <span class="mb-2 block text-sm font-semibold text-slate-700">Nama lengkap</span>
-                                <input name="name" type="text" required minlength="3" maxlength="150" autocomplete="name" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" placeholder="Nama customer" />
+                                <input name="name" type="text" required minlength="3" maxlength="150" autocomplete="name" value="{{ old('name', $authUser?->name ?? '') }}" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" placeholder="Nama customer" />
                             </label>
                             <label class="block">
                                 <span class="mb-2 block text-sm font-semibold text-slate-700">No. WhatsApp</span>
                                 <input name="phone" type="tel" required 
                                     inputmode="tel" 
-                                    maxlength="16" 
+                                    maxlength="14" 
                                     autocomplete="tel" 
-                                    pattern="^\+?[1-9]\d{6,14}$"
-                                    title="Gunakan format internasional, misalnya +6281234567890 atau +14155552671"
+                                    pattern="^08[0-9]{8,13}$"
+                                    title=""
                                     class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400"
-                                    placeholder="+6281234567890"
+                                    placeholder="081234567890"
                                     />
                             </label>
                         </div>
@@ -240,7 +240,7 @@
                         <div class="grid gap-4 sm:grid-cols-2">
                             <label class="block">
                                 <span class="mb-2 block text-sm font-semibold text-slate-700">Email</span>
-                                <input name="email" type="email" required maxlength="150" autocomplete="email" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" placeholder="email@contoh.com" />
+                                <input name="email" type="email" required maxlength="150" autocomplete="email" value="{{ $authUser?->email ?? '' }}" readonly class="w-full rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-slate-500 outline-none" placeholder="email@contoh.com" />
                             </label>
                             <label class="block">
                                 <span class="mb-2 block text-sm font-semibold text-slate-700">Jumlah peserta</span>

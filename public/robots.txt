@@ -1,2 +1,14 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /register
+Disallow: /logout
+Disallow: /profile
+Disallow: /booking-ticket
+Disallow: /booking
+Disallow: /payment
+
+# Fallback file. Production source is served dynamically from /robots.txt
+# and points to the full sitemap URL based on APP_URL.
+Sitemap: https://capolagago.wuaze.com/sitemap.xml

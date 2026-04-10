@@ -10,6 +10,7 @@ use App\Services\BookingService;
 use App\Services\MidtransService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
@@ -111,6 +112,7 @@ class BookingController extends Controller
             'prefilledGuests' => max(1, (int) $request->query('guests', 2)),
             'searchQuery' => $searchQuery,
             'midtransClientKey' => $this->midtransClientKey(),
+            'authUser' => $request->user(),
         ]);
     }
 
@@ -264,8 +266,7 @@ class BookingController extends Controller
 
         $data = $request->validate([
             'customer_name' => ['required', 'string', 'min:3', 'max:150'],
-            'customer_email' => ['required', 'email:rfc', 'max:150'],
-            'customer_phone' => ['required', 'string', 'regex:/^(?:\+62|62|0)8[0-9]{7,13}$/'],
+            'customer_phone' => ['required', 'string', 'regex:/^08[0-9]{8,13}$/'],
             'visit_date' => ['required', 'date', 'after_or_equal:today'],
             'total_guests' => ['required', 'integer', 'min:1'],
             'payment_method_id' => ['required', 'integer', 'exists:payment_methods,id'],
@@ -275,7 +276,9 @@ class BookingController extends Controller
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $booking = $this->bookingService->createPublicBooking($data);
+        $data['customer_email'] = (string) $request->user()->email;
+
+        $booking = $this->bookingService->createAuthenticatedBooking($data, $request->user());
 
         $paymentGateway = null;
 
@@ -508,6 +511,7 @@ class BookingController extends Controller
         $payment = $this->bookingService->getPendingPaymentSummaryByToken($token);
 
         abort_if(! $payment, 404);
+        abort_if(($payment['user_id'] ?? null) !== Auth::id(), 403);
         abort_if(($payment['payment_provider'] ?? null) !== 'midtrans', 422, 'Metode pembayaran ini tidak menggunakan Midtrans.');
         abort_if(($payment['payment_status'] ?? null) !== 'pending', 422, 'Pembayaran ini sudah tidak berada pada status pending.');
         abort_if(($payment['booking_status'] ?? null) === 'cancelled', 422, 'Booking sudah dibatalkan.');
@@ -800,6 +804,7 @@ class BookingController extends Controller
                 'u.email as customer_email'
             )
             ->where('b.public_token', $token)
+            ->where('b.user_id', Auth::id())
             ->first();
     }
 

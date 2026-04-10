@@ -4,6 +4,8 @@
     $bookingUrl = route('ticket.booking');
     $aboutUrl = route('frontend.about');
     $adminUrl = route('admin.dashboard');
+    $profileUrl = route('frontend.profile');
+    $profileOrdersUrl = route('frontend.orders');
     $isHome = request()->routeIs('frontend.home');
     $isWisata = request()->routeIs('frontend.wisata*');
     $isBooking = request()->routeIs('ticket.booking*');
@@ -49,7 +51,23 @@
                     <input name="q" type="search" value="{{ request('q', '') }}" placeholder="Cari..." class="w-24 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400" />
                 </form>
                 @if ($currentUser)
-                    <a class="inline-flex items-center justify-center rounded-md bg-[#1a3a4a] px-3 py-2 text-sm font-medium text-white transition hover:bg-[#1a3a4a]/90" href="{{ $adminUrl }}">Dashboard</a>
+                    @if ($currentUser->hasAnyRole(['Super Admin', 'Mitra']))
+                        <a class="inline-flex items-center justify-center rounded-md bg-[#1a3a4a] px-3 py-2 text-sm font-medium text-white transition hover:bg-[#1a3a4a]/90" href="{{ $adminUrl }}">Dashboard</a>
+                    @else
+                        <details class="relative">
+                            <summary class="inline-flex cursor-pointer list-none items-center justify-center rounded-md bg-[#1a3a4a] px-3 py-2 text-sm font-medium text-white transition hover:bg-[#1a3a4a]/90">
+                                Profile
+                            </summary>
+                            <div class="absolute right-0 top-full z-50 mt-2 w-44 overflow-hidden rounded-2xl border border-slate-200 bg-white py-2 shadow-xl">
+                                <a href="{{ $profileUrl }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-900">
+                                    Profile
+                                </a>
+                                <a href="{{ $profileOrdersUrl }}" class="flex items-center px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-900">
+                                    Pesanan
+                                </a>
+                            </div>
+                        </details>
+                    @endif
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="inline-flex items-center justify-center rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
@@ -93,7 +111,14 @@
                     </form>
 
                     @if ($currentUser)
-                        <a class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-[#1a3a4a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1a3a4a]/90" href="{{ $adminUrl }}">Dashboard</a>
+                        @if ($currentUser->hasAnyRole(['Super Admin', 'Mitra']))
+                            <a class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-[#1a3a4a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1a3a4a]/90" href="{{ $adminUrl }}">Dashboard</a>
+                        @else
+                            <div class="mt-4 space-y-2">
+                                <a class="inline-flex w-full items-center justify-center rounded-xl bg-[#1a3a4a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1a3a4a]/90" href="{{ $profileUrl }}">Profile</a>
+                                <a class="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50" href="{{ $profileOrdersUrl }}">Pesanan</a>
+                            </div>
+                        @endif
                         <form method="POST" action="{{ route('logout') }}" class="mt-3">
                             @csrf
                             <button type="submit" class="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">

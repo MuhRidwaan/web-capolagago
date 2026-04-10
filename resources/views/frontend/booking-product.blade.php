@@ -65,9 +65,9 @@
                 <span>Kembali ke daftar produk</span>
             </a>
             <h1 class="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Pesan {{ $product->name }}</h1>
-            <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
+            <!-- <p class="mt-3 max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
                 Pilih tanggal kunjungan dan jumlah peserta, lalu cek ketersediaan slot sebelum melanjutkan ke booking utama.
-            </p>
+            </p> -->
         </div>
     </div>
 </section>

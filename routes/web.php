@@ -17,15 +17,80 @@ use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Frontend\BookingController as FrontendBookingController;
 use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\ProfileController;
+use App\Models\Product;
 use App\Http\Controllers\Payment\MidtransWebhookController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/robots.txt', function () {
+    $lines = [
+        'User-agent: *',
+        'Allow: /',
+        'Disallow: /admin',
+        'Disallow: /login',
+        'Disallow: /register',
+        'Disallow: /logout',
+        'Disallow: /profile',
+        'Disallow: /booking-ticket',
+        'Disallow: /booking',
+        'Disallow: /payment',
+        'Sitemap: ' . route('sitemap'),
+    ];
+
+    return response(implode("\n", $lines) . "\n", 200)
+        ->header('Content-Type', 'text/plain; charset=UTF-8');
+})->name('robots');
+
+Route::get('/sitemap.xml', function () {
+    $staticPages = collect([
+        [
+            'loc' => route('frontend.home'),
+            'lastmod' => now()->toDateString(),
+            'changefreq' => 'daily',
+            'priority' => '1.0',
+        ],
+        [
+            'loc' => route('frontend.about'),
+            'lastmod' => now()->toDateString(),
+            'changefreq' => 'monthly',
+            'priority' => '0.6',
+        ],
+        [
+            'loc' => route('frontend.wisata'),
+            'lastmod' => now()->toDateString(),
+            'changefreq' => 'daily',
+            'priority' => '0.9',
+        ],
+    ]);
+
+    $products = Product::query()
+        ->where('is_active', true)
+        ->whereHas('category', fn ($query) => $query->where('type', 'internal'))
+        ->orderByDesc('updated_at')
+        ->get(['slug', 'updated_at'])
+        ->map(function (Product $product) {
+            return [
+                'loc' => route('frontend.wisata.show', ['slug' => $product->slug]),
+                'lastmod' => optional($product->updated_at)->toDateString() ?? now()->toDateString(),
+                'changefreq' => 'weekly',
+                'priority' => '0.8',
+            ];
+        });
+
+    return response()
+        ->view('sitemap.xml', ['urls' => $staticPages->concat($products)])
+        ->header('Content-Type', 'application/xml; charset=UTF-8');
+})->name('sitemap');
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
+    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/register', [RegisteredUserController::class, 'store'])->name('register.store');
 });
 
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
@@ -38,28 +103,39 @@ Route::view('/about', 'frontend.about')->name('frontend.about');
 Route::get('/wisata', [HomeController::class, 'wisata'])->name('frontend.wisata');
 Route::get('/wisata/{slug}', [HomeController::class, 'wisataDetail'])->name('frontend.wisata.show');
 Route::view('/welcome', 'welcome')->name('welcome');
-Route::get('/booking-ticket', [FrontendBookingController::class, 'index'])
-    ->name('ticket.booking');
-Route::get('/booking-ticket/product/{slug}', [FrontendBookingController::class, 'product'])
-    ->name('ticket.booking.product');
-Route::get('/booking-ticket/product/{slug}/calendar', [FrontendBookingController::class, 'productCalendar'])
-    ->name('ticket.booking.product.calendar');
-Route::get('/booking-ticket/availability', [FrontendBookingController::class, 'availability'])
-    ->name('ticket.booking.availability');
-Route::get('/booking-ticket/estimate', [FrontendBookingController::class, 'estimate'])
-    ->name('ticket.booking.estimate');
-Route::post('/booking-ticket/checkout', [FrontendBookingController::class, 'checkout'])
-    ->name('ticket.booking.checkout');
-Route::get('/booking-ticket/status/{token}', [FrontendBookingController::class, 'status'])
-    ->name('ticket.booking.status');
-Route::post('/booking-ticket/status/{token}/reviews', [FrontendBookingController::class, 'storeReview'])
-    ->name('ticket.booking.review.store');
-Route::post('/booking-ticket/status/{token}/resume-payment', [FrontendBookingController::class, 'resumePayment'])
-    ->name('ticket.booking.resume-payment');
-Route::post('/booking-ticket/status/{token}/sync-payment', [FrontendBookingController::class, 'syncPaymentStatus'])
-    ->name('ticket.booking.sync-payment');
-Route::get('/booking/finish', [FrontendBookingController::class, 'finish'])
-    ->name('ticket.booking.finish');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'index'])
+        ->name('frontend.profile');
+    Route::get('/profile/orders', [ProfileController::class, 'orders'])
+        ->name('frontend.orders');
+    Route::patch('/profile', [ProfileController::class, 'updateProfile'])
+        ->name('frontend.profile.update');
+    Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])
+        ->name('frontend.profile.password.update');
+    Route::get('/booking-ticket', [FrontendBookingController::class, 'index'])
+        ->name('ticket.booking');
+    Route::get('/booking-ticket/product/{slug}', [FrontendBookingController::class, 'product'])
+        ->name('ticket.booking.product');
+    Route::get('/booking-ticket/product/{slug}/calendar', [FrontendBookingController::class, 'productCalendar'])
+        ->name('ticket.booking.product.calendar');
+    Route::get('/booking-ticket/availability', [FrontendBookingController::class, 'availability'])
+        ->name('ticket.booking.availability');
+    Route::get('/booking-ticket/estimate', [FrontendBookingController::class, 'estimate'])
+        ->name('ticket.booking.estimate');
+    Route::post('/booking-ticket/checkout', [FrontendBookingController::class, 'checkout'])
+        ->name('ticket.booking.checkout');
+    Route::get('/booking-ticket/status/{token}', [FrontendBookingController::class, 'status'])
+        ->name('ticket.booking.status');
+    Route::post('/booking-ticket/status/{token}/reviews', [FrontendBookingController::class, 'storeReview'])
+        ->name('ticket.booking.review.store');
+    Route::post('/booking-ticket/status/{token}/resume-payment', [FrontendBookingController::class, 'resumePayment'])
+        ->name('ticket.booking.resume-payment');
+    Route::post('/booking-ticket/status/{token}/sync-payment', [FrontendBookingController::class, 'syncPaymentStatus'])
+        ->name('ticket.booking.sync-payment');
+    Route::get('/booking/finish', [FrontendBookingController::class, 'finish'])
+        ->name('ticket.booking.finish');
+});
 
 // Debug routes hanya untuk local development.
 if (app()->environment('local')) {
@@ -91,7 +167,7 @@ Route::post('/payment/webhook/midtrans', [MidtransWebhookController::class, 'han
 // ── Admin ─────────────────────────────────────────────────────────────────────
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'role:Super Admin|Mitra'])
+    ->middleware(['auth', 'admin.access', 'role:Super Admin|Mitra'])
     ->group(function () {
 
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');

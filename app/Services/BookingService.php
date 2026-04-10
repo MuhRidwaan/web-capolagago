@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Models\User;
 
 class BookingService
 {
@@ -164,6 +165,99 @@ class BookingService
         });
     }
 
+    public function createAuthenticatedBooking(array $payload, User $user): array
+    {
+        $quote = $this->buildPublicBookingQuote($payload);
+        $paymentMethod = $quote['payment_method'];
+        $items = $quote['items'];
+        $subtotal = $quote['subtotal'];
+        $feeAmount = $quote['fee_amount'];
+        $totalAmount = $quote['total_amount'];
+        $visitDate = $quote['visit_date'];
+        $totalGuests = $quote['total_guests'];
+
+        return DB::transaction(function () use ($payload, $user, $items, $subtotal, $feeAmount, $totalAmount, $paymentMethod, $visitDate, $totalGuests) {
+            DB::table('users')->where('id', $user->id)->update([
+                'name' => $payload['customer_name'],
+                'updated_at' => now(),
+            ]);
+
+            $bookingCode = $this->generateBookingCode();
+            $publicToken = $this->generatePublicToken();
+
+            $bookingId = DB::table('bookings')->insertGetId([
+                'booking_code' => $bookingCode,
+                'public_token' => $publicToken,
+                'user_id' => $user->id,
+                'visit_date' => $visitDate,
+                'checkout_date' => null,
+                'total_guests' => $totalGuests,
+                'subtotal' => $subtotal,
+                'discount_amount' => 0,
+                'service_fee' => $feeAmount,
+                'total_amount' => $totalAmount,
+                'promo_code' => null,
+                'status' => 'waiting_payment',
+                'notes' => $payload['notes'] ?? null,
+                'source' => 'web',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            foreach ($items as $index => $item) {
+                $items[$index]['booking_id'] = $bookingId;
+                $items[$index]['created_at'] = now();
+                $items[$index]['updated_at'] = now();
+            }
+
+            DB::table('booking_items')->insert($items);
+
+            $this->bookingSlotService->syncBookedSlotsForBooking($bookingId);
+
+            DB::table('payments')->insert([
+                'booking_id' => $bookingId,
+                'payment_code' => $bookingCode,
+                'payment_method_id' => $paymentMethod->id,
+                'amount' => $totalAmount,
+                'fee_amount' => $feeAmount,
+                'status' => 'pending',
+                'gateway_transaction_id' => null,
+                'gateway_order_id' => $bookingCode,
+                'va_number' => null,
+                'qr_url' => null,
+                'gateway_response' => null,
+                'paid_at' => null,
+                'expired_at' => now()->addHours(24),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return [
+                'booking_id' => $bookingId,
+                'booking_code' => $bookingCode,
+                'public_token' => $publicToken,
+                'payment_code' => $bookingCode,
+                'payment_method_id' => $paymentMethod->id,
+                'payment_method' => $paymentMethod->name,
+                'payment_type' => $paymentMethod->type,
+                'payment_provider' => $paymentMethod->provider,
+                'subtotal' => $subtotal,
+                'fee_amount' => $feeAmount,
+                'total_amount' => $totalAmount,
+                'status' => 'waiting_payment',
+                'customer_name' => $payload['customer_name'],
+                'customer_email' => $user->email,
+                'customer_phone' => $payload['customer_phone'],
+                'items' => collect($items)->map(fn ($item) => [
+                    'product_id' => $item['product_id'],
+                    'name' => $item['product_name_snapshot'],
+                    'quantity' => (int) $item['quantity'],
+                    'price' => (float) $item['unit_price'],
+                ])->values()->all(),
+            ];
+        });
+    }
+
     public function estimatePublicBooking(array $payload): array
     {
         $quote = $this->buildPublicBookingQuote($payload);
@@ -199,6 +293,7 @@ class BookingService
             ->leftJoin('payment_methods as pm', 'pm.id', '=', 'py.payment_method_id')
             ->select(
                 'b.id as booking_id',
+                'b.user_id',
                 'b.booking_code',
                 'b.public_token',
                 'b.total_amount',
@@ -235,6 +330,7 @@ class BookingService
 
         return [
             'booking_id' => (int) $booking->booking_id,
+            'user_id' => (int) $booking->user_id,
             'booking_code' => $booking->booking_code,
             'public_token' => $booking->public_token,
             'total_amount' => (float) $booking->total_amount,

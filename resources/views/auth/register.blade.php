@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Capolaga') }} | Login</title>
+    <title>{{ config('app.name', 'Capolaga') }} | Register</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,13 +16,11 @@
             --page-bg: #eef3ef;
             --panel-bg: #f8faf8;
             --surface: #ffffff;
-            --surface-soft: #dff4df;
             --text: #24493a;
             --muted: #7f8d87;
             --line: #dbe4de;
             --accent: #2f7356;
             --accent-strong: #255c45;
-            --accent-soft: #cfeccc;
             --danger: #c55454;
         }
 
@@ -66,7 +64,7 @@
             display: inline-flex;
             align-items: center;
             gap: 14px;
-            margin-bottom: 64px;
+            margin-bottom: 54px;
             text-decoration: none;
         }
 
@@ -124,7 +122,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 8px;
             padding: 6px;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
             background: linear-gradient(135deg, #d8f0d9, #c6e9c7);
             border-radius: 999px;
         }
@@ -150,18 +148,9 @@
             padding: 14px 16px;
             border-radius: 16px;
             font-size: 0.92rem;
-        }
-
-        .feedback.error {
             background: rgba(197, 84, 84, 0.09);
             color: var(--danger);
             border: 1px solid rgba(197, 84, 84, 0.14);
-        }
-
-        .feedback.success {
-            background: rgba(47, 115, 86, 0.08);
-            color: var(--accent-strong);
-            border: 1px solid rgba(47, 115, 86, 0.14);
         }
 
         .field {
@@ -236,36 +225,31 @@
             background: rgba(47, 115, 86, 0.08);
         }
 
-        .helper {
+        .terms {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
+            align-items: flex-start;
+            gap: 12px;
             margin: 8px 0 24px;
-            font-size: 0.94rem;
-        }
-
-        .remember {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
             color: #5d6b64;
+            font-size: 0.94rem;
+            line-height: 1.55;
         }
 
-        .remember input {
+        .terms input {
             width: 17px;
             height: 17px;
+            margin-top: 2px;
             accent-color: var(--accent);
         }
 
-        .helper-link,
+        .terms a,
         .footer a {
             color: var(--accent);
             font-weight: 600;
             text-decoration: none;
         }
 
-        .helper-link:hover,
+        .terms a:hover,
         .footer a:hover {
             color: var(--accent-strong);
         }
@@ -347,7 +331,7 @@
         .hero-title {
             max-width: 520px;
             margin: 0;
-            font-size: clamp(2.6rem, 5vw, 4.25rem);
+            font-size: clamp(2.4rem, 5vw, 4.1rem);
             line-height: 1.08;
             letter-spacing: -0.05em;
         }
@@ -426,13 +410,8 @@
                 width: 100%;
             }
 
-            .helper {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
             .hero-title {
-                font-size: 2.3rem;
+                font-size: 2.25rem;
             }
 
             .hero-cards {
@@ -454,30 +433,34 @@
             </a>
 
             <div class="form-wrap">
-                <h1 class="heading">Selamat Datang Kembali</h1>
-                <p class="subheading">Masuk untuk melanjutkan booking dan menjelajahi pengalaman terbaik di Capolaga.</p>
+                <h1 class="heading">Buat Akun Anda</h1>
+                <p class="subheading">Daftar dan mulai jelajahi pengalaman alam Capolaga dengan booking yang lebih cepat.</p>
 
                 <div class="switcher">
-                    <a class="switcher-link active" href="{{ route('login') }}">Masuk</a>
-                    <a class="switcher-link" href="{{ route('register') }}">Daftar</a>
+                    <a class="switcher-link" href="{{ route('login') }}">Masuk</a>
+                    <a class="switcher-link active" href="{{ route('register') }}">Daftar</a>
                 </div>
 
-                @if (session('success'))
-                    <div class="feedback success">{{ session('success') }}</div>
-                @endif
-
                 @if ($errors->any())
-                    <div class="feedback error">{{ $errors->first() }}</div>
+                    <div class="feedback">{{ $errors->first() }}</div>
                 @endif
 
-                <form method="POST" action="{{ route('login.store') }}">
+                <form method="POST" action="{{ route('register.store') }}">
                     @csrf
+
+                    <div class="field">
+                        <div class="input-shell">
+                            <i class="fas fa-user field-icon"></i>
+                            <div class="floating-label">Nama Lengkap <span class="required">*</span></div>
+                            <input id="name" type="text" name="name" value="{{ old('name') }}" placeholder="Masukkan nama Anda" autocomplete="name" required autofocus>
+                        </div>
+                    </div>
 
                     <div class="field">
                         <div class="input-shell">
                             <i class="fas fa-envelope field-icon"></i>
                             <div class="floating-label">Email <span class="required">*</span></div>
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="nama@email.com" autocomplete="email" required autofocus>
+                            <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="nama@email.com" autocomplete="email" required>
                         </div>
                     </div>
 
@@ -485,29 +468,37 @@
                         <div class="input-shell">
                             <i class="fas fa-lock field-icon"></i>
                             <div class="floating-label">Kata Sandi <span class="required">*</span></div>
-                            <input id="password" type="password" name="password" placeholder="Masukkan password" autocomplete="current-password" required>
+                            <input id="password" type="password" name="password" placeholder="Buat password" autocomplete="new-password" required>
                             <button type="button" class="password-toggle" data-target="password" aria-label="Tampilkan password">
                                 <i class="fas fa-eye-slash"></i>
                             </button>
                         </div>
                     </div>
 
-                    <div class="helper">
-                        <label class="remember" for="remember">
-                            <input type="checkbox" id="remember" name="remember" value="1" {{ old('remember') ? 'checked' : '' }}>
-                            Ingat saya
-                        </label>
-                        <a class="helper-link" href="{{ route('register') }}">Belum punya akun?</a>
+                    <div class="field">
+                        <div class="input-shell">
+                            <i class="fas fa-lock field-icon"></i>
+                            <div class="floating-label">Konfirmasi Kata Sandi <span class="required">*</span></div>
+                            <input id="password_confirmation" type="password" name="password_confirmation" placeholder="Ulangi password" autocomplete="new-password" required>
+                            <button type="button" class="password-toggle" data-target="password_confirmation" aria-label="Tampilkan konfirmasi password">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
+                        </div>
                     </div>
 
+                    <label class="terms" for="terms_preview">
+                        <input type="checkbox" id="terms_preview">
+                        <span>Saya setuju dengan <a href="#" onclick="return false;">Syarat Layanan</a> dan <a href="#" onclick="return false;">Kebijakan Privasi</a></span>
+                    </label>
+
                     <button type="submit" class="submit-btn">
-                        <i class="fas fa-sign-in-alt"></i> Masuk
+                        <i class="fas fa-user-plus"></i> Buat Akun
                     </button>
                 </form>
             </div>
 
             <div class="footer">
-                &copy; {{ date('Y') }} Capolaga, Bandung, Jawa Barat
+                Sudah punya akun? <a href="{{ route('login') }}">Masuk sekarang</a>
             </div>
         </section>
 
@@ -522,24 +513,24 @@
             <div class="hero-content">
                 <div class="hero-overline">Bandung, Jawa Barat</div>
                 <h2 class="hero-title">Jelajahi Alam, Petualangan, dan Relaksasi Khas Capolaga</h2>
-                <p class="hero-text">Nikmati camping, glamping, pemandian air panas, dan aktivitas outdoor dalam satu destinasi hijau yang tenang dan berkesan.</p>
+                <p class="hero-text">Dari camping ground yang rindang sampai air panas alami, semuanya siap jadi bagian dari perjalanan liburanmu berikutnya.</p>
             </div>
 
             <div class="hero-cards">
                 <div class="hero-card">
                     <i class="fas fa-tree"></i>
                     <strong>Wisata Alam</strong>
-                    <span>Hutan & sungai</span>
+                    <span>Udara segar pegunungan</span>
                 </div>
                 <div class="hero-card">
-                    <i class="fas fa-campground"></i>
+                    <i class="fas fa-water"></i>
+                    <strong>Petualangan</strong>
+                    <span>Aktivitas outdoor seru</span>
+                </div>
+                <div class="hero-card">
+                    <i class="fas fa-fire"></i>
                     <strong>Camping</strong>
-                    <span>Glamping & api unggun</span>
-                </div>
-                <div class="hero-card">
-                    <i class="fas fa-hot-tub"></i>
-                    <strong>Relaksasi</strong>
-                    <span>Air panas alami</span>
+                    <span>Malam hangat & nyaman</span>
                 </div>
             </div>
         </aside>
