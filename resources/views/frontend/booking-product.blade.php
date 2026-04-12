@@ -41,7 +41,11 @@
         max-width: 100%;
     }
 
-    @media (max-width: 639px) {
+    @media (max-width: 600px) {
+        #calendar-panel {
+            padding: 0.9rem;
+        }
+
         .calendar-shell {
             width: calc(100% + 0.75rem);
             margin-left: -0.375rem;
@@ -49,8 +53,12 @@
         }
 
         #calendar-grid {
-            gap: 0.15rem;
-            background: #e8faf1;
+            gap: 0.2rem;
+        }
+
+        #calendar-grid > button,
+        #calendar-grid > div {
+            min-height: 4.5rem;
         }
     }
 
@@ -156,7 +164,7 @@
                 <div id="calendar-status" class="mt-5 hidden rounded-[1.75rem] border px-4 py-4 text-sm leading-7 sm:mt-4 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm"></div>
 
                 <div class="calendar-shell mx-auto mt-5 min-w-0 rounded-[2rem] border border-slate-200 bg-white p-3 shadow-[0_18px_40px_rgba(15,23,42,0.06)] sm:mt-4 sm:rounded-[28px] sm:border-emerald-100 sm:p-4">
-                    <div class="mb-2.5 grid grid-cols-7 gap-0 text-center text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-slate-500 sm:mb-3 sm:gap-1.5 sm:text-[11px] sm:tracking-[0.24em]">
+                    <div class="mb-2.5 grid grid-cols-7 gap-1 sm:gap-2 text-center text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-slate-500 sm:mb-3 sm:gap-1.5 sm:text-[11px] sm:tracking-[0.24em]">
                         <div class="py-2">Min</div>
                         <div class="py-2">Sen</div>
                         <div class="py-2">Sel</div>
@@ -165,9 +173,9 @@
                         <div class="py-2">Jum</div>
                         <div class="py-2">Sab</div>
                     </div>
-                    <div class="rounded-[1.75rem] border border-slate-200 bg-[#eefbf4] p-1.5 sm:rounded-[22px] sm:bg-slate-50 sm:p-2">
+                    <div class="rounded-[1.75rem] border border-slate-200 bg-emerald-50 p-1.5 sm:rounded-[22px] sm:bg-slate-50 sm:p-2">
                         <div class="overflow-hidden rounded-[1.45rem] bg-white">
-                            <div id="calendar-grid" class="grid grid-cols-7 gap-0 bg-[#e8faf1] sm:gap-px sm:bg-emerald-50/60"></div>
+                            <div id="calendar-grid" class="grid grid-cols-7 gap-1 sm:gap-2 bg-[#e8faf1] sm:gap-px sm:bg-emerald-50/60"></div>
                         </div>
                     </div>
                     <div class="mt-5 flex flex-wrap gap-2 text-xs font-medium text-slate-600 sm:mt-3 sm:text-[11px]">
@@ -432,17 +440,27 @@
             const firstDate = new Date(`${calendar.month}-01T00:00:00`);
             const firstWeekday = firstDate.getDay();
             const leadingEmptyCells = Array.from({ length: firstWeekday }, () => {
-                return '<div class="min-h-[56px] rounded-[0.9rem] bg-[#eefbf4] sm:min-h-[92px] sm:rounded-xl sm:bg-transparent"></div>';
-            }).join('');
+                return `
+                    <div class="min-h-[56px] sm:min-h-[92px] opacity-30 bg-slate-100 rounded-xl pointer-events-none"></div>
+                `;
+        }).join('');
 
             const dayCells = calendar.days.map((day) => {
+            const isCurrentMonth = day.date.startsWith(state.month);
+            if (!isCurrentMonth) {
+                return `
+                    <div class="min-h-[56px] sm:min-h-[92px] opacity-30 bg-slate-100 rounded-xl flex items-start justify-end p-2">
+                        <span class="text-xs text-slate-400">${day.day}</span>
+                    </div>
+                `;
+            }
                 const tones = getDayToneClasses(day);
                 const isSelected = visitDateInput.value === day.date;
                 const isClickable = day.status === 'available' && !day.is_past;
                 const isDisabled = !isClickable;
                 const buttonStateClass = isSelected
                     ? 'relative z-10 border-emerald-200 bg-white shadow-[0_0_0_2px_rgba(110,231,183,0.32)]'
-                    : 'border-[#dff5e8] bg-[#eefbf4]';
+                    : 'border border-emerald-100 bg-white shadow-sm hover:shadow-md';
                 const quotaLabel = day.status === 'blocked'
                     ? 'Tutup'
                     : day.status === 'full'
@@ -494,27 +512,25 @@
                         aria-label="${buttonLabel}"
                         title="${buttonLabel}"
                         ${isDisabled ? 'disabled' : ''}
-                        class="group min-h-[56px] rounded-[0.9rem] border px-1.5 py-1.5 text-left align-top transition ${tones.button} ${buttonStateClass} sm:min-h-[92px] sm:rounded-xl sm:border-transparent sm:bg-white sm:p-2"
+                        class="group flex min-h-[56px] flex-col rounded-[0.9rem] border px-1.5 py-1.5 text-left align-top transition ${tones.button} ${buttonStateClass} sm:min-h-[104px] sm:rounded-xl sm:border-transparent sm:bg-white sm:p-2"
                     >
-                        <div class="flex h-full flex-col justify-between sm:block">
-                            <div class="flex items-start justify-between gap-1.5 sm:gap-2">
-                                <div class="flex items-center gap-1 sm:gap-2">
-                                    <span class="text-[0.88rem] font-semibold ${mobileDayClass} sm:text-sm sm:font-bold sm:text-slate-900">${day.day}</span>
-                                </div>
-                                <span class="hidden rounded-full px-2 py-1 text-[9px] font-semibold leading-none sm:inline-flex sm:text-[10px] ${tones.badge}">
-                                    ${quotaLabel}
-                                </span>
-                                <span class="${mobileIndicatorClass} h-2 w-2 shrink-0 rounded-full sm:hidden"></span>
+                        <div class="flex items-start justify-between gap-1.5 sm:gap-2">
+                            <div class="flex items-center gap-1 sm:gap-2">
+                                <span class="text-[0.88rem] font-semibold ${mobileDayClass} sm:text-sm sm:font-bold sm:text-slate-900">${day.day}</span>
                             </div>
-                            <div class="mt-1 sm:hidden">
-                                <span class="${mobileQuotaValue !== '' ? 'inline-flex text-[0.6rem] font-semibold leading-none' : 'hidden'} ${tones.meta}">
-                                    ${mobileQuotaValue}
-                                </span>
-                            </div>
+                            <span class="hidden rounded-full px-2 py-1 text-[9px] font-semibold leading-none sm:inline-flex sm:text-[10px] ${tones.badge}">
+                                ${quotaLabel}
+                            </span>
+                            <span class="${mobileIndicatorClass} h-2 w-2 shrink-0 rounded-full sm:hidden"></span>
                         </div>
-                        <div class="hidden sm:block">
-                            <div class="mt-2 rounded-2xl ${desktopCardClass} px-2 py-1.5">
-                                <p class="text-[11px] font-semibold ${tones.meta}">
+                        <div class="mt-auto sm:hidden">
+                            <span class="${mobileQuotaValue !== '' ? 'inline-flex text-[0.6rem] font-semibold leading-none' : 'hidden'} ${tones.meta}">
+                                ${mobileQuotaValue}
+                            </span>
+                        </div>
+                        <div class="mt-auto hidden sm:block">
+                            <div class="rounded-2xl ${desktopCardClass} px-2 py-1.5">
+                                <p class="text-[11px] font-semibold leading-tight ${tones.meta}">
                                     ${day.status === 'available' ? `${day.remaining_capacity} slot` : desktopStatus}
                                 </p>
                             </div>
