@@ -221,7 +221,7 @@
                         <div class="grid gap-4 sm:grid-cols-2">
                             <label class="block">
                                 <span class="mb-2 block text-sm font-semibold text-slate-700">Nama lengkap</span>
-                                <input name="name" type="text" required minlength="3" maxlength="150" autocomplete="name" value="{{ old('name', $authUser?->name ?? '') }}" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" placeholder="Nama customer" />
+                                <input name="name" type="text" required minlength="3" maxlength="150" autocomplete="name" value="{{ old('name', $authUser?->name ?? '') }}" readonly class="w-full rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-slate-500 outline-none" placeholder="Nama customer" />
                             </label>
                             <label class="block">
                                 <span class="mb-2 block text-sm font-semibold text-slate-700">No. WhatsApp</span>
@@ -230,8 +230,10 @@
                                     maxlength="14" 
                                     autocomplete="tel" 
                                     pattern="^08[0-9]{8,13}$"
+                                    value="{{ old('phone', $authUser?->phone ?? '') }}"
                                     title=""
-                                    class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400"
+                                    readonly
+                                    class="w-full rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-slate-500 outline-none"
                                     placeholder="081234567890"
                                     />
                             </label>
@@ -244,7 +246,7 @@
                             </label>
                             <label class="block">
                                 <span class="mb-2 block text-sm font-semibold text-slate-700">Jumlah peserta</span>
-                                <input id="guest-input" name="guests" type="number" required min="1" step="1" value="2" class="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none transition focus:border-emerald-400" />
+                                <input id="guest-input" name="guests" type="number" required min="1" step="1" value="2" readonly class="w-full rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-slate-500 outline-none" />
                             </label>
                         </div>
 
@@ -794,7 +796,11 @@
                         </p>
                         <div class="mt-4 flex items-end justify-between gap-3">
                             <p class="text-base font-bold text-slate-900">Rp ${currency(product.price)}<span class="text-sm font-medium text-slate-500"> ${product.price_label}</span></p>
-                            <span class="rounded-2xl px-4 py-2.5 text-sm font-semibold ${selected ? 'bg-emerald-700 text-white shadow-sm' : 'bg-slate-100 text-slate-700'}">
+                            <span class="rounded-2xl border px-4 py-2.5 text-sm font-semibold ${selected
+                                ? 'border-emerald-700 bg-emerald-700 text-white shadow-sm'
+                                : eligible
+                                    ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                                    : 'border-amber-200 bg-amber-50 text-amber-800'}">
                                 ${selected ? 'Dipilih' : eligible ? 'Tambah' : 'Tidak Tersedia'}
                             </span>
                         </div>

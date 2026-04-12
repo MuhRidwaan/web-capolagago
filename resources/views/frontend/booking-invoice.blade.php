@@ -52,6 +52,7 @@
             border-radius: 18px;
             box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
             padding: 36px 42px 40px;
+            overflow: hidden;
         }
         .topline {
             display: flex;
@@ -129,6 +130,11 @@
             font-family: Arial, sans-serif;
             margin-top: 8px;
         }
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
         th, td {
             border: 1px solid var(--border);
             padding: 12px 10px;
@@ -183,6 +189,74 @@
         }
         .muted { color: var(--muted); }
 
+        @media (max-width: 767px) {
+            .shell {
+                padding: 16px 12px 28px;
+            }
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .toolbar a,
+            .toolbar button {
+                width: 100%;
+                text-align: center;
+            }
+            .paper {
+                border-radius: 16px;
+                padding: 20px 16px 24px;
+            }
+            .topline,
+            .summary,
+            .bottom {
+                grid-template-columns: 1fr;
+                display: grid;
+                gap: 16px;
+            }
+            .topline {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+            }
+            .invoice-title {
+                text-align: left;
+            }
+            .invoice-title h1 {
+                font-size: 24px;
+                line-height: 1.15;
+            }
+            .brand {
+                font-size: 22px;
+            }
+            .value-strong {
+                font-size: 20px;
+                line-height: 1.2;
+            }
+            .summary .card[style] {
+                text-align: left !important;
+            }
+            .table-wrap table {
+                min-width: 620px;
+            }
+            th,
+            td {
+                font-size: 13px;
+                padding: 10px 8px;
+            }
+            .totals-row {
+                font-size: 14px;
+            }
+            .totals-row.total {
+                font-size: 16px;
+            }
+            .bank,
+            .note,
+            .small {
+                font-size: 13px;
+                line-height: 1.7;
+            }
+        }
+
         @media print {
             body { background: #fff; }
             .shell { padding: 0; max-width: none; }
@@ -234,26 +308,28 @@
             </div>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Deskripsi Paket Tour</th>
-                    <th class="num">Peserta</th>
-                    <th class="num">Harga Paket</th>
-                    <th class="num">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($items as $item)
+        <div class="table-wrap">
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ $item->product_name_snapshot }}{{ $item->is_addon ? ' (Add-on)' : '' }}</td>
-                        <td class="num">{{ number_format((float) $item->quantity, 0, ',', '.') }}</td>
-                        <td class="num">Rp {{ number_format((float) $item->unit_price, 0, ',', '.') }}</td>
-                        <td class="num">Rp {{ number_format((float) $item->subtotal, 0, ',', '.') }}</td>
+                        <th>Deskripsi Paket Tour</th>
+                        <th class="num">Peserta</th>
+                        <th class="num">Harga Paket</th>
+                        <th class="num">Total</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach ($items as $item)
+                        <tr>
+                            <td>{{ $item->product_name_snapshot }}{{ $item->is_addon ? ' (Add-on)' : '' }}</td>
+                            <td class="num">{{ number_format((float) $item->quantity, 0, ',', '.') }}</td>
+                            <td class="num">Rp {{ number_format((float) $item->unit_price, 0, ',', '.') }}</td>
+                            <td class="num">Rp {{ number_format((float) $item->subtotal, 0, ',', '.') }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
         <div class="bottom">
             <div>

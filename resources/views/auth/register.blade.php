@@ -466,6 +466,14 @@
 
                     <div class="field">
                         <div class="input-shell">
+                            <i class="fas fa-phone-alt field-icon"></i>
+                            <div class="floating-label">No. HP <span class="required">*</span></div>
+                            <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" placeholder="081234567890" inputmode="tel" maxlength="14" autocomplete="tel" pattern="^08[0-9]{8,13}$" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="input-shell">
                             <i class="fas fa-lock field-icon"></i>
                             <div class="floating-label">Kata Sandi <span class="required">*</span></div>
                             <input id="password" type="password" name="password" placeholder="Buat password" autocomplete="new-password" required>

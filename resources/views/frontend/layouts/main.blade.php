@@ -18,10 +18,23 @@
             --accent: #14b8a6;
         }
 
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             background-color: var(--bg);
             color: var(--fg);
-            overflow-x: clip;
+            overflow-x: hidden;
         }
 
         .bg-background { background-color: var(--bg); }
@@ -33,6 +46,44 @@
         .bg-primary { background-color: var(--primary); }
         .bg-accent { background-color: var(--accent); }
         .shadow-xs { box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06); }
+
+        img,
+        svg,
+        video,
+        canvas,
+        iframe {
+            max-width: 100%;
+        }
+
+        input,
+        select,
+        textarea,
+        button {
+            max-width: 100%;
+        }
+
+        @media (max-width: 767px) {
+            [class*="grid-cols-["] {
+                grid-template-columns: minmax(0, 1fr) !important;
+            }
+
+            [class*="max-w-["],
+            [class*="min-w-["] {
+                min-width: 0;
+            }
+
+            [class*="px-8"] {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            [class*="md:px-8"],
+            [class*="lg:px-8"],
+            [class*="xl:px-8"] {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+        }
     </style>
     @stack('head')
 </head>

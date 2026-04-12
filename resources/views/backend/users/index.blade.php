@@ -61,12 +61,13 @@
                                     <th>Nama</th>
                                     <th>Email</th>
                                     <th>Role</th>
-                                    <th style="width: 140px;">Aksi</th>
+                                    <th>Status</th>
+                                    <th style="width: 180px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($users as $user)
-                                    <tr>
+                                    <tr class="{{ $user->is_active ? '' : 'table-secondary text-muted' }}">
                                         <td>{{ $users->firstItem() + $loop->index }}</td>
                                         <td>{{ $user->name }}</td>
                                         <td>{{ $user->email }}</td>
@@ -78,27 +79,44 @@
                                             @endforelse
                                         </td>
                                         <td>
+                                            <span class="badge {{ $user->is_active ? 'badge-success' : 'badge-secondary' }}">
+                                                {{ $user->is_active ? 'Aktif' : 'Nonaktif' }}
+                                            </span>
+                                        </td>
+                                        <td>
                                             <div class="capolaga-action-group">
                                                 <a href="{{ route('admin.users.edit', $user) }}"
                                                     class="btn btn-warning btn-sm capolaga-icon-btn" title="Edit user">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <form action="{{ route('admin.users.destroy', $user) }}" method="POST"
-                                                    class="d-inline"
-                                                    onsubmit="return confirm('Yakin ingin menghapus user ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn btn-danger btn-sm capolaga-icon-btn" type="submit"
-                                                        title="Hapus user">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
+                                                @if ($user->is_active)
+                                                    <form action="{{ route('admin.users.destroy', $user) }}" method="POST"
+                                                        class="d-inline"
+                                                        onsubmit="return confirm('Yakin ingin menonaktifkan user ini? User tidak akan bisa login, tetapi riwayat datanya tetap tersimpan.')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="btn btn-danger btn-sm" type="submit"
+                                                            title="Nonaktifkan user">
+                                                            Nonaktifkan
+                                                        </button>
+                                                    </form>
+                                                @else
+                                                    <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST"
+                                                        class="d-inline"
+                                                        onsubmit="return confirm('Aktifkan kembali user ini? User akan bisa login lagi.')">
+                                                        @csrf
+                                                        <button class="btn btn-success btn-sm" type="submit"
+                                                            title="Aktifkan user">
+                                                            Aktifkan
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="text-center text-muted p-4">Belum ada data user.</td>
+                                        <td colspan="6" class="text-center text-muted p-4">Belum ada data user.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

@@ -23,7 +23,7 @@
     $navInactiveClass = 'inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium text-slate-500 transition-colors hover:text-slate-900';
 @endphp
 
-<header class="fixed left-0 right-0 top-0 z-50 border-b border-slate-200/70 bg-white/95 backdrop-blur-sm transition-all duration-300">
+<header class="fixed left-0 right-0 top-0 z-50 bg-white backdrop-blur-sm transition-all duration-300">
     <div class="mx-auto max-w-[1920px] px-4 md:px-8">
         <nav class="flex h-14 items-center justify-between md:h-16">
             <a class="flex items-center gap-2" href="{{ $homeUrl }}">
@@ -52,10 +52,10 @@
                 </form>
                 @if ($currentUser)
                     @if ($currentUser->hasAnyRole(['Super Admin', 'Mitra']))
-                        <a class="inline-flex items-center justify-center rounded-md bg-[#1a3a4a] px-3 py-2 text-sm font-medium text-white transition hover:bg-[#1a3a4a]/90" href="{{ $adminUrl }}">Dashboard</a>
+                        <a class="inline-flex items-center justify-center rounded-md bg-teal-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-teal-700" href="{{ $adminUrl }}">Dashboard</a>
                     @else
                         <details class="relative">
-                            <summary class="inline-flex cursor-pointer list-none items-center justify-center rounded-md bg-[#1a3a4a] px-3 py-2 text-sm font-medium text-white transition hover:bg-[#1a3a4a]/90">
+                            <summary class="inline-flex cursor-pointer list-none items-center justify-center rounded-md bg-teal-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-teal-700">
                                 Profile
                             </summary>
                             <div class="absolute right-0 top-full z-50 mt-2 w-44 overflow-hidden rounded-2xl border border-slate-200 bg-white py-2 shadow-xl">
@@ -75,7 +75,7 @@
                         </button>
                     </form>
                 @else
-                    <a class="inline-flex items-center justify-center rounded-md bg-[#1a3a4a] px-3 py-2 text-sm font-medium text-white transition hover:bg-[#1a3a4a]/90" href="{{ route('login') }}">Login</a>
+                    <a class="inline-flex items-center justify-center rounded-md bg-teal-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-teal-700" href="{{ route('login') }}">Login</a>
                 @endif
             </div>
 
@@ -112,10 +112,10 @@
 
                     @if ($currentUser)
                         @if ($currentUser->hasAnyRole(['Super Admin', 'Mitra']))
-                            <a class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-[#1a3a4a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1a3a4a]/90" href="{{ $adminUrl }}">Dashboard</a>
+                            <a class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-teal-700" href="{{ $adminUrl }}">Dashboard</a>
                         @else
                             <div class="mt-4 space-y-2">
-                                <a class="inline-flex w-full items-center justify-center rounded-xl bg-[#1a3a4a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1a3a4a]/90" href="{{ $profileUrl }}">Profile</a>
+                                <a class="inline-flex w-full items-center justify-center rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-teal-700" href="{{ $profileUrl }}">Profile</a>
                                 <a class="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50" href="{{ $profileOrdersUrl }}">Pesanan</a>
                             </div>
                         @endif
@@ -126,7 +126,7 @@
                             </button>
                         </form>
                     @else
-                        <a class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-[#1a3a4a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#1a3a4a]/90" href="{{ route('login') }}">Login</a>
+                        <a class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-teal-700" href="{{ route('login') }}">Login</a>
                     @endif
                 </div>
             </details>

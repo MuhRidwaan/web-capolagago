@@ -6,7 +6,7 @@
     $ctaBackgroundUrl = asset('images/glamping.jpg');
 @endphp
 
-<section id="about" class="scroll-mt-24 bg-[#264f63] text-white">
+<section id="about" class="scroll-mt-24 overflow-x-hidden bg-[#264f63] text-white">
     <div class="relative overflow-hidden border-t border-white/10">
         <div class="absolute inset-0">
             <img src="{{ $ctaBackgroundUrl }}" alt="" class="h-full w-full object-cover object-center opacity-45" />
@@ -73,7 +73,7 @@
                             </span>
                             <div>
                                 <p class="text-xs text-white/65">Telepon</p>
-                                <a href="tel:+6281234567890" class="mt-1 block text-sm font-medium text-white/90 transition hover:text-white">+62 812-3456-7890</a>
+                                <a href="tel:+628123456789" class="mt-1 block text-sm font-medium text-white/90 transition hover:text-white">+62 812-3456-7890</a>
                             </div>
                         </div>
                         <div class="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 sm:gap-4">
@@ -85,7 +85,7 @@
                             </span>
                             <div>
                                 <p class="text-xs text-white/65">Email</p>
-                                <a href="mailto:info@capolagago.com" class="mt-1 block text-sm font-medium text-white/90 transition hover:text-white">info@capolagago.com</a>
+                                <a href="mailto:Capolagago@gmail.com" class="mt-1 block text-sm font-medium text-white/90 transition hover:text-white">info@capolagago.com</a>
                             </div>
                         </div>
                     </div>
@@ -115,11 +115,11 @@
                     <ul class="mt-5 space-y-3 text-sm text-white/70">
                         <li class="flex items-center gap-3">
                             <span class="text-[#f2c14e]">●</span>
-                            <a href="tel:+6281234567890" class="transition hover:text-white">+6285624554616</a>
+                            <a href="tel:+6281234567890" class="transition hover:text-white">+62 812-3456-7890</a>
                         </li>
                         <li class="flex items-center gap-3">
                             <span class="text-[#f2c14e]">●</span>
-                            <a href="mailto:agrotourismbandung@gmail.com" class="transition hover:text-white">agrotourismbandung@gmail.com</a>
+                            <a href="mailto:Capolagago@gmail.com" class="transition hover:text-white">Capolagago@gmail.com</a>
                         </li>
                         <li class="flex items-center gap-3">
                             <span class="text-[#f2c14e]">●</span>

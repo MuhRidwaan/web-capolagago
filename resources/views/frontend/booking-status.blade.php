@@ -47,15 +47,15 @@
         </div>
 
         <div class="mx-auto max-w-[560px]">
-            <div class="mb-5 flex items-start gap-3">
-                <a href="{{ route('frontend.orders') }}" class="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-50">
-                    <span aria-hidden="true">&larr;</span>
-                </a>
-                <div>
-                    <h1 class="text-[2rem] font-bold tracking-tight text-slate-900">Lanjutkan Pembayaran</h1>
-                    <p class="mt-1 text-sm text-slate-500">Booking {{ $booking->booking_code }}</p>
+                <div class="mb-5 flex items-start gap-3">
+                    <a href="{{ route('frontend.orders') }}" class="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:bg-slate-50">
+                        <span aria-hidden="true">&larr;</span>
+                    </a>
+                    <div class="min-w-0">
+                        <h1 class="text-[1.8rem] font-bold tracking-tight text-slate-900 sm:text-[2rem]">Lanjutkan Pembayaran</h1>
+                        <p class="mt-1 text-sm text-slate-500">Booking {{ $booking->booking_code }}</p>
+                    </div>
                 </div>
-            </div>
 
             @if (session('review_success'))
                 <div class="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
@@ -77,21 +77,21 @@
 
             <section class="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm">
                 <div class="divide-y divide-slate-200 text-sm">
-                    <div class="flex items-center justify-between gap-4 px-4 py-4">
+                    <div class="flex flex-col gap-1 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                         <span class="text-slate-500">Kode Booking</span>
                         <span class="font-semibold text-slate-900">{{ $booking->booking_code }}</span>
                     </div>
-                    <div class="flex items-center justify-between gap-4 px-4 py-4">
+                    <div class="flex flex-col gap-1 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                         <span class="text-slate-500">Nama Paket</span>
-                        <span class="text-right font-semibold text-slate-900">{{ $mainPackage->product_name_snapshot ?? 'Paket Wisata' }}</span>
+                        <span class="font-semibold text-slate-900 sm:text-right">{{ $mainPackage->product_name_snapshot ?? 'Paket Wisata' }}</span>
                     </div>
-                    <div class="flex items-center justify-between gap-4 px-4 py-4">
+                    <div class="flex flex-col gap-1 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                         <span class="text-slate-500">Tanggal Kunjungan</span>
                         <span class="font-semibold text-slate-900">{{ \Illuminate\Support\Carbon::parse($booking->visit_date)->translatedFormat('d M Y') }}</span>
                     </div>
-                    <div class="flex items-center justify-between gap-4 px-4 py-4">
+                    <div class="flex flex-col gap-1 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                         <span class="text-slate-500">Total Bayar</span>
-                        <span class="text-right text-[1.65rem] font-bold text-emerald-700">Rp {{ number_format((float) $booking->total_amount, 0, ',', '.') }}</span>
+                        <span class="text-[1.45rem] font-bold text-emerald-700 sm:text-right sm:text-[1.65rem]">Rp {{ number_format((float) $booking->total_amount, 0, ',', '.') }}</span>
                     </div>
                 </div>
             </section>
@@ -112,8 +112,8 @@
 
                 @if ($payment)
                     <div class="space-y-3">
-                        <div class="flex items-center justify-between gap-4 rounded-[18px] border border-slate-200 bg-white px-4 py-4">
-                            <div class="flex items-center gap-3">
+                        <div class="flex flex-col gap-3 rounded-[18px] border border-slate-200 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                            <div class="flex min-w-0 items-center gap-3">
                                 <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
                                     @if (($payment->payment_type ?? '') === 'bank_transfer' || $payment->va_number)
                                         <span aria-hidden="true">🏦</span>
@@ -123,12 +123,12 @@
                                         <span aria-hidden="true">💳</span>
                                     @endif
                                 </span>
-                                <div>
+                                <div class="min-w-0">
                                     <p class="font-semibold text-slate-900">{{ $payment->payment_method_name ?? 'Metode Pembayaran' }}</p>
-                                    <p class="mt-1 text-xs text-slate-500">{{ $payment->va_number ?: ($payment->payment_code ?? 'Referensi pembayaran tersedia di invoice') }}</p>
+                                    <p class="mt-1 break-all text-xs text-slate-500">{{ $payment->va_number ?: ($payment->payment_code ?? 'Referensi pembayaran tersedia di invoice') }}</p>
                                 </div>
                             </div>
-                            <span class="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-700">
+                            <span class="w-fit rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-700">
                                 {{ strtoupper((string) ($payment->payment_type ?? 'pay')) }}
                             </span>
                         </div>
@@ -192,13 +192,13 @@
 
         <div class="mx-auto mt-10 max-w-[920px] grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
             <section class="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                <div class="flex items-center justify-between gap-4">
-                    <div>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                    <div class="min-w-0">
                         <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Ringkasan Booking</p>
                         <h2 class="mt-2 text-xl font-bold text-slate-900">Detail Pesanan</h2>
                     </div>
                     @if ($payment?->expired_at)
-                        <div class="text-right">
+                        <div class="sm:text-right">
                             <p class="text-xs uppercase tracking-[0.18em] text-slate-400">Batas Bayar</p>
                             <p class="mt-1 text-sm font-semibold text-slate-900">{{ \Illuminate\Support\Carbon::parse($payment->expired_at)->translatedFormat('d M Y, H:i') }}</p>
                         </div>
@@ -208,14 +208,14 @@
                 <div class="mt-5 rounded-[20px] border border-slate-200">
                     <div class="divide-y divide-slate-200">
                         @foreach ($items as $item)
-                            <div class="flex items-start justify-between gap-4 px-4 py-4">
+                            <div class="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                                 <div class="min-w-0">
                                     <p class="font-semibold text-slate-900">{{ $item->product_name_snapshot }}</p>
                                     <p class="mt-1 text-xs text-slate-500">
                                         {{ $item->is_addon ? 'Add-on' : 'Produk utama' }} • {{ $item->quantity }} x Rp {{ number_format((float) $item->unit_price, 0, ',', '.') }}
                                     </p>
                                 </div>
-                                <p class="shrink-0 text-sm font-bold text-slate-900">Rp {{ number_format((float) $item->subtotal, 0, ',', '.') }}</p>
+                                <p class="text-sm font-bold text-slate-900 sm:shrink-0">Rp {{ number_format((float) $item->subtotal, 0, ',', '.') }}</p>
                             </div>
                         @endforeach
                     </div>
@@ -407,7 +407,7 @@
                     setFeedback('Pembayaran terkonfirmasi! Halaman akan direfresh...', 'success');
                     setTimeout(() => window.location.reload(), 1500);
                 } else if (result.status === 'pending') {
-                    setFeedback('Pembayaran masih pending di Midtrans.', 'warning');
+                    setFeedback('Pembayaran masih pending.', 'warning');
                 } else {
                     setFeedback(result.message || 'Status: ' + result.status, 'warning');
                 }

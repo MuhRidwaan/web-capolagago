@@ -47,6 +47,11 @@
             margin-left: -0.375rem;
             margin-right: -0.375rem;
         }
+
+        #calendar-grid {
+            gap: 0.15rem;
+            background: #e8faf1;
+        }
     }
 
     @media (min-width: 1024px) {
@@ -132,59 +137,58 @@
                 </div>
             </div>
 
-            <div id="calendar-panel" class="mt-4 hidden rounded-3xl border border-slate-200 bg-slate-50 p-3 sm:p-3.5">
+            <div id="calendar-panel" class="mt-4 hidden rounded-[2rem] border border-slate-200 bg-[#f8fafc] p-3.5 shadow-[0_18px_45px_rgba(148,163,184,0.12)] sm:rounded-3xl sm:bg-slate-50 sm:p-4">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Kalender Kuota</p>
-                    <p class="mt-1 text-[11px] text-slate-600 sm:text-xs">Klik tanggal untuk memilih kunjungan dan lihat sisa kuota.</p>
+                    <p class="mt-3 text-2xl font-semibold tracking-tight text-slate-900 sm:mt-2 sm:text-xl" id="calendar-label">Memuat kalender...</p>
+                    <p class="mt-2 text-sm leading-6 text-slate-600 sm:mt-1 sm:text-xs">Klik tanggal untuk memilih kunjungan dan lihat sisa kuota.</p>
                 </div>
 
-                <div id="calendar-status" class="mt-3 hidden rounded-2xl border px-3 py-2.5 text-xs"></div>
+                <div class="mt-5 flex items-center gap-4 sm:mt-4 sm:justify-between">
+                    <button type="button" id="calendar-prev-button" class="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-base font-semibold text-slate-700 shadow-sm transition hover:border-emerald-300 hover:text-emerald-700 sm:h-10 sm:w-10 sm:rounded-full sm:text-sm">
+                        &larr;
+                    </button>
+                    <button type="button" id="calendar-next-button" class="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-base font-semibold text-slate-700 shadow-sm transition hover:border-emerald-300 hover:text-emerald-700 sm:h-10 sm:w-10 sm:rounded-full sm:text-sm">
+                        &rarr;
+                    </button>
+                </div>
 
-                <div class="calendar-shell mx-auto mt-4 min-w-0 rounded-[24px] border border-emerald-100 bg-white p-2.5 shadow-[0_18px_40px_rgba(15,23,42,0.06)] sm:rounded-[28px] sm:p-4">
-                    <div class="mb-2.5 flex items-center justify-between gap-2 sm:mb-3 sm:gap-3">
-                        <button type="button" id="calendar-prev-button" class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-sm text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700 sm:h-9 sm:w-9">
-                            &larr;
-                        </button>
-                        <div class="text-center">
-                            <h3 id="calendar-label" class="text-base font-bold text-slate-900 sm:text-lg">Memuat kalender...</h3>
-                        </div>
-                        <button type="button" id="calendar-next-button" class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-sm text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700 sm:h-9 sm:w-9">
-                            &rarr;
-                        </button>
+                <div id="calendar-status" class="mt-5 hidden rounded-[1.75rem] border px-4 py-4 text-sm leading-7 sm:mt-4 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm"></div>
+
+                <div class="calendar-shell mx-auto mt-5 min-w-0 rounded-[2rem] border border-slate-200 bg-white p-3 shadow-[0_18px_40px_rgba(15,23,42,0.06)] sm:mt-4 sm:rounded-[28px] sm:border-emerald-100 sm:p-4">
+                    <div class="mb-2.5 grid grid-cols-7 gap-0 text-center text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-slate-500 sm:mb-3 sm:gap-1.5 sm:text-[11px] sm:tracking-[0.24em]">
+                        <div class="py-2">Min</div>
+                        <div class="py-2">Sen</div>
+                        <div class="py-2">Sel</div>
+                        <div class="py-2">Rab</div>
+                        <div class="py-2">Kam</div>
+                        <div class="py-2">Jum</div>
+                        <div class="py-2">Sab</div>
                     </div>
-                    <div class="mb-2.5 grid grid-cols-7 gap-0.5 text-center text-[9px] font-semibold text-slate-500 sm:mb-3 sm:gap-1.5 sm:text-[11px]">
-                        <div class="py-1">Min</div>
-                        <div class="py-1">Sen</div>
-                        <div class="py-1">Sel</div>
-                        <div class="py-1">Rab</div>
-                        <div class="py-1">Kam</div>
-                        <div class="py-1">Jum</div>
-                        <div class="py-1">Sab</div>
-                    </div>
-                    <div class="rounded-[20px] border border-slate-200 bg-slate-50 p-1 sm:rounded-[22px] sm:p-2">
-                        <div class="overflow-hidden rounded-[18px] bg-white">
-                            <div id="calendar-grid" class="grid grid-cols-7 gap-px bg-emerald-50/50"></div>
+                    <div class="rounded-[1.75rem] border border-slate-200 bg-[#eefbf4] p-1.5 sm:rounded-[22px] sm:bg-slate-50 sm:p-2">
+                        <div class="overflow-hidden rounded-[1.45rem] bg-white">
+                            <div id="calendar-grid" class="grid grid-cols-7 gap-0 bg-[#e8faf1] sm:gap-px sm:bg-emerald-50/60"></div>
                         </div>
                     </div>
-                    <div class="mt-3 grid grid-cols-2 gap-2 text-[10px] font-medium text-slate-600 sm:flex sm:flex-wrap sm:text-[11px]">
-                        <span class="inline-flex items-center justify-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1.5 text-emerald-700 sm:justify-start">
+                    <div class="mt-5 flex flex-wrap gap-2 text-xs font-medium text-slate-600 sm:mt-3 sm:text-[11px]">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-white px-3 py-2 text-emerald-700 shadow-sm sm:justify-start sm:px-2.5 sm:py-1.5">
                             <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
                             Tersedia
                         </span>
-                        <span class="inline-flex items-center justify-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-2.5 py-1.5 text-amber-700 sm:justify-start">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-amber-100 bg-white px-3 py-2 text-amber-700 shadow-sm sm:justify-start sm:px-2.5 sm:py-1.5">
                             <span class="h-2 w-2 rounded-full bg-amber-500"></span>
-                            Penuh
+                            Kuota tipis / penuh
                         </span>
-                        <span class="inline-flex items-center justify-center gap-1.5 rounded-full border border-rose-100 bg-rose-50 px-2.5 py-1.5 text-rose-700 sm:justify-start">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-rose-100 bg-white px-3 py-2 text-rose-700 shadow-sm sm:justify-start sm:px-2.5 sm:py-1.5">
                             <span class="h-2 w-2 rounded-full bg-rose-500"></span>
-                            Tidak tersedia
+                            Diblokir
                         </span>
-                        <span class="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-slate-600 sm:justify-start">
+                        <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-slate-600 shadow-sm sm:justify-start sm:px-2.5 sm:py-1.5">
                             <span class="h-2 w-2 rounded-full bg-slate-400"></span>
                             Belum diatur
                         </span>
                     </div>
-                    <p class="mt-3 text-sm leading-6 text-slate-500">
+                    <p class="mt-4 text-sm leading-6 text-slate-500 sm:mt-3">
                         Pilih tanggal yang tersedia untuk kunjungan Anda.
                     </p>
                 </div>
@@ -192,10 +196,12 @@
 
             <div id="availability-feedback" class="mt-5 hidden rounded-2xl border px-4 py-3 text-sm"></div>
 
-            <div class="mt-6 flex justify-end">
-                <a id="continue-booking-link" href="{{ route('ticket.booking', ['product' => $product->slug, 'date' => $prefilledVisitDate, 'guests' => $prefilledGuests]) }}" aria-disabled="true" class="pointer-events-none inline-flex w-full items-center justify-center rounded-2xl bg-slate-300 px-5 py-3 text-sm font-semibold text-white transition sm:w-auto">
+            <div class="sticky bottom-0 z-20 -mx-1 mt-6 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc] to-[#f8fafc]/0 px-1 pb-[calc(0.35rem+env(safe-area-inset-bottom))] pt-6 sm:static sm:mx-0 sm:bg-none sm:p-0">
+                <div class="flex justify-end">
+                <a id="continue-booking-link" href="{{ route('ticket.booking', ['product' => $product->slug, 'date' => $prefilledVisitDate, 'guests' => $prefilledGuests]) }}" aria-disabled="true" class="pointer-events-none inline-flex min-h-[4.4rem] w-[74%] items-center justify-center rounded-[1.75rem] bg-slate-300 px-6 py-4 text-[1.02rem] font-semibold text-white shadow-[0_20px_40px_rgba(148,163,184,0.28)] transition sm:min-h-0 sm:w-auto sm:rounded-2xl sm:px-5 sm:py-3 sm:text-sm sm:shadow-none">
                     Lanjut ke Booking
                 </a>
+                </div>
             </div>
             </section>
         </div>
@@ -426,7 +432,7 @@
             const firstDate = new Date(`${calendar.month}-01T00:00:00`);
             const firstWeekday = firstDate.getDay();
             const leadingEmptyCells = Array.from({ length: firstWeekday }, () => {
-                return '<div class="min-h-[54px] rounded-xl bg-transparent sm:min-h-[92px]"></div>';
+                return '<div class="min-h-[56px] rounded-[0.9rem] bg-[#eefbf4] sm:min-h-[92px] sm:rounded-xl sm:bg-transparent"></div>';
             }).join('');
 
             const dayCells = calendar.days.map((day) => {
@@ -435,8 +441,8 @@
                 const isClickable = day.status === 'available' && !day.is_past;
                 const isDisabled = !isClickable;
                 const buttonStateClass = isSelected
-                    ? 'relative z-10 border-emerald-400 bg-emerald-50 shadow-[0_0_0_2px_rgba(16,185,129,0.14)]'
-                    : '';
+                    ? 'relative z-10 border-emerald-200 bg-white shadow-[0_0_0_2px_rgba(110,231,183,0.32)]'
+                    : 'border-[#dff5e8] bg-[#eefbf4]';
                 const quotaLabel = day.status === 'blocked'
                     ? 'Tutup'
                     : day.status === 'full'
@@ -444,16 +450,6 @@
                         : day.status === 'default'
                             ? 'Info'
                             : `${day.remaining_capacity}`;
-                const showDesktopBadge = day.status !== 'available';
-                const mobileStatus = day.status === 'available'
-                    ? `${day.remaining_capacity} slot`
-                    : day.status === 'full'
-                        ? 'Kuota habis'
-                        : day.status === 'blocked'
-                            ? 'Ditutup'
-                            : day.is_past
-                                ? 'Lewat'
-                                : 'Belum diatur';
                 const desktopStatus = day.status === 'available'
                     ? `Kuota tersedia: ${day.remaining_capacity}`
                     : day.status === 'full'
@@ -464,22 +460,6 @@
                                 ? 'Tanggal lewat'
                                 : 'Belum diatur';
                 const buttonLabel = `${day.date} - ${desktopStatus}`;
-                const mobileBadge = day.status === 'available'
-                    ? `${day.remaining_capacity}`
-                    : day.status === 'full'
-                        ? '!'
-                        : day.status === 'blocked'
-                            ? 'x'
-                            : day.is_past
-                                ? '-'
-                                : '?';
-                const mobileBadgeClass = day.status === 'available'
-                    ? 'bg-emerald-100 text-emerald-700'
-                    : day.status === 'full'
-                        ? 'bg-amber-100 text-amber-700'
-                        : day.status === 'blocked'
-                            ? 'bg-rose-100 text-rose-700'
-                            : 'bg-slate-200 text-slate-500';
                 const mobileDayClass = day.is_past
                     ? 'text-slate-400'
                     : day.status === 'blocked'
@@ -489,14 +469,14 @@
                             : day.status === 'available'
                                 ? 'text-emerald-900'
                                 : 'text-slate-600';
-                const mobileQuotaText = day.status === 'available'
+                const mobileQuotaValue = day.status === 'available'
                     ? `${day.remaining_capacity}`
                     : day.status === 'full'
-                        ? 'Penuh'
-                        : day.status === 'blocked'
-                            ? 'Tutup'
-                            : '';
-                const showMobileQuotaText = day.status === 'available' || day.status === 'full' || day.status === 'blocked';
+                        ? '0'
+                        : '';
+                const mobileIndicatorClass = day.is_past || day.status === 'default'
+                    ? 'hidden'
+                    : `inline-flex ${tones.accent}`;
                 const desktopCardClass = day.is_past
                     ? 'bg-slate-50'
                     : day.status === 'available'
@@ -514,23 +494,24 @@
                         aria-label="${buttonLabel}"
                         title="${buttonLabel}"
                         ${isDisabled ? 'disabled' : ''}
-                        class="group min-h-[60px] rounded-[10px] border border-transparent bg-white px-1.5 py-1 text-left align-top transition ${tones.button} ${buttonStateClass} sm:min-h-[92px] sm:rounded-xl sm:p-2"
+                        class="group min-h-[56px] rounded-[0.9rem] border px-1.5 py-1.5 text-left align-top transition ${tones.button} ${buttonStateClass} sm:min-h-[92px] sm:rounded-xl sm:border-transparent sm:bg-white sm:p-2"
                     >
-                        <div class="flex items-start justify-between gap-1 sm:gap-2">
-                            <div class="flex items-center gap-1 sm:gap-2">
-                                <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full ${tones.accent} sm:h-2.5 sm:w-2.5"></span>
-                                <span class="text-[10px] font-bold ${mobileDayClass} sm:text-sm sm:text-slate-900">${day.day}</span>
+                        <div class="flex h-full flex-col justify-between sm:block">
+                            <div class="flex items-start justify-between gap-1.5 sm:gap-2">
+                                <div class="flex items-center gap-1 sm:gap-2">
+                                    <span class="text-[0.88rem] font-semibold ${mobileDayClass} sm:text-sm sm:font-bold sm:text-slate-900">${day.day}</span>
+                                </div>
+                                <span class="hidden rounded-full px-2 py-1 text-[9px] font-semibold leading-none sm:inline-flex sm:text-[10px] ${tones.badge}">
+                                    ${quotaLabel}
+                                </span>
+                                <span class="${mobileIndicatorClass} h-2 w-2 shrink-0 rounded-full sm:hidden"></span>
                             </div>
-                            <span class="${showDesktopBadge ? 'hidden rounded-full px-2 py-1 text-[9px] font-semibold leading-none sm:inline-flex sm:text-[10px]' : 'hidden'} ${tones.badge}">
-                                ${quotaLabel}
-                            </span>
-                            <span class="inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[7px] font-bold leading-none ${mobileBadgeClass} sm:hidden">
-                                ${mobileBadge}
-                            </span>
+                            <div class="mt-1 sm:hidden">
+                                <span class="${mobileQuotaValue !== '' ? 'inline-flex text-[0.6rem] font-semibold leading-none' : 'hidden'} ${tones.meta}">
+                                    ${mobileQuotaValue}
+                                </span>
+                            </div>
                         </div>
-                        <p class="${showMobileQuotaText ? 'mt-1 block text-[8px] font-semibold leading-none sm:hidden' : 'hidden'} ${tones.meta}">
-                            ${mobileQuotaText}
-                        </p>
                         <div class="hidden sm:block">
                             <div class="mt-2 rounded-2xl ${desktopCardClass} px-2 py-1.5">
                                 <p class="text-[11px] font-semibold ${tones.meta}">

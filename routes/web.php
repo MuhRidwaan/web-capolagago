@@ -113,6 +113,8 @@ Route::middleware('auth')->group(function () {
         ->name('frontend.profile.update');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])
         ->name('frontend.profile.password.update');
+    Route::patch('/profile/reviews/{review}', [ProfileController::class, 'updateReview'])
+        ->name('frontend.profile.reviews.update');
     Route::get('/booking-ticket', [FrontendBookingController::class, 'index'])
         ->name('ticket.booking');
     Route::get('/booking-ticket/product/{slug}', [FrontendBookingController::class, 'product'])
@@ -177,6 +179,7 @@ Route::prefix('admin')
 
         // ── Pengaturan Sistem (manage_users) ──────────────────────────────────
         Route::middleware('permission:manage_users')->group(function () {
+            Route::post('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
             Route::resource('users', UserController::class)->except(['show']);
             Route::resource('roles', RoleController::class)->except(['show']);
 

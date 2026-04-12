@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,10 +23,20 @@ class AuthenticatedSessionController extends Controller
         ]);
 
         $remember = (bool) ($validated['remember'] ?? false);
+        $user = User::query()
+            ->where('email', $validated['email'])
+            ->first();
+
+        if ($user && ! $user->is_active) {
+            return back()
+                ->withErrors(['email' => 'Akun ini sudah dinonaktifkan. Silakan hubungi admin.'])
+                ->onlyInput('email');
+        }
 
         if (! Auth::attempt([
             'email' => $validated['email'],
             'password' => $validated['password'],
+            'is_active' => true,
         ], $remember)) {
             return back()
                 ->withErrors(['email' => 'Email atau password salah.'])

@@ -99,8 +99,8 @@
     </section>
 @endif
 
-<section id="home" class="{{ ! empty($pendingGuestBooking) ? '' : 'pt-16 sm:pt-20 md:pt-24' }}">
-    <div class="relative overflow-hidden bg-slate-900">
+<section id="home" class="overflow-x-hidden {{ ! empty($pendingGuestBooking) ? '' : 'pt-16 sm:pt-20 md:pt-24' }}">
+    <div class="relative overflow-hidden bg-white">
         <div id="hero-slider" class="absolute inset-0">
             @foreach ($heroSlides as $index => $slide)
                 <article
@@ -208,7 +208,7 @@
         </div>
     </div>
 
-    <div class="border-b border-border bg-white">
+    <div class="bg-white">
         <div class="mx-auto max-w-[1920px] px-4 py-4 md:px-8 md:py-5">
             <form action="{{ route('frontend.home') }}" method="GET" class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(220px,0.9fr)_minmax(220px,0.9fr)_260px] xl:items-end">
                 <div class="grid grid-cols-1 gap-4">

@@ -38,7 +38,8 @@
                             <label class="capolaga-form-label">Account Information</label>
                             <div class="text-muted small">
                                 Created at: {{ $user->created_at?->format('d M Y H:i') ?? '-' }} |
-                                Last updated: {{ $user->updated_at?->format('d M Y H:i') ?? '-' }}
+                                Last updated: {{ $user->updated_at?->format('d M Y H:i') ?? '-' }} |
+                                Status: {{ $user->is_active ? 'Aktif' : 'Nonaktif' }}
                             </div>
                         </div>
 

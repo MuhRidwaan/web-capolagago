@@ -8,12 +8,16 @@ use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query()->with('roles')->orderBy('name');
+        $query = User::query()
+            ->with('roles')
+            ->orderByDesc('is_active')
+            ->orderBy('name');
 
         if ($request->filled('q')) {
             $q = trim((string) $request->string('q'));
@@ -47,6 +51,7 @@ class UserController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => $validated['password'],
+            'is_active' => true,
         ]);
 
         $user->syncRoles($validated['roles'] ?? []);
@@ -90,16 +95,37 @@ class UserController extends Controller
     public function destroy(Request $request, User $user)
     {
         if ($request->user()?->is($user)) {
-            return back()->with('error', 'Kamu tidak bisa menghapus akun sendiri.');
+            return back()->with('error', 'Kamu tidak bisa menonaktifkan akun sendiri.');
         }
 
-        if ($user->hasRole('Super Admin') && User::role('Super Admin')->count() <= 1) {
-            return back()->with('error', 'Tidak bisa menghapus Super Admin terakhir.');
+        if (! $user->is_active) {
+            return back()->with('info', 'User ini sudah nonaktif.');
         }
 
-        $user->delete();
+        if ($user->hasRole('Super Admin') && User::role('Super Admin')->where('is_active', true)->count() <= 1) {
+            return back()->with('error', 'Tidak bisa menonaktifkan Super Admin aktif terakhir.');
+        }
 
-        return back()->with('success', 'User berhasil dihapus.');
+        $user->forceFill([
+            'is_active' => false,
+        ])->save();
+
+        DB::table('sessions')->where('user_id', $user->id)->delete();
+
+        return back()->with('success', 'User berhasil dinonaktifkan.');
+    }
+
+    public function toggleStatus(Request $request, User $user)
+    {
+        if ($user->is_active) {
+            return $this->destroy($request, $user);
+        }
+
+        $user->forceFill([
+            'is_active' => true,
+        ])->save();
+
+        return back()->with('success', 'User berhasil diaktifkan kembali.');
     }
 
     /**

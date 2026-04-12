@@ -6,7 +6,7 @@
 @section('content')
 @include('frontend.layouts.header')
 
-<section class="relative overflow-hidden border-b border-slate-200 pt-20 md:pt-24">
+<section class="relative overflow-x-hidden overflow-y-hidden border-b border-slate-200 pt-20 md:pt-24">
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(45,157,168,0.16),transparent_36%),linear-gradient(135deg,#f8fafc_0%,#eef6f7_48%,#f7fbfc_100%)]"></div>
     <div class="absolute -right-20 top-20 h-64 w-64 rounded-full bg-teal-200/30 blur-3xl"></div>
     <div class="absolute -left-16 bottom-10 h-72 w-72 rounded-full bg-sky-200/30 blur-3xl"></div>
