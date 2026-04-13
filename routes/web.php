@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\PaymentSettingController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductSlotController;
+use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\PromotionController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ReviewController;
@@ -177,6 +178,11 @@ Route::prefix('admin')
 
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::redirect('/dashboard', '/admin');
+
+        // ── Profil Admin ──────────────────────────────────────────────────────
+        Route::get('/profile', [AdminProfileController::class, 'index'])->name('profile');
+        Route::patch('/profile/info', [AdminProfileController::class, 'updateInfo'])->name('profile.update-info');
+        Route::patch('/profile/password', [AdminProfileController::class, 'updatePassword'])->name('profile.update-password');
 
         // ── Pengaturan Sistem (manage_users) ──────────────────────────────────
         Route::middleware('permission:manage_users')->group(function () {

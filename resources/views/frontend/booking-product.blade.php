@@ -145,60 +145,66 @@
                 </div>
             </div>
 
-            <div id="calendar-panel" class="mt-4 hidden rounded-[2rem] border border-slate-200 bg-[#f8fafc] p-3.5 shadow-[0_18px_45px_rgba(148,163,184,0.12)] sm:rounded-3xl sm:bg-slate-50 sm:p-4">
-                <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Kalender Kuota</p>
-                    <p class="mt-3 text-2xl font-semibold tracking-tight text-slate-900 sm:mt-2 sm:text-xl" id="calendar-label">Memuat kalender...</p>
-                    <p class="mt-2 text-sm leading-6 text-slate-600 sm:mt-1 sm:text-xs">Klik tanggal untuk memilih kunjungan dan lihat sisa kuota.</p>
-                </div>
+            <div id="calendar-panel" class="fixed inset-0 z-50 hidden items-end justify-center sm:items-center" role="dialog" aria-modal="true">
+                {{-- Backdrop --}}
+                <div id="calendar-backdrop" class="absolute inset-0 bg-slate-950/50 backdrop-blur-sm"></div>
 
-                <div class="mt-5 flex items-center gap-4 sm:mt-4 sm:justify-between">
-                    <button type="button" id="calendar-prev-button" class="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-base font-semibold text-slate-700 shadow-sm transition hover:border-emerald-300 hover:text-emerald-700 sm:h-10 sm:w-10 sm:rounded-full sm:text-sm">
-                        &larr;
-                    </button>
-                    <button type="button" id="calendar-next-button" class="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-base font-semibold text-slate-700 shadow-sm transition hover:border-emerald-300 hover:text-emerald-700 sm:h-10 sm:w-10 sm:rounded-full sm:text-sm">
-                        &rarr;
-                    </button>
-                </div>
-
-                <div id="calendar-status" class="mt-5 hidden rounded-[1.75rem] border px-4 py-4 text-sm leading-7 sm:mt-4 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm"></div>
-
-                <div class="calendar-shell mx-auto mt-5 min-w-0 rounded-[2rem] border border-slate-200 bg-white p-3 shadow-[0_18px_40px_rgba(15,23,42,0.06)] sm:mt-4 sm:rounded-[28px] sm:border-emerald-100 sm:p-4">
-                    <div class="mb-2.5 grid grid-cols-7 gap-1 sm:gap-2 text-center text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-slate-500 sm:mb-3 sm:gap-1.5 sm:text-[11px] sm:tracking-[0.24em]">
-                        <div class="py-2">Min</div>
-                        <div class="py-2">Sen</div>
-                        <div class="py-2">Sel</div>
-                        <div class="py-2">Rab</div>
-                        <div class="py-2">Kam</div>
-                        <div class="py-2">Jum</div>
-                        <div class="py-2">Sab</div>
+                {{-- Modal content --}}
+                <div class="relative z-10 w-full max-w-md rounded-t-[2rem] border border-slate-200 bg-white p-5 shadow-2xl sm:rounded-[2rem] sm:p-6">
+                    {{-- Header --}}
+                    <div class="mb-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Kalender Kuota</p>
+                            <p class="mt-1 text-xl font-semibold tracking-tight text-slate-900" id="calendar-label">Memuat kalender...</p>
+                        </div>
+                        <button type="button" id="calendar-close-button"
+                            class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:bg-slate-100">
+                            ✕
+                        </button>
                     </div>
-                    <div class="rounded-[1.75rem] border border-slate-200 bg-emerald-50 p-1.5 sm:rounded-[22px] sm:bg-slate-50 sm:p-2">
-                        <div class="overflow-hidden rounded-[1.45rem] bg-white">
-                            <div id="calendar-grid" class="grid grid-cols-7 gap-1 sm:gap-2 bg-[#e8faf1] sm:gap-px sm:bg-emerald-50/60"></div>
+                    <p class="mb-4 text-xs text-slate-500">Klik tanggal untuk memilih kunjungan dan lihat sisa kuota.</p>
+
+                    <div class="flex items-center justify-between gap-4">
+                        <button type="button" id="calendar-prev-button" class="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-xs text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
+                            &larr;
+                        </button>
+                        <button type="button" id="calendar-next-button" class="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 bg-white text-xs text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
+                            &rarr;
+                        </button>
+                    </div>
+
+                    <div id="calendar-status" class="mt-4 hidden rounded-2xl border px-4 py-3 text-sm"></div>
+
+                    <div class="calendar-shell mx-auto mt-4 min-w-0 rounded-[1.5rem] border border-slate-200 bg-white p-3 shadow-sm">
+                        <div class="mb-2.5 grid grid-cols-7 gap-1 text-center text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                            <div class="py-1">Min</div>
+                            <div class="py-1">Sen</div>
+                            <div class="py-1">Sel</div>
+                            <div class="py-1">Rab</div>
+                            <div class="py-1">Kam</div>
+                            <div class="py-1">Jum</div>
+                            <div class="py-1">Sab</div>
+                        </div>
+                        <div class="rounded-[1.25rem] border border-slate-200 bg-emerald-50 p-1.5">
+                            <div class="overflow-hidden rounded-[1rem] bg-white">
+                                <div id="calendar-grid" class="grid grid-cols-7 gap-1 bg-[#e8faf1]"></div>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex flex-wrap gap-2 text-xs font-medium text-slate-600">
+                            <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-100 bg-white px-2.5 py-1.5 text-emerald-700">
+                                <span class="h-2 w-2 rounded-full bg-emerald-500"></span>Tersedia
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-white px-2.5 py-1.5 text-amber-700">
+                                <span class="h-2 w-2 rounded-full bg-amber-500"></span>Tipis/Penuh
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 rounded-full border border-rose-100 bg-white px-2.5 py-1.5 text-rose-700">
+                                <span class="h-2 w-2 rounded-full bg-rose-500"></span>Diblokir
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 text-slate-600">
+                                <span class="h-2 w-2 rounded-full bg-slate-400"></span>Belum diatur
+                            </span>
                         </div>
                     </div>
-                    <div class="mt-5 flex flex-wrap gap-2 text-xs font-medium text-slate-600 sm:mt-3 sm:text-[11px]">
-                        <span class="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-white px-3 py-2 text-emerald-700 shadow-sm sm:justify-start sm:px-2.5 sm:py-1.5">
-                            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-                            Tersedia
-                        </span>
-                        <span class="inline-flex items-center gap-2 rounded-full border border-amber-100 bg-white px-3 py-2 text-amber-700 shadow-sm sm:justify-start sm:px-2.5 sm:py-1.5">
-                            <span class="h-2 w-2 rounded-full bg-amber-500"></span>
-                            Kuota tipis / penuh
-                        </span>
-                        <span class="inline-flex items-center gap-2 rounded-full border border-rose-100 bg-white px-3 py-2 text-rose-700 shadow-sm sm:justify-start sm:px-2.5 sm:py-1.5">
-                            <span class="h-2 w-2 rounded-full bg-rose-500"></span>
-                            Diblokir
-                        </span>
-                        <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-slate-600 shadow-sm sm:justify-start sm:px-2.5 sm:py-1.5">
-                            <span class="h-2 w-2 rounded-full bg-slate-400"></span>
-                            Belum diatur
-                        </span>
-                    </div>
-                    <p class="mt-4 text-sm leading-6 text-slate-500 sm:mt-3">
-                        Pilih tanggal yang tersedia untuk kunjungan Anda.
-                    </p>
                 </div>
             </div>
 
@@ -324,7 +330,15 @@
         };
 
         const syncCalendarVisibility = () => {
-            calendarPanel.classList.toggle('hidden', !state.calendarOpen);
+            if (state.calendarOpen) {
+                calendarPanel.classList.remove('hidden');
+                calendarPanel.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+            } else {
+                calendarPanel.classList.add('hidden');
+                calendarPanel.classList.remove('flex');
+                document.body.style.overflow = '';
+            }
         };
 
         const syncSummary = () => {
@@ -440,19 +454,13 @@
             const firstDate = new Date(`${calendar.month}-01T00:00:00`);
             const firstWeekday = firstDate.getDay();
             const leadingEmptyCells = Array.from({ length: firstWeekday }, () => {
-                return `
-                    <div class="min-h-[56px] sm:min-h-[92px] opacity-30 bg-slate-100 rounded-xl pointer-events-none"></div>
-                `;
+                return `<div style="min-height:52px"></div>`;
         }).join('');
 
             const dayCells = calendar.days.map((day) => {
             const isCurrentMonth = day.date.startsWith(state.month);
             if (!isCurrentMonth) {
-                return `
-                    <div class="min-h-[56px] sm:min-h-[92px] opacity-30 bg-slate-100 rounded-xl flex items-start justify-end p-2">
-                        <span class="text-xs text-slate-400">${day.day}</span>
-                    </div>
-                `;
+                return `<div style="min-height:52px"></div>`;
             }
                 const tones = getDayToneClasses(day);
                 const isSelected = visitDateInput.value === day.date;
@@ -512,29 +520,12 @@
                         aria-label="${buttonLabel}"
                         title="${buttonLabel}"
                         ${isDisabled ? 'disabled' : ''}
-                        class="group flex min-h-[56px] flex-col rounded-[0.9rem] border px-1.5 py-1.5 text-left align-top transition ${tones.button} ${buttonStateClass} sm:min-h-[104px] sm:rounded-xl sm:border-transparent sm:bg-white sm:p-2"
+                        class="group relative flex flex-col items-center justify-center rounded-xl border py-2 text-center transition ${tones.button} ${buttonStateClass}"
+                        style="min-height:52px"
                     >
-                        <div class="flex items-start justify-between gap-1.5 sm:gap-2">
-                            <div class="flex items-center gap-1 sm:gap-2">
-                                <span class="text-[0.88rem] font-semibold ${mobileDayClass} sm:text-sm sm:font-bold sm:text-slate-900">${day.day}</span>
-                            </div>
-                            <span class="hidden rounded-full px-2 py-1 text-[9px] font-semibold leading-none sm:inline-flex sm:text-[10px] ${tones.badge}">
-                                ${quotaLabel}
-                            </span>
-                            <span class="${mobileIndicatorClass} h-2 w-2 shrink-0 rounded-full sm:hidden"></span>
-                        </div>
-                        <div class="mt-auto sm:hidden">
-                            <span class="${mobileQuotaValue !== '' ? 'inline-flex text-[0.6rem] font-semibold leading-none' : 'hidden'} ${tones.meta}">
-                                ${mobileQuotaValue}
-                            </span>
-                        </div>
-                        <div class="mt-auto hidden sm:block">
-                            <div class="rounded-2xl ${desktopCardClass} px-2 py-1.5">
-                                <p class="text-[11px] font-semibold leading-tight ${tones.meta}">
-                                    ${day.status === 'available' ? `${day.remaining_capacity} slot` : desktopStatus}
-                                </p>
-                            </div>
-                        </div>
+                        <span class="text-sm font-bold leading-none ${mobileDayClass}">${day.day}</span>
+                        ${mobileQuotaValue !== '' ? `<span class="mt-1 text-[9px] font-semibold leading-none ${tones.meta}">${mobileQuotaValue}</span>` : ''}
+                        <span class="${mobileIndicatorClass} absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full"></span>
                     </button>
                 `;
             }).join('');
@@ -674,6 +665,25 @@
             if (state.calendarOpen && !state.calendar) {
                 await loadCalendar();
             }
+        });
+
+        // Close button & backdrop
+        const calendarCloseButton = document.getElementById('calendar-close-button');
+        const calendarBackdrop = document.getElementById('calendar-backdrop');
+
+        const closeCalendarModal = () => {
+            state.calendarOpen = false;
+            syncCalendarVisibility();
+        };
+
+        if (calendarCloseButton) {
+            calendarCloseButton.addEventListener('click', closeCalendarModal);
+        }
+        if (calendarBackdrop) {
+            calendarBackdrop.addEventListener('click', closeCalendarModal);
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && state.calendarOpen) closeCalendarModal();
         });
         guestInput.addEventListener('input', () => {
             state.availability = null;

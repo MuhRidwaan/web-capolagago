@@ -167,6 +167,18 @@ class DashboardController extends Controller
                 ->where('status', 'pending')
                 ->count();
 
+            // Stats user baru dari kolom is_active & phone
+            $totalUsers = DB::table('users')->where('is_active', true)->count();
+            $newUsersThisMonth = DB::table('users')
+                ->where('is_active', true)
+                ->whereBetween(DB::raw('DATE(created_at)'), [$monthStart, $monthEnd])
+                ->count();
+            $usersWithPhone = DB::table('users')
+                ->where('is_active', true)
+                ->whereNotNull('phone')
+                ->where('phone', '!=', '')
+                ->count();
+
             $recentBookings = DB::table('bookings as b')
                 ->join('users as u', 'u.id', '=', 'b.user_id')
                 ->select('b.booking_code', 'u.name as customer_name', 'b.visit_date', 'b.status', 'b.total_amount')
@@ -213,6 +225,12 @@ class DashboardController extends Controller
                     'tone' => 'warning',
                     'meta' => $pendingPayments . ' pembayaran masih pending',
                 ],
+                [
+                    'label' => 'Member Terdaftar',
+                    'value' => number_format((float) $totalUsers, 0, ',', '.'),
+                    'tone' => 'secondary',
+                    'meta' => '+' . $newUsersThisMonth . ' baru bulan ini',
+                ],
             ];
         }
 
@@ -243,6 +261,10 @@ class DashboardController extends Controller
             'totalProducts' => (clone $productBase)->count(),
             'averageRating' => (float) ((clone $productBase)->avg('p.rating_avg') ?? 0),
             'totalReviews' => (int) ((clone $productBase)->sum('p.review_count') ?? 0),
+            'totalUsers' => $totalUsers ?? null,
+            'newUsersThisMonth' => $newUsersThisMonth ?? null,
+            'usersWithPhone' => $usersWithPhone ?? null,
+            'pendingPayments' => $pendingPayments ?? null,
         ]);
     }
 

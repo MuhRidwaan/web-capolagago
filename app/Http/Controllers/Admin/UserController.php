@@ -50,6 +50,7 @@ class UserController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
             'password' => $validated['password'],
             'is_active' => true,
         ]);
@@ -78,6 +79,7 @@ class UserController extends Controller
         $user->forceFill([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
         ]);
 
         if (! empty($validated['password'])) {

@@ -66,6 +66,14 @@
                         </div>
 
                         <div class="form-group">
+                            <label class="capolaga-form-label">No. HP</label>
+                            <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}"
+                                class="form-control capolaga-form-control @error('phone') is-invalid @enderror"
+                                placeholder="08xxxxxxxxxx" maxlength="20">
+                            @error('phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+
+                        <div class="form-group">
                             <label class="capolaga-form-label">Role <span class="capolaga-required">*</span></label>
                             <select name="roles[]" class="form-control capolaga-form-control @error('roles') is-invalid @enderror @error('roles.*') is-invalid @enderror" required>
                                 <option value="">-- Select role --</option>

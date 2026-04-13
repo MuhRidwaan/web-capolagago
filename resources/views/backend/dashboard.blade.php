@@ -233,6 +233,68 @@
                 @endforeach
             </div>
 
+            @if(!$isMitra && isset($totalUsers))
+            <div class="row mb-2">
+                <div class="col-12">
+                    <p class="text-uppercase font-weight-bold text-muted small mb-2" style="letter-spacing:.06em;">
+                        <i class="fas fa-users mr-1"></i> Statistik Member
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <div class="card capolaga-dashboard-stat mb-4">
+                        <div class="capolaga-dashboard-stat-bar bg-primary"></div>
+                        <div class="card-body d-flex align-items-center gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center mr-3"
+                                style="width:48px;height:48px;background:rgba(0,123,255,.1);flex-shrink:0;">
+                                <i class="fas fa-users text-primary"></i>
+                            </div>
+                            <div>
+                                <p class="capolaga-dashboard-stat-label mb-0">Total Member Aktif</p>
+                                <div class="capolaga-dashboard-stat-value">{{ number_format($totalUsers, 0, ',', '.') }}</div>
+                                <p class="capolaga-dashboard-stat-meta">+{{ $newUsersThisMonth }} baru bulan ini</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card capolaga-dashboard-stat mb-4">
+                        <div class="capolaga-dashboard-stat-bar bg-success"></div>
+                        <div class="card-body d-flex align-items-center gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center mr-3"
+                                style="width:48px;height:48px;background:rgba(40,167,69,.1);flex-shrink:0;">
+                                <i class="fas fa-phone text-success"></i>
+                            </div>
+                            <div>
+                                <p class="capolaga-dashboard-stat-label mb-0">Member dengan No. HP</p>
+                                <div class="capolaga-dashboard-stat-value">{{ number_format($usersWithPhone, 0, ',', '.') }}</div>
+                                <p class="capolaga-dashboard-stat-meta">
+                                    {{ $totalUsers > 0 ? round($usersWithPhone / $totalUsers * 100) : 0 }}% dari total member
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card capolaga-dashboard-stat mb-4">
+                        <div class="capolaga-dashboard-stat-bar bg-warning"></div>
+                        <div class="card-body d-flex align-items-center gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center mr-3"
+                                style="width:48px;height:48px;background:rgba(255,193,7,.1);flex-shrink:0;">
+                                <i class="fas fa-clock text-warning"></i>
+                            </div>
+                            <div>
+                                <p class="capolaga-dashboard-stat-label mb-0">Pembayaran Pending</p>
+                                <div class="capolaga-dashboard-stat-value">{{ number_format($pendingPayments, 0, ',', '.') }}</div>
+                                <p class="capolaga-dashboard-stat-meta">
+                                    <a href="{{ route('admin.payments.index') }}" class="text-warning">Lihat semua →</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             @php
                 $statusCards = [
                     'pending' => ['label' => 'Pending', 'tone' => 'secondary'],
