@@ -319,11 +319,17 @@
     // Select2 untuk filter produk
     $('#filter-product').select2({ theme: 'bootstrap4', width: '100%' });
 
-    // Select2 untuk dropdown produk di modal generate
-    $('#modalGenerate select[name=product_id]').select2({
-        theme: 'bootstrap4',
-        width: '100%',
-        placeholder: '-- Pilih Produk --',
+    // Select2 untuk dropdown produk di modal generate — init saat modal dibuka
+    $('#modalGenerate').on('shown.bs.modal', function () {
+        const $select = $(this).find('select[name=product_id]');
+        if (!$select.hasClass('select2-hidden-accessible')) {
+            $select.select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                placeholder: '-- Pilih Produk --',
+                dropdownParent: $('#modalGenerate'),
+            });
+        }
     });
 
     // Select2 untuk dropdown status inline bulk action
@@ -409,7 +415,7 @@
     });
 
     // Auto-fill total_slots dari max_capacity produk di modal generate
-    $('#modalGenerate select[name=product_id]').on('change', function () {
+    $('#modalGenerate').on('change', 'select[name=product_id]', function () {
         const cap = $(this).find(':selected').data('capacity');
         if (cap) $('#gen_total_slots').val(cap);
     });

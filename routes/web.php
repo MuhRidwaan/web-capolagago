@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\PaymentSettingController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductSlotController;
+use App\Http\Controllers\Admin\PromotionController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\RoleController;
@@ -233,6 +234,18 @@ Route::prefix('admin')
         Route::middleware('permission:manage_users|manage_products')->group(function () {
             Route::resource('mitra', MitraController::class)->parameters(['mitra' => 'mitra'])->except(['show']);
             Route::patch('/mitra/{mitra}/status', [MitraController::class, 'updateStatus'])->name('mitra.status');
+        });
+
+        // ── Promosi (manage_products) ─────────────────────────────────────────
+        Route::middleware('permission:manage_products')->group(function () {
+            Route::get('/promotions', [PromotionController::class, 'index'])->name('promotions.index');
+            Route::get('/promotions/create', [PromotionController::class, 'create'])->name('promotions.create');
+            Route::post('/promotions', [PromotionController::class, 'store'])->name('promotions.store');
+            Route::get('/promotions/{id}/edit', [PromotionController::class, 'edit'])->name('promotions.edit');
+            Route::put('/promotions/{id}', [PromotionController::class, 'update'])->name('promotions.update');
+            Route::post('/promotions/{id}/toggle', [PromotionController::class, 'toggleActive'])->name('promotions.toggle');
+            Route::delete('/promotions/{id}', [PromotionController::class, 'destroy'])->name('promotions.destroy');
+            Route::get('/promo-types', [PromotionController::class, 'types'])->name('promo-types.index');
         });
 
         // ── Laporan (view_reports) ────────────────────────────────────────────
